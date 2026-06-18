@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     cmake \
     git \
     curl \
-    gcc-riscv64-unknown-elf \
+    g++-riscv64-linux-gnu \
     texlive-latex-extra \
     texlive-lang-spanish \
     texlive-publishers \
