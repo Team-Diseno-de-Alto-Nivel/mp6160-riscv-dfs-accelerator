@@ -17,6 +17,8 @@
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{textcomp}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, shapes, fit}
 
 % --- Comando auxiliar para marcar huecos de referencias de los companeros.
 % Cada \pend{...} es un punto donde falta insertar una cita o afinar texto.
@@ -242,6 +244,78 @@ instrucci\'on utilizada es: \textit{``consolida la informaci\'on que te dimos
 de los 10 art\'iculos y c\'italos correctamente seg\'un la t\'ecnica con que
 mejoran el DFS''}. Todo el contenido t\'ecnico, las decisiones de dise\~no y la
 selecci\'on final de referencias fueron revisados y validados por los autores.
+
+
+\section*{Arquitectura propuesta}
+
+\subsection{Flujo de operación del acelerador DFS}
+
+La arquitectura propuesta implementa un acelerador hardware especializado para la
+ejecución del algoritmo Depth First Search (DFS) sobre matrices 2D. El sistema
+desplaza la carga computacional desde el procesador principal hacia una unidad
+dedicada en FPGA, compuesta por módulos de control, exploración y almacenamiento
+del estado de búsqueda. El flujo de operación se divide en las siguientes etapas:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.17]{images/diagrama_segundo_nivel.png}
+    \caption{Arquitectura propuesta del acelerador hardware DFS para exploración de matrices 2D.
+             El sistema separa la ejecución del algoritmo DFS del procesador principal mediante un
+            motor especializado en FPGA compuesto por módulos de control, exploración y memoria.}
+    \label{fig:diagrama_segundo_nivel}
+\end{figure}
+
+\subsubsection{Configuración y carga de datos}
+
+Inicialmente, el sistema host, basado en un procesador CPU/RISC-V, envía la
+información necesaria para iniciar la búsqueda. Esta información incluye la
+matriz 2D de entrada, la posición inicial del recorrido y los parámetros de
+configuración del algoritmo. La matriz es almacenada en la memoria
+\textit{Grid Memory}, mientras que la memoria de nodos visitados
+(\textit{Visited Memory}) es inicializada para evitar recorridos repetidos.
+
+\subsubsection{Control de ejecución}
+
+El módulo \textit{DFS Controller} administra la secuencia de operaciones del
+acelerador mediante una máquina de estados finitos (FSM). Este controlador
+coordina las etapas de lectura de nodos, exploración de vecinos, actualización
+del estado de memoria y finalización del recorrido. De esta forma, se mantiene
+el flujo de ejecución del algoritmo DFS sin requerir intervención continua del
+procesador principal.
+
+\subsubsection{Generación de vecinos}
+
+El módulo \textit{Neighbor Generator} se encarga de obtener las posiciones
+adyacentes al nodo actual dentro de la matriz 2D. Para una celda ubicada en la
+posición $(x,y)$, el hardware genera las posibles posiciones vecinas:
+$(x-1,y)$, $(x+1,y)$, $(x,y-1)$ y $(x,y+1)$. Esta operación permite realizar la
+exploración de la estructura matricial directamente en hardware, reduciendo el
+costo computacional asociado al cálculo repetitivo de vecinos.
+
+\subsubsection{Administración de la pila DFS}
+
+Debido a la naturaleza iterativa del algoritmo DFS, es necesario mantener un
+registro de los nodos pendientes de exploración. El módulo
+\textit{Stack Manager} implementa esta función mediante operaciones de
+almacenamiento y recuperación (\textit{push/pop}), permitiendo conservar el
+orden de recorrido y administrar eficientemente el estado interno de la
+búsqueda.
+
+\subsubsection{Actualización de memoria}
+
+Durante la exploración, el acelerador realiza accesos a las memorias internas
+para consultar la información de la matriz y actualizar los nodos visitados.
+La separación entre \textit{Grid Memory} y \textit{Visited Memory} permite
+mantener independiente la información de entrada y el estado dinámico del
+algoritmo, evitando exploraciones redundantes.
+
+\subsubsection{Entrega de resultados}
+
+Finalmente, cuando no existen más nodos pendientes en la pila, el controlador
+finaliza la ejecución y el módulo \textit{Result Interface} entrega la
+información generada al sistema host. Dependiendo de la aplicación, el resultado
+puede representar un camino encontrado, una región conectada o la cantidad de
+nodos explorados.
 
 %=========================================================================
 \bibliographystyle{IEEEtran}
