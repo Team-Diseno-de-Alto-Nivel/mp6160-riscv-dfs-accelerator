@@ -1,0 +1,24 @@
+{
+    "name": "DFS RISC-V Hardware Accelerator",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "postCreateCommand": "make clean && make",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "GitHub.vscode-github-actions",
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cmake-tools",
+                "ms-vscode.makefile-tools"
+            ],
+            "settings": {
+                "cmake.buildDirectory": "${workspaceFolder}/src/model/build"
+            }
+        }
+    }
+}

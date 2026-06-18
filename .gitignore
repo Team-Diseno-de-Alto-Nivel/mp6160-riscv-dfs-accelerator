@@ -1,0 +1,23 @@
+# Build artifacts
+build/
+*.o
+*.a
+*.so
+*.out
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile.cmake
+_deps/
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Editor
+.vscode/*
+!.vscode/c_cpp_properties.json
+*.swp
+*~

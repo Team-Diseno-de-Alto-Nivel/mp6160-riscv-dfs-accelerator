@@ -1,0 +1,184 @@
+%=========================================================================
+%  refs.bib  -  Referencias del proyecto
+%  Las 3 primeras entradas estan completas (fuentes aportadas).
+%  Las restantes son PLANTILLAS para que cada companero complete sus
+%  referencias indexadas (<10 anios). Objetivo total: ~10 referencias,
+%  con al menos 2 de resultados reproducibles y otras ~5 que cubran
+%  parcialmente el problema.
+%=========================================================================
+
+% ---- Definicion basica de DFS (material didactico).
+%      NOTA: fuente no indexada; el profe podria pedir reemplazarla por CLRS
+%      (Cormen et al., Introduction to Algorithms) u otra fuente indexada.
+@online{datacamp_dfs,
+  author       = {{DataCamp}},
+  title        = {Depth-First Search ({DFS}) Algorithm in {Python}},
+  year         = {2024},
+  url          = {https://www.datacamp.com/es/tutorial/depth-first-search-in-python},
+  note         = {Tutorial en l\'inea; consultado en 2026}
+}
+
+% ---- Limitaciones de CPU/memoria en recorrido de grafos (indexado, <10 anios)
+@article{giorgi2023,
+  author  = {Roberto Giorgi},
+  title   = {Distributed Large-Scale Graph Processing on {FPGAs}},
+  journal = {Journal of Big Data},
+  year    = {2023},
+  volume  = {10},
+  number  = {1},
+  pages   = {95},
+  doi     = {10.1186/s40537-023-00756-x}
+}
+
+% ---- Patrones de acceso irregular en aceleradores de grafos (indexado).
+%      VERIFICAR el booktitle exacto en ACM DL antes de la entrega final.
+@inproceedings{dann2021,
+  author    = {Jonas Dann and Daniel Ritter and Holger Fr\"oning},
+  title     = {Demystifying Memory Access Patterns of {FPGA}-Based Graph
+               Processing Accelerators},
+  booktitle = {Proc. 4th ACM SIGMOD Joint Int. Workshop on Graph Data
+               Management Experiences \& Systems (GRADES) and Network Data
+               Analytics (NDA)},
+  year      = {2021},
+  doi       = {10.1145/3461837.3464512}
+}
+
+% ---- [1] Ancla principal: paralelizan DFS, resultados reproducibles (repo HOG2)
+@misc{futuhi2025,
+  author       = {Ehsan Futuhi and Nathan R. Sturtevant},
+  title        = {A Parallel {CPU}-{GPU} Framework for Cost-Bounded {DFS}
+                  with Applications to {IDA*} and {BTS}},
+  year         = {2025},
+  eprint       = {2507.11916},
+  archivePrefix= {arXiv},
+  primaryClass = {cs.AI},
+  howpublished = {arXiv preprint arXiv:2507.11916},
+  note         = {C\'odigo basado en HOG2}
+}
+
+% ---- Backtracking/BCP en hardware (SAT). OJO: 2008, FUERA de rango (<10 anios).
+%      Datos del bibtex oficial de Microsoft Research. Contenido muy pertinente,
+%      considerar reemplazo por SAT-en-HW mas reciente si el profe lo objeta.
+%      (Clave original Microsoft: davis2008designing)
+@inproceedings{microsoftsat,
+  author    = {Davis, John and Tan, Zhangxi and Yu, Fang and Zhang, Lintao},
+  title     = {Designing an Efficient Hardware Implication Accelerator
+               for {SAT} Solving},
+  booktitle = {Int. Conf. on Theory and Applications of Satisfiability
+               Testing (SAT)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {4996},
+  pages     = {48--62},
+  year      = {2008},
+  month     = {May},
+  publisher = {Springer},
+  isbn      = {978-3-540-79718-0},
+  doi       = {10.1007/978-3-540-79719-7_6}
+}
+
+%=========================================================================
+%  REFERENCIAS DE ELICIT (DFS + hardware). El grupo recorta a ~10.
+%  Marcadas las que estan FUERA del rango <10 anios o sin DOI.
+%=========================================================================
+
+% [DFS paralelo en DAGs - NVIDIA. Indexado, con DOI. Hasta 6x vs CPU secuencial]
+@inproceedings{naumov2017,
+  author    = {Maxim Naumov and Alysson Vrielink and Michael Garland},
+  title     = {Parallel Depth-First Search for Directed Acyclic Graphs},
+  booktitle = {Proc. 7th Workshop on Irregular Applications: Architectures
+               and Algorithms (IA3)},
+  articleno = {4},
+  pages     = {1--8},
+  year      = {2017},
+  publisher = {ACM},
+  doi       = {10.1145/3149704.3149764}
+}
+
+% [DFS paralelo multicore-CPU/GPU. OJO: sin DOI y de 2014 (>10 anios)]
+@misc{yin2014,
+  author = {Yueh-Chuan Yin},
+  title  = {Parallel Depth First Search Algorithm on Multicore-{CPU} and {GPU}},
+  year   = {2014},
+  note   = {Sin DOI; verificar venue. Posiblemente fuera de rango (>10 anios)}
+}
+
+% [DFS subgraph matching en GPU. Indexado, reciente. ICDE 2024]
+@inproceedings{yuan2024,
+  author    = {Lyuheng Yuan and Da Yan and Jiao Han and Akhlaque Ahmad
+               and Yang Zhou and Zhe Jiang},
+  title     = {Faster Depth-First Subgraph Matching on {GPUs}},
+  booktitle = {2024 IEEE 40th Int. Conf. on Data Engineering (ICDE)},
+  year      = {2024},
+  doi       = {10.1109/ICDE60146.2024.00244}
+}
+
+% [Acelerador HW de recorrido con localidad. MICRO 2018. MUY relevante]
+@inproceedings{mukkara2018,
+  author    = {Anurag Mukkara and Nathan Beckmann and Maleen Abeydeera
+               and Xiaosong Ma and Daniel S\'anchez},
+  title     = {Exploiting Locality in Graph Analytics through
+               Hardware-Accelerated Traversal Scheduling},
+  booktitle = {2018 51st Annual IEEE/ACM Int. Symp. on Microarchitecture (MICRO)},
+  year      = {2018},
+  doi       = {10.1109/MICRO.2018.00010}
+}
+
+% [DFS en FPGA (Huffman). Indexado, muy reciente 2025]
+@inproceedings{mukherji2025,
+  author    = {Prachichi Mukherji and Seema Rajput and Payoshni Mankar},
+  title     = {Depth-First Search Based Accelerated {Huffman} Encoding on {FPGA}},
+  booktitle = {2025 IEEE 34th Int. Conf. on Microelectronics (MIEL)},
+  year      = {2025},
+  doi       = {10.1109/MIEL66332.2025.11260989}
+}
+
+% [Codificador Huffman de alto desempeno en FPGA. Indexado. (aportado por equipo)]
+@article{article,
+  author  = {Masood Mahammad and Appala Uppala and Shaik Hussain
+             and Anusha Marouthu},
+  title   = {{FPGA} Implementation of High-Performance {Huffman} Encoder
+             for Image Processing Applications},
+  journal = {International Journal of Reconfigurable and Embedded Systems (IJRES)},
+  year    = {2026},
+  volume  = {15},
+  number  = {1},
+  pages   = {68--77},
+  doi     = {10.11591/ijres.v15.i1.pp68-77}
+}
+
+% [DFS con reordenamiento de vertices para eficiencia de cache. (aportado por equipo)]
+@inproceedings{Lyu2021SeqDFS,
+  author    = {Qiuyi Lyu and Mo Sha and Bin Gong and Kuangda Lyu},
+  title     = {Accelerating Depth-First Traversal by Graph Ordering},
+  booktitle = {Proc. Int. Conf. on Scientific and Statistical Database
+               Management (SSDBM)},
+  year      = {2021},
+  doi       = {10.1145/3468791.3468796}
+}
+
+%=========================================================================
+%  REFERENCIAS DESCARTADAS (no citadas; fuera de rango o redundantes).
+%  Se conservan comentadas por si el grupo las necesita.
+%=========================================================================
+
+% [Acelerador HW para SAT. OJO: 2006, FUERA de rango (>10 anios).
+%  Ademas ya existe microsoftsat. Considerar eliminar.]
+@inproceedings{safar2006,
+  author    = {Mona Safar and Mohamed Shalan and M. Watheq El-Kharashi
+               and Ashraf Salem},
+  title     = {A Hardware Accelerator for {SAT} Solving},
+  booktitle = {2006 Int. Conf. on Computer Engineering and Systems (ICCES)},
+  year      = {2006},
+  doi       = {10.1109/ICCES.2006.320437},
+  note      = {FUERA DE RANGO (>10 anios); usar solo como contexto historico}
+}
+
+% [Tesis sobre computacion reconfigurable para recorrido de grafos.
+%  OJO: 2013, sin DOI, es tesis. Probablemente fuera de rango.]
+@phdthesis{betkaoui2013,
+  author = {Brahim Betkaoui},
+  title  = {Reconfigurable Computing for Large-Scale Graph Traversal Algorithms},
+  school = {Imperial College London},
+  year   = {2013},
+  note   = {Tesis doctoral; sin DOI. Posiblemente fuera de rango (>10 anios)}
+}
