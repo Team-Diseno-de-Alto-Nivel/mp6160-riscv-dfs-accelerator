@@ -8,6 +8,10 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     gcc-riscv64-unknown-elf \
+    texlive-latex-extra \
+    texlive-lang-spanish \
+    texlive-publishers \
+    latexmk \
     && rm -rf /var/lib/apt/lists/*
 
 # Pre-compile SystemC 2.3.4 so project builds skip the download step
