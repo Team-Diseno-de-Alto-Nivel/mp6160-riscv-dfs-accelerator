@@ -262,11 +262,23 @@ var\'ia la forma de la matriz (cuadrada/angosta) para medir el costo
 de esa b\'usqueda anclada en el borde.
 \end{itemize}
 
-Las m\'etricas son ciclos/tiempo simulado, instrucciones ejecutadas y
-throughput (celdas por ciclo), contra una ejecuci\'on RISC-V base sin
-acelerador. Las herramientas son SystemC 2.3.4 con TLM 2.0 para el
-modelo, y \texttt{riscv64-unknown-elf-gcc/g++} para compilar el
-software.
+El acelerador propuesto se puede habilitar o deshabilitar en tiempo
+de ejecuci\'on, por lo que cada caso se corre dos veces sobre el mismo
+modelo --con el acelerador activo y con el n\'ucleo RISC-V solo-- y
+en ambas corridas se registra:
+
+\begin{itemize}
+\item Ciclos simulados (latencia)
+\item Instrucciones ejecutadas
+\item \textit{Throughput} (celdas procesadas por ciclo)
+\item Celdas visitadas / nodos expandidos
+\item Profundidad m\'axima de pila alcanzada
+\end{itemize}
+
+El contraste entre ambas corridas, por m\'etrica, cuantifica la
+ganancia del acelerador. Las herramientas son SystemC 2.3.4 con
+TLM 2.0 para el modelo, y \texttt{riscv64-unknown-elf-gcc/g++} para
+compilar el software.
 
 %=========================================================================
 % NOTA: Las secciones siguientes NO son parte de la entrega de Semana 5.
