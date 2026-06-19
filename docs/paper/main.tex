@@ -10,6 +10,7 @@
 \IEEEoverridecommandlockouts
 
 \usepackage[spanish]{babel}      % division silabica y rotulos en espanol
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}} %Para que la tabla se llame así y no cuadro
 \usepackage[utf8]{inputenc}      % permite tildes y enie directamente
 \usepackage[T1]{fontenc}
 \usepackage{cite}
@@ -294,14 +295,11 @@ Aceleradores de grafos dispersos en FPGA con HBM
 \end{table*}
 
 \subsection{Desaf\'ios observados}
-De la revisi\'on se desprenden los desaf\'ios que motivan este trabajo: (i) el
-paralelismo de DFS se ve limitado por la contenci\'on sobre el estado
-compartido del recorrido; (ii) los accesos irregulares a memoria reducen la
-eficiencia en hardware de prop\'osito general; y (iii) las soluciones
-existentes se orientan a grafos dispersos, GPU o dominios distintos (SAT,
-\textit{subgraph matching}), sin atender el recorrido DFS sobre matrices 2D
-densas mediante un procesador RISC-V especializado. Este \'ultimo vac\'io es el
-que aborda la arquitectura propuesta en la siguiente secci\'on.
+A partir del análisis de la Sección II y la síntesis presentada en la Tabla I, se identifican los principales desafíos que motivan este trabajo.
+En primer lugar, el paralelismo de DFS se ve limitado por la contenci\'on sobre el estado compartido del recorrido.
+En segundo lugar, el recorrido sobre matrices 2D presenta patrones de acceso a memoria irregulares, lo que reduce el aprovechamiento de caché y aumenta la latencia en arquitecturas de propósito general.
+En tercer lugar, las soluciones del estado del arte se enfocan principalmente en grafos dispersos, aceleración en GPU o dominios especializados como SAT o \textit{subgraph matching}. Esto limita su aplicabilidad directa al problema de DFS sobre matrices 2D densas en un entorno embebido basado en RISC-V.
+En conjunto, estas limitaciones evidencian la ausencia de una arquitectura especializada que desacople el control del DFS del cómputo de exploración de vecinos, lo cual define el vacío arquitectónico que este trabajo aborda en la siguiente sección.
 
 %=========================================================================
 \section{Propuesta de Soluci\'on}
@@ -361,27 +359,6 @@ El contraste entre ambas corridas, por m\'etrica, cuantifica la
 ganancia del acelerador. Las herramientas son SystemC 2.3.4 con
 TLM 2.0 para el modelo, y \texttt{riscv64-unknown-elf-gcc/g++} para
 compilar el software.
-
-%=========================================================================
-% NOTA: Las secciones siguientes NO son parte de la entrega de Semana 5.
-% Se dejan comentadas como esqueleto para los avances posteriores.
-%
-% \section{Resultados y An\'alisis}                    % Avance 1 / 2
-% \section{Conclusiones y Trabajo Futuro}              % Articulo final
-%=========================================================================
-
-%=========================================================================
-\section*{Declaraci\'on sobre el uso de Inteligencia Artificial}
-Durante la elaboraci\'on de este trabajo se utilizaron herramientas de
-inteligencia artificial generativa como apoyo en tareas de validaci\'on de
-informaci\'on, mejora de la redacci\'on y consolidaci\'on de contenido. En
-particular, se emplearon para contrastar afirmaciones t\'ecnicas contra las
-fuentes citadas, refinar la claridad y el estilo del texto, y consolidar la
-informaci\'on de los trabajos del estado del arte. Un ejemplo del tipo de
-instrucci\'on utilizada es: \textit{``consolida la informaci\'on que te dimos
-de los 10 art\'iculos y c\'italos correctamente seg\'un la t\'ecnica con que
-mejoran el DFS''}. Todo el contenido t\'ecnico, las decisiones de dise\~no y la
-selecci\'on final de referencias fueron revisados y validados por los autores.
 
 
 \section*{Arquitectura propuesta}
@@ -454,6 +431,27 @@ finaliza la ejecución y el módulo \textit{Result Interface} entrega la
 información generada al sistema host. Dependiendo de la aplicación, el resultado
 puede representar un camino encontrado, una región conectada o la cantidad de
 nodos explorados.
+
+%=========================================================================
+% NOTA: Las secciones siguientes NO son parte de la entrega de Semana 5.
+% Se dejan comentadas como esqueleto para los avances posteriores.
+%
+% \section{Resultados y An\'alisis}                    % Avance 1 / 2
+% \section{Conclusiones y Trabajo Futuro}              % Articulo final
+%=========================================================================
+
+%=========================================================================
+\section*{Declaraci\'on sobre el uso de Inteligencia Artificial}
+Durante la elaboraci\'on de este trabajo se utilizaron herramientas de
+inteligencia artificial generativa como apoyo en tareas de validaci\'on de
+informaci\'on, mejora de la redacci\'on y consolidaci\'on de contenido. En
+particular, se emplearon para contrastar afirmaciones t\'ecnicas contra las
+fuentes citadas, refinar la claridad y el estilo del texto, y consolidar la
+informaci\'on de los trabajos del estado del arte. Un ejemplo del tipo de
+instrucci\'on utilizada es: \textit{``consolida la informaci\'on que te dimos
+de los 10 art\'iculos y c\'italos correctamente seg\'un la t\'ecnica con que
+mejoran el DFS''}. Todo el contenido t\'ecnico, las decisiones de dise\~no y la
+selecci\'on final de referencias fueron revisados y validados por los autores.
 
 %=========================================================================
 \bibliographystyle{IEEEtran}
