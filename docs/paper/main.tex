@@ -427,10 +427,22 @@ en ambas corridas se registra:
 \item Profundidad m\'axima de pila alcanzada
 \end{itemize}
 
+Adem\'as, a partir de la s\'intesis e implementaci\'on del acelerador
+en la FPGA se reportan las m\'etricas a nivel de \textit{hardware}:
+
+\begin{itemize}
+\item Utilizaci\'on de recursos (LUT, FF, BRAM y DSP)
+\item Frecuencia m\'axima de operaci\'on (\textit{Fmax}) y cierre de \textit{timing}
+\item \textit{Throughput} sostenido en operaciones por segundo (OP/s)
+\end{itemize}
+
 El contraste entre ambas corridas, por m\'etrica, cuantifica la
 ganancia del acelerador. Las herramientas son SystemC 2.3.4 con
-TLM 2.0 para el modelo, y \texttt{riscv64-unknown-elf-gcc/g++} para
-compilar el software.
+TLM 2.0 para el modelo y \texttt{riscv64-unknown-elf-gcc/g++} para
+compilar el software; la implementaci\'on en \textit{hardware} se
+realiza mediante s\'intesis de alto nivel (HLS) con AMD Vitis HLS
+\pend{versi\'on} y Vivado \pend{versi\'on}, sobre una FPGA AMD Kria
+KV260.
 
 %=========================================================================
 % NOTA: La secci\'on siguiente NO es parte de la entrega actual.
