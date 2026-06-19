@@ -304,65 +304,6 @@ En conjunto, estas limitaciones evidencian la ausencia de una arquitectura espec
 %=========================================================================
 \section{Propuesta de Soluci\'on}
 
-\subsection{Plan de Experimento}
-
-Para contrastar la soluci\'on propuesta frente a una ejecuci\'on RISC-V
-base, se seleccionan cinco problemas de DFS sobre matrices 2D que cubren
-los patrones de c\'omputo identificados en la Secci\'on~II, tomados de
-LeetCode \cite{leetcode}. Cada uno se ejecuta variado para forzar su
-peor caso, midiendo el costo en ciclos simulados a distintos tama\~nos
-de matriz.
-
-\begin{itemize}
-\item \textbf{Number of Islands}: cuenta regiones de celdas conectadas
-en una matriz binaria, mediante flood fill que marca cada celda
-visitada y expande hacia sus vecinas. Se var\'ia la conectividad (4/8)
-y la densidad de islas para medir el costo del patr\'on lineal en su
-mejor y peor caso.
-\item \textbf{Unique Paths III}: cuenta los caminos que visitan
-exactamente una vez cada celda transitable, mediante backtracking con
-marca y desmarca de visitado (\textit{undo}). Se var\'ia la densidad de
-obst\'aculos y el tama\~no de la matriz para medir el costo hasta el
-punto donde se vuelve impracticable.
-\item \textbf{Word Search II}: determina cu\'ales palabras de una lista
-pueden formarse recorriendo celdas adyacentes sin repetirlas, mediante
-backtracking guiado por un trie compartido que poda ramas sin prefijo
-v\'alido. Se var\'ia el tama\~no del diccionario y se quita la poda
-para medir el costo con y sin esa optimizaci\'on algor\'itmica.
-\item \textbf{Longest Increasing Path}: encuentra la longitud del
-camino m\'as largo con valores estrictamente crecientes, mediante DFS
-multi-origen con memoizaci\'on \textit{top-down} para evitar
-recomputar subcaminos. Se corre con y sin memoizaci\'on para medir el
-costo de la b\'usqueda exponencial frente a su versi\'on acotada.
-\item \textbf{Pacific Atlantic Water Flow}: encuentra las celdas desde
-las que el agua puede fluir hacia ambos oc\'eanos en los bordes
-opuestos de la matriz, mediante DFS multi-origen lanzado desde los
-bordes con dos conjuntos de visitados que se intersectan al final. Se
-var\'ia la forma de la matriz (cuadrada/angosta) para medir el costo
-de esa b\'usqueda anclada en el borde.
-\end{itemize}
-
-El acelerador propuesto se puede habilitar o deshabilitar en tiempo
-de ejecuci\'on, por lo que cada caso se corre dos veces sobre el mismo
-modelo --con el acelerador activo y con el n\'ucleo RISC-V solo-- y
-en ambas corridas se registra:
-
-\begin{itemize}
-\item Ciclos simulados (latencia)
-\item Instrucciones ejecutadas
-\item \textit{Throughput} (celdas procesadas por ciclo)
-\item Celdas visitadas / nodos expandidos
-\item Profundidad m\'axima de pila alcanzada
-\end{itemize}
-
-El contraste entre ambas corridas, por m\'etrica, cuantifica la
-ganancia del acelerador. Las herramientas son SystemC 2.3.4 con
-TLM 2.0 para el modelo, y \texttt{riscv64-unknown-elf-gcc/g++} para
-compilar el software.
-
-
-\section*{Arquitectura propuesta}
-
 \subsection{Flujo de operación del acelerador DFS}
 
 La arquitectura propuesta implementa un acelerador hardware especializado para la
@@ -433,10 +374,68 @@ puede representar un camino encontrado, una región conectada o la cantidad de
 nodos explorados.
 
 %=========================================================================
-% NOTA: Las secciones siguientes NO son parte de la entrega de Semana 5.
-% Se dejan comentadas como esqueleto para los avances posteriores.
+\section{Resultados y An\'alisis}
+
+\subsection{Plan de Experimento}
+
+Para contrastar la soluci\'on propuesta frente a una ejecuci\'on RISC-V
+base, se seleccionan cinco problemas de DFS sobre matrices 2D que cubren
+los patrones de c\'omputo identificados en la Secci\'on~II, tomados de
+LeetCode \cite{leetcode}. Cada uno se ejecuta variado para forzar su
+peor caso, midiendo el costo en ciclos simulados a distintos tama\~nos
+de matriz.
+
+\begin{itemize}
+\item \textbf{Number of Islands}: cuenta regiones de celdas conectadas
+en una matriz binaria, mediante flood fill que marca cada celda
+visitada y expande hacia sus vecinas. Se var\'ia la conectividad (4/8)
+y la densidad de islas para medir el costo del patr\'on lineal en su
+mejor y peor caso.
+\item \textbf{Unique Paths III}: cuenta los caminos que visitan
+exactamente una vez cada celda transitable, mediante backtracking con
+marca y desmarca de visitado (\textit{undo}). Se var\'ia la densidad de
+obst\'aculos y el tama\~no de la matriz para medir el costo hasta el
+punto donde se vuelve impracticable.
+\item \textbf{Word Search II}: determina cu\'ales palabras de una lista
+pueden formarse recorriendo celdas adyacentes sin repetirlas, mediante
+backtracking guiado por un trie compartido que poda ramas sin prefijo
+v\'alido. Se var\'ia el tama\~no del diccionario y se quita la poda
+para medir el costo con y sin esa optimizaci\'on algor\'itmica.
+\item \textbf{Longest Increasing Path}: encuentra la longitud del
+camino m\'as largo con valores estrictamente crecientes, mediante DFS
+multi-origen con memoizaci\'on \textit{top-down} para evitar
+recomputar subcaminos. Se corre con y sin memoizaci\'on para medir el
+costo de la b\'usqueda exponencial frente a su versi\'on acotada.
+\item \textbf{Pacific Atlantic Water Flow}: encuentra las celdas desde
+las que el agua puede fluir hacia ambos oc\'eanos en los bordes
+opuestos de la matriz, mediante DFS multi-origen lanzado desde los
+bordes con dos conjuntos de visitados que se intersectan al final. Se
+var\'ia la forma de la matriz (cuadrada/angosta) para medir el costo
+de esa b\'usqueda anclada en el borde.
+\end{itemize}
+
+El acelerador propuesto se puede habilitar o deshabilitar en tiempo
+de ejecuci\'on, por lo que cada caso se corre dos veces sobre el mismo
+modelo --con el acelerador activo y con el n\'ucleo RISC-V solo-- y
+en ambas corridas se registra:
+
+\begin{itemize}
+\item Ciclos simulados (latencia)
+\item Instrucciones ejecutadas
+\item \textit{Throughput} (celdas procesadas por ciclo)
+\item Celdas visitadas / nodos expandidos
+\item Profundidad m\'axima de pila alcanzada
+\end{itemize}
+
+El contraste entre ambas corridas, por m\'etrica, cuantifica la
+ganancia del acelerador. Las herramientas son SystemC 2.3.4 con
+TLM 2.0 para el modelo, y \texttt{riscv64-unknown-elf-gcc/g++} para
+compilar el software.
+
+%=========================================================================
+% NOTA: La secci\'on siguiente NO es parte de la entrega actual.
+% Se deja comentada como esqueleto para el art\'iculo final.
 %
-% \section{Resultados y An\'alisis}                    % Avance 1 / 2
 % \section{Conclusiones y Trabajo Futuro}              % Articulo final
 %=========================================================================
 
