@@ -290,7 +290,6 @@ Aceleradores de grafos dispersos en FPGA con HBM
 & Requiere una FPGA con HBM (plataforma específica y costosa, p.~ej. Alveo/XCU280, distinta a la KV260 disponible en este curso); está orientado a BFS sobre grafos dispersos de gran escala en formato vértice-céntrico, no a DFS con pila sobre matrices densas de tamaño pequeño/mediano; el costo del \emph{crossbar} de despacho de vértices crece con el cuadrado del número de PEs, por lo que una matriz completa puede consumir más de la mitad de los LUTs disponibles si el número de PEs es grande, limitando cuánto puede escalar el diseño antes de agotar la lógica.
 & Se dispone de una FPGA con HBM y el cuello de botella del problema es el ancho de banda de acceso aleatorio sobre un grafo disperso de gran escala procesado vértice por vértice. \\
 
-// Más fuentes
 Un acelerador de alto rendimiento y eficiencia energética para análisis de grafos
 & \cite{ham2016graphicionado}
 & Presenta una arquitectura especializada para algoritmos de grafos que integra procesamiento y memoria cercana al cómputo. Reduce significativamente los accesos a memoria externa y mejora el rendimiento energético frente a CPU y GPU.
