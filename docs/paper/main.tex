@@ -289,7 +289,20 @@ Aceleradores de grafos dispersos en FPGA con HBM
 & Escala el cómputo de BFS según los canales de memoria HBM disponibles mediante un \emph{crossbar} multi-capa y PEs de modo híbrido; ScalaBFS2 alcanza 56.92~GTEPS operando a 170--225~MHz sobre el chip Xilinx~XCU280, casi 3$\times$ el rendimiento de su versión anterior (ScalaBFS,~19.7~GTEPS) y equivalente al de GPUs de gama alta con la mitad del ancho de banda.
 & Requiere una FPGA con HBM (plataforma específica y costosa, p.~ej. Alveo/XCU280, distinta a la KV260 disponible en este curso); está orientado a BFS sobre grafos dispersos de gran escala en formato vértice-céntrico, no a DFS con pila sobre matrices densas de tamaño pequeño/mediano; el costo del \emph{crossbar} de despacho de vértices crece con el cuadrado del número de PEs, por lo que una matriz completa puede consumir más de la mitad de los LUTs disponibles si el número de PEs es grande, limitando cuánto puede escalar el diseño antes de agotar la lógica.
 & Se dispone de una FPGA con HBM y el cuello de botella del problema es el ancho de banda de acceso aleatorio sobre un grafo disperso de gran escala procesado vértice por vértice. \\
- 
+
+// Más fuentes
+Un acelerador de alto rendimiento y eficiencia energética para análisis de grafos
+& \cite{ham2016graphicionado}
+& Presenta una arquitectura especializada para algoritmos de grafos que integra procesamiento y memoria cercana al cómputo. Reduce significativamente los accesos a memoria externa y mejora el rendimiento energético frente a CPU y GPU.
+& Está orientado a grafos generales de gran escala almacenados en formatos dispersos. La complejidad del hardware y los requerimientos de memoria pueden resultar excesivos para problemas basados en matrices 2D de tamaño moderado.
+& Es especialmente adecuado cuando se procesan grafos muy grandes donde el cuello de botella principal es el acceso a memoria y se requiere maximizar throughput y eficiencia energética.
+
+Procesamiento de gráficos a gran escala en arquitecturas multi-FPGA
+\cite{dai2017foregraph}
+& Demuestra cómo particionar grafos y distribuir el procesamiento entre múltiples FPGA para escalar el rendimiento. Proporciona estrategias efectivas para balanceo de carga y comunicación entre dispositivos.
+& La complejidad de implementación aumenta considerablemente debido a la necesidad de múltiples FPGA y mecanismos de sincronización. No resulta práctico para sistemas embebidos o plataformas de bajo costo.
+& Es viable cuando se trabaja con grafos extremadamente grandes que exceden la capacidad de una única FPGA y se dispone de infraestructura multi-dispositivo.
+
 \bottomrule
 \end{tabular}
 \end{table*}
