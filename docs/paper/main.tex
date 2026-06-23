@@ -82,16 +82,15 @@ rather than improving performance \cite{giorgi2023}. For this reason,
 specialized architectures have been adopted that tailor the \textit{datapath}
 and memory to the traversal's access pattern \cite{dann2021}.
 
-This paper addresses the optimization of DFS algorithms over 2D matrices,
-using a RISC-V processor with hardware acceleration modeled in SystemC. The main idea is to identify, in the code of multiple DFS problems, the leading
+In this paper we work on making DFS faster over 2D matrices, using a RISC-V
+processor with hardware acceleration that we model in SystemC. The main idea is to identify, in the code of multiple DFS problems, the leading
 algorithmic pattern and adapt the processor to execute it in an efficient way,
 using the core as an orchestrator. Our contributions are threefold. (i) An analysis of the algorithmic pattern
 shared across DFS problems, identifying promising candidates for acceleration.
 (ii) An architecture and its SystemC model for design-space exploration before
 RTL. (iii) An experimental methodology to compare the solution against a
 baseline RISC-V execution, reporting \textit{throughput}, latency, and resource
-metrics. The acceleration mechanism and its level will be determined from the state of
-the art.
+metrics.
 
 %=========================================================================
 
@@ -103,8 +102,8 @@ optimization of memory access, and hardware specialization.
 
 \subsection{Traversal Parallelization}
 
-A common strategy involves breaking down the search space into independent tasks 
-that are executed in parallel, with dynamic load balancing. Futuhi and Sturtevant 
+One common approach is to split the search into independent tasks that run in
+parallel, sharing the work out as they go. Futuhi and Sturtevant 
 propose a CPU-GPU framework for cost-bounded DFS that separates the search and 
 heuristic evaluation phases, groups evaluations into batches, and distributes subtree 
 among asynchronous workers. This achieves an order-of-magnitude speedup on problems 
@@ -134,8 +133,8 @@ other than the dense 2D matrices addressed by this proposal.
 
 A second line of research aims to address the main obstacle in the traversal: irregular memory accesses.
 Dann \textit{et al.} have conducted a detailed study on how various FPGA-based 
-graph accelerators access memory. They have found that performance depends 
-both on computational capacity and on how data is organized in memory. Based 
+graph accelerators access memory. What they found is that speed depends on two things: how much compute the
+accelerator has, and how the data is laid out in memory. Based 
 on this, they point out that techniques such as partitioning data, processing 
 independent regions, and improving spatial and temporal locality can significantly 
 reduce access time \cite{dann2021}. Their contribution is a catalog of memory factors 
@@ -157,9 +156,9 @@ that the order of visitation is key to optimizing the traversal.
 Giorgi \textit{et al.} have addressed the limitation of devices internal memory: since this 
 forces repeated data transfers, causing transfer time to exceed computation time, 
 he proposes dividing the graph and using a distributed multi-FPGA architecture that 
-outperforms equivalent implementations on CPUs and GPUs.\cite{giorgi2023}. These solutions demonstrate 
-that memory management is just as important as computation, although they focus on 
-iterative algorithms on large-scale graphs rather than on traversing matrices.
+outperforms equivalent implementations on CPUs and GPUs.\cite{giorgi2023}. Overall, these works show that handling memory well matters
+as much as the computation, though they target iterative algorithms on large graphs
+rather than traversals over matrices.
 
 
 \subsection{Especializaci\'on en hardware reconfigurable}
@@ -243,7 +242,7 @@ Connected component labeling (CCL/CCA) on FPGA
  
 Sparse graph accelerators on FPGA with HBM
 & \cite{li2024scalabfs2}
-& Maximize BFS computation by leveraging HBM channels via a multi-layer crossbar. ScalaBFS2 hits 56.92~GTEPS on an XCU280 chip, tripling its predecessor and matching high-end GPUs at half the bandwidth.
+& Pushes BFS as far as it can go by using HBM channels through a multi-layer crossbar. ScalaBFS2 reaches 56.92~GTEPS on an XCU280 chip, three times its predecessor and on par with high-end GPUs while using half the bandwidth.
 & Requires expensive, prohibitive HBM boards, far from the course's KV260. Also, its logic is tailored for sparse BFS, not the matrix DFS of this project. Its crossbar scales quadratically, so a dense matrix would drain the LUTs fast.
 & The budget allows HBM hardware and the real bottleneck lies in random access over massive sparse graphs processed vertex by vertex. \\
  
@@ -255,7 +254,7 @@ High-performance, energy-efficient accelerator for graph analytics
  
 Large-scale graph processing on multi-FPGA architectures
 & \cite{dai2017foregraph}
-& Splits the graph to distribute the workload across multiple FPGAs and keep performance from hitting a ceiling. Its techniques for load balancing and chip communication are a great solution.
+& Splits the graph so the work is shared across several FPGAs and performance does not stall on a single chip. Its load balancing and chip-to-chip communication hold up well.
 & Synchronizing multiple FPGAs unleashes a development nightmare. That is why this option is completely out of the question if you are working with embedded systems or low-cost boards.
 & It only works if the graph overflows any single chip on the market and you happen to have a multi-FPGA hardware setup already in place. \\
 \bottomrule
@@ -263,7 +262,7 @@ Large-scale graph processing on multi-FPGA architectures
 \end{table*}
 
 \subsection{Observed Challenges}
-Based on the analysis in Section II and the summary presented in Table I, we can identify the main challenges that motivated this work. 
+From the analysis in Section II and the summary in Table I, we can pull out the main problems that pushed us to do this work. 
 The first challenge is that DFS parallelism is limited by contention over the shared traversal state. 
 Second, traversal of 2D matrices exhibits irregular memory access patterns, which reduces cache utilization and increases latency in general-purpose architectures. 
 Third, state-of-the-art solutions focus primarily on sparse graphs, GPU acceleration, or specialized domains such as SAT or subgraph matching. 
@@ -304,8 +303,8 @@ repeated traversals.
 The DFS Controller module manages the sequence of operations of the accelerator 
 using a finite state machine (FSM). This controller coordinates the stages of 
 reading nodes, exploring neighbors, updating memory state, and completing the 
-traversal. In this way, the execution flow of the DFS algorithm is maintained 
-without requiring continuous intervention from the main processor.
+traversal. Once it starts, the search runs on its own and the main processor does
+not have to step in at every node.
 
 \subsubsection{Neighbor Generation}
 
@@ -401,8 +400,8 @@ implementation is carried out through high-level synthesis (HLS) with AMD Vitis
 HLS and Vivado, targeting an AMD Kria KV260 FPGA.
 
 \section*{Artificial Intelligence Use Declaration}
-During the preparation of this paper, generative AI tools were used to help with
-tasks such as information validation, grammar, and content organization.
+While writing this paper, we used generative AI tools to help with tasks like:
+checking information, fixing grammar, and organizing content.
 Specifically, they were used to verify technical claims against the cited
 sources, improve the clarity and style of the writing, and consolidate
 information from prior state-of-the-art work. An example of the kind of prompt
