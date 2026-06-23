@@ -339,73 +339,66 @@ can represent a path found, connected region, or the number of nodes explored.
 
 \section{Results and Analysis}
 
-\subsection{Plan de Experimento}
+\subsection{Experiment Plan}
 
-Para contrastar la soluci\'on propuesta frente a una ejecuci\'on RISC-V
-base, se seleccionan cinco problemas de DFS sobre matrices 2D que cubren
-los patrones de c\'omputo identificados en la Secci\'on~II, tomados de
-LeetCode \cite{leetcode}. Cada uno se ejecuta variado para forzar su
-peor caso, midiendo el costo en ciclos simulados a distintos tama\~nos
-de matriz.
-
-\begin{itemize}
-\item \textbf{Number of Islands}: cuenta regiones de celdas conectadas
-en una matriz binaria, mediante flood fill que marca cada celda
-visitada y expande hacia sus vecinas. Se var\'ia la conectividad (4/8)
-y la densidad de islas para medir el costo del patr\'on lineal en su
-mejor y peor caso.
-\item \textbf{Unique Paths III}: cuenta los caminos que visitan
-exactamente una vez cada celda transitable, mediante backtracking con
-marca y desmarca de visitado (\textit{undo}). Se var\'ia la densidad de
-obst\'aculos y el tama\~no de la matriz para medir el costo hasta el
-punto donde se vuelve impracticable.
-\item \textbf{Word Search II}: determina cu\'ales palabras de una lista
-pueden formarse recorriendo celdas adyacentes sin repetirlas, mediante
-backtracking guiado por un trie compartido que poda ramas sin prefijo
-v\'alido. Se var\'ia el tama\~no del diccionario y se quita la poda
-para medir el costo con y sin esa optimizaci\'on algor\'itmica.
-\item \textbf{Longest Increasing Path}: encuentra la longitud del
-camino m\'as largo con valores estrictamente crecientes, mediante DFS
-multi-origen con memoizaci\'on \textit{top-down} para evitar
-recomputar subcaminos. Se corre con y sin memoizaci\'on para medir el
-costo de la b\'usqueda exponencial frente a su versi\'on acotada.
-\item \textbf{Pacific Atlantic Water Flow}: encuentra las celdas desde
-las que el agua puede fluir hacia ambos oc\'eanos en los bordes
-opuestos de la matriz, mediante DFS multi-origen lanzado desde los
-bordes con dos conjuntos de visitados que se intersectan al final. Se
-var\'ia la forma de la matriz (cuadrada/angosta) para medir el costo
-de esa b\'usqueda anclada en el borde.
-\end{itemize}
-
-El acelerador propuesto se puede habilitar o deshabilitar en tiempo
-de ejecuci\'on, por lo que cada caso se corre dos veces sobre el mismo
-modelo --con el acelerador activo y con el n\'ucleo RISC-V solo-- y
-en ambas corridas se registra:
+To benchmark the proposed solution against a RISC-V baseline, five DFS problems
+over 2D matrices were selected from LeetCode \cite{leetcode}. They cover the
+algorithmic patterns identified in Section~II. Each is executed with varied
+inputs to force its worst case, measuring the cost in simulated cycles for
+different matrix sizes.
 
 \begin{itemize}
-\item Ciclos simulados (latencia)
-\item Instrucciones ejecutadas
-\item \textit{Throughput} (celdas procesadas por ciclo)
-\item Celdas visitadas / nodos expandidos
-\item Profundidad m\'axima de pila alcanzada
+\item \textbf{Number of Islands}: counts regions of connected cells in a binary
+matrix using a flood fill that marks each visited cell and expands to its
+neighbors. Connectivity (4 and 8 neighbors) and island density are varied to
+measure the cost of the pattern in the best and worst cases.
+\item \textbf{Unique Paths III}: counts the paths that visit every walkable cell
+exactly once, using backtracking that marks and unmarks visited cells. Obstacle
+density and matrix size are varied to measure the cost
+up to the point where it becomes impractical.
+\item \textbf{Word Search II}: determines which words from a list can be formed
+by traversing adjacent cells without repeating them, using backtracking guided
+by a shared trie that skips branches without a valid prefix. Dictionary size is
+varied and pruning is removed to measure the cost with and without that
+algorithmic optimization.
+\item \textbf{Longest Increasing Path}: finds the length of the longest path
+with strictly increasing values, using multi-source DFS with \textit{top-down}
+memoization to avoid recomputing subpaths. It is run with and without
+memoization to measure the cost of the exponential search against its bounded
+version.
+\item \textbf{Pacific Atlantic Water Flow}: finds the cells from which water can
+flow to both oceans on opposite edges of the matrix, using multi-source DFS
+launched from the edges with two visited sets that intersect at the end. The
+matrix shape, square or narrow, is varied to measure the cost of that
+edge-anchored search.
 \end{itemize}
 
-Adem\'as, a partir de la s\'intesis e implementaci\'on del acelerador
-en la FPGA se reportan las m\'etricas a nivel de \textit{hardware}:
+The proposed accelerator can be turned on or off at runtime, so each case runs
+twice on the same model, once with the accelerator on and once with just the
+RISC-V core, and both runs record:
 
 \begin{itemize}
-\item Utilizaci\'on de recursos (LUT, FF, BRAM y DSP)
-\item Frecuencia m\'axima de operaci\'on (\textit{Fmax}) y cierre de \textit{timing}
-\item \textit{Throughput} sostenido en operaciones por segundo (OP/s)
+\item Simulated latency (\texttt{sc\_time})
+\item Instruction count
+\item \textit{Throughput} (cells processed per second)
+\item Visited cells and expanded nodes
+\item Peak stack depth
 \end{itemize}
 
-El contraste entre ambas corridas, por m\'etrica, cuantifica la
-ganancia del acelerador. Las herramientas son SystemC 2.3.4 con
-TLM 2.0 para el modelo y \texttt{riscv64-unknown-elf-gcc/g++} para
-compilar el software; la implementaci\'on en \textit{hardware} se
-realiza mediante s\'intesis de alto nivel (HLS) con AMD Vitis HLS
-\pend{versi\'on} y Vivado \pend{versi\'on}, sobre una FPGA AMD Kria
-KV260.
+Hardware-level metrics from synthesizing and implementing the
+accelerator on the FPGA will be collected, including:
+
+\begin{itemize}
+\item Resource usage (LUT, FF, BRAM, and DSP)
+\item Maximum operating frequency (\textit{Fmax}) and \textit{timing} closure
+\item Sustained \textit{throughput} in operations per second (OP/s)
+\end{itemize}
+
+A metric-by-metric comparison of the two runs quantifies the gain provided by
+the accelerator. The model is implemented in SystemC 2.3.4 with TLM 2.0, and the
+software is compiled with \texttt{riscv64-unknown-elf-gcc/g++}. The hardware
+implementation is carried out through high-level synthesis (HLS) with AMD Vitis
+HLS and Vivado, targeting an AMD Kria KV260 FPGA.
 
 \section*{Artificial Intelligence Use Declaration}
 Durante la elaboraci\'on de este trabajo se utilizaron herramientas de
