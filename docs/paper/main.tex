@@ -1,17 +1,9 @@
-%=========================================================================
-%  Proyecto MP6160 - Diseno de Alto Nivel de Sistemas Electronicos
-%  Estudio preliminar del estado del arte (Semana 5)
-%  Plantilla IEEE Conference (IEEEtran) - lista para Overleaf
-%
-%  Overleaf YA incluye IEEEtran. Solo subir main.tex y refs.bib,
-%  poner el compilador en pdfLaTeX y compilar.
-%=========================================================================
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
 
-\usepackage[spanish]{babel}      % division silabica y rotulos en espanol
-\addto\captionsspanish{\renewcommand{\tablename}{Tabla}} %Para que la tabla se llame así y no cuadro
-\usepackage[utf8]{inputenc}      % permite tildes y enie directamente
+\usepackage[english]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -23,28 +15,24 @@
 \usepackage{booktabs}
 \usetikzlibrary{positioning, arrows.meta, shapes, fit}
 
-% --- Comando auxiliar para marcar huecos de referencias de los companeros.
-% Cada \pend{...} es un punto donde falta insertar una cita o afinar texto.
-% Para la entrega final: reemplazar por la cita real y borrar el resaltado.
 \newcommand{\pend}[1]{\textcolor{red}{[#1]}}
 
 \begin{document}
 
-\title{Optimizaci\'on de Algoritmos Depth-First Search\\
-en Matrices 2D mediante un Procesador RISC-V\\
-con Aceleramiento por Hardware}
+\title{Optimization of Depth-First Search Algorithms\\
+on 2D Matrices using a RISC-V Processor\\
+with Hardware Acceleration}
 
 \author{
 \IEEEauthorblockN{Gabriel Abarca Aguilar, Jes\'us Alberto Castro Murillo,
-Jos\'e Fabio Jaramillo Cordero,\\ Mois\'es Leiva Solano y Noel Antonio P\'erez C\'aceres}
-\IEEEauthorblockA{\textit{Escuela de Ingenier\'ia en Electr\'onica}\\
+Jos\'e Fabio Jaramillo Cordero,\\ Mois\'es Leiva Solano and Noel Antonio P\'erez C\'aceres}
+\IEEEauthorblockA{\textit{School of Electronic Engineering}\\
 \textit{Instituto Tecnol\'ogico de Costa Rica}\\
 Costa Rica}
 }
 
 \maketitle
 
-%=========================================================================
 \begin{abstract}
 \textit{Depth-First Search} (DFS) is a fundamental traversal primitive over 2D
 matrices, underlying problems such as connected-component labeling,
@@ -64,65 +52,48 @@ Depth-First Search, RISC-V, hardware acceleration, 2D matrices, SystemC,
 architectural exploration.
 \end{IEEEkeywords}
 
-%=========================================================================
-\section{Introducci\'on}
+\section{Introduction}
 
-% --- Parrafo 1: que es DFS y donde se usa
-\textit{Depth-First Search} (DFS) es uno de los algoritmos de recorrido m\'as
-fundamentales en computaci\'on, y es el n\'ucleo de m\'ultiples problemas
-definidos sobre matrices 2D \cite{datacamp_dfs}. Al interpretar cada celda
-como un nodo conectado a sus vecinos, DFS permite descubrir conectividad,
-regiones y trayectorias dentro de la cuadr\'icula. Esta representaci\'on
-aparece en dominios distintos: \textit{pathfinding} sobre mapas de celdas en
-rob\'otica y videojuegos, etiquetado de componentes conexas y \textit{flood
-fill} en procesamiento de im\'agenes, y planificaci\'on en espacios discretos.
+\textit{Depth-First Search} (DFS) is a fundamental traversal algorithm in
+computer science, and is the core of multiple problems defined over 2D matrices
+\cite{datacamp_dfs}. By mapping each value of the matrix as a connected node,
+DFS allows us to discover connectivity, regions, and paths within it. We can
+find this kind of approach in robotics, video games, image processing,
+discrete-space planning, and connected-component labeling.
 
-% --- Parrafo 2: por que duele (complejidad)
-La eficiencia de DFS depende de c\'omo se plantee el problema sobre la matriz.
-En un recorrido simple, donde cada celda se visita una sola vez, el costo es
-lineal: $O(m \cdot n)$ en tiempo y espacio para una matriz de $m \times n$
-\cite{datacamp_dfs}. Sin embargo, muchos problemas lanzan una b\'usqueda
-independiente desde cada celda, explorando todos los caminos posibles hasta
-cierta profundidad. En estos casos el costo deja de ser lineal: con
-$m \cdot n$ or\'igenes, un factor de ramificaci\'on $b$ y caminos de longitud
-m\'axima $L$, el trabajo escala como $O(m \cdot n \cdot b^{L})$, de forma
-exponencial respecto a la longitud del camino. Este crecimiento convierte al
-recorrido DFS en el cuello de botella de estas aplicaciones y motiva explotar
-el paralelismo entre las b\'usquedas independientes.
+DFS efficiency depends on the problem. In a simple graph traversal, where each
+node is visited once, the cost is $O(m \cdot n)$ for an $m \times n$ matrix
+\cite{datacamp_dfs}. However, some problems trigger an independent search from
+each node, each performing its own DFS. Here the cost is no longer linear: with
+$m \cdot n$ origins, a branching factor $b$, and a maximum path length $L$, the
+work grows as $O(m \cdot n \cdot b^{L})$, exponentially with path length. This
+makes DFS a bottleneck in these applications and justifies exploring parallelism
+options across the independent searches.
 
-% --- Parrafo 3: por que el HW de proposito general no basta
-Estos costos se agravan sobre hardware de prop\'osito general. El recorrido de
-matrices y grafos presenta accesos a memoria irregulares y poca intensidad
-computacional, lo que degrada el desempe\~no en CPUs, cuyas jerarqu\'ias de
-cach\'e no logran explotar localidad \cite{giorgi2023, dann2021}. Adem\'as, en
-plataformas con memoria reducida la pila y el registro de visitados no siempre
-caben en la memoria interna, por lo que los datos se transfieren de forma
-repetida y el tiempo de transferencia domina sobre el de c\'omputo
-\cite{giorgi2023}. La naturaleza secuencial de DFS tambi\'en limita el
-paralelismo: al compartir el estado del recorrido, m\'ultiples hilos sobre una
-misma memoria aumentan el \textit{overhead} por contenci\'on en lugar de
-mejorar el rendimiento \cite{giorgi2023}. Por ello se han adoptado
-arquitecturas especializadas que adaptan el \textit{datapath} y la memoria al
-patr\'on de acceso del recorrido \cite{dann2021}.
+These costs intensify in general-purpose hardware. Matrix and graph traversal
+has irregular memory accesses and low arithmetic intensity, which reduces
+performance on CPUs, as their cache hierarchies fail to exploit locality
+\cite{giorgi2023, dann2021}. Also, on platforms with limited memory the stack
+and the visited set may not fit in internal memory, so data is repeatedly
+transferred and transfer time dominates compute time \cite{giorgi2023}. The
+sequential nature of DFS also limits parallelism. Since the traversal state is
+shared, multiple threads over a single memory increase contention overhead
+rather than improving performance \cite{giorgi2023}. For this reason,
+specialized architectures have been adopted that tailor the \textit{datapath}
+and memory to the traversal's access pattern \cite{dann2021}.
 
-% --- Parrafo 4: propuesta y contribuciones
-Este trabajo aborda la optimizaci\'on de algoritmos DFS sobre matrices 2D
-mediante un procesador RISC-V con aceleramiento por hardware, modelado en
-SystemC. La idea central es identificar, a partir del c\'odigo de varios
-problemas DFS, el patr\'on de c\'omputo dominante ---expansi\'on de vecinos,
-verificaci\'on de visitado y actualizaci\'on de la pila--- y especializar el
-procesador para ejecutarlo de forma eficiente, dejando al n\'ucleo RISC-V como
-secuenciador. Las contribuciones son tres: (i) un an\'alisis del patr\'on de
-c\'omputo com\'un a varios problemas DFS y la identificaci\'on de candidatos a
-aceleraci\'on; (ii) una propuesta de arquitectura y su modelo en SystemC, que
-habilita la exploraci\'on del espacio de dise\~no antes del RTL; y (iii) una
-metodolog\'ia experimental para contrastar la soluci\'on frente a una
-ejecuci\'on RISC-V base, con m\'etricas de \textit{throughput}, latencia y
-recursos. El mecanismo y el grano de la aceleraci\'on se precisar\'an a partir
-del estado del arte.
+This paper addresses the optimization of DFS algorithms over 2D matrices,
+using a RISC-V processor with hardware acceleration modeled in SystemC. The main idea is to identify, in the code of multiple DFS problems, the leading
+algorithmic pattern and adapt the processor to execute it in an efficient way,
+using the core as an orchestrator. Our contributions are threefold. (i) An analysis of the algorithmic pattern
+shared across DFS problems, identifying promising candidates for acceleration.
+(ii) An architecture and its SystemC model for design-space exploration before
+RTL. (iii) An experimental methodology to compare the solution against a
+baseline RISC-V execution, reporting \textit{throughput}, latency, and resource
+metrics. The acceleration mechanism and its level will be determined from the state of
+the art.
 
 %=========================================================================
-
 
 \section{Background and Related Work}
 
@@ -213,13 +184,8 @@ retroceso ---el coraz\'on del \textit{backtracking}--- puede ejecutarse en un
 dise\~nos atienden dominios cuyas estructuras de datos y l\'ogica de poda
 difieren del recorrido sobre matrices 2D.
 
-% =====================================================================
-% SECCIÓN NUEVA: II-E. Fortalezas y debilidades de las soluciones del SOTA
-% =====================================================================
- 
 \subsection{Strengths and Weaknesses of SOTA Solutions}
 
- 
 Table~\ref{tab:sota_fortalezas} summarizes, by line of attack, the
 strengths and weaknesses identified in Section~II, along with the
 conditions that make each approach viable (or not) for the dense 2D
@@ -235,7 +201,6 @@ accelerators on FPGA with high-bandwidth memory
 the same underlying neighborhood exploration pattern over graph or matrix
 structures as our DFS traversal.
 
- 
 \begin{table*}[t]
 \centering
 \caption{Strengths, weaknesses, and viability of SOTA solutions, by line of attack.}
@@ -263,7 +228,6 @@ Specialization in reconfigurable hardware (Huffman/SAT)
 & Proves that moving the backtracking loop to dedicated hardware speeds up the process significantly, hitting 5 to 16$\times$ over software while consuming very few LUTs in SAT and Huffman.
 & The DFS engine is completely fused with the internal domain logic. Due to this rigidity, you cannot separate it to use it as a generic search engine in other applications.
 & The problem is restricted to compression or SAT solvers where the structures and discard rules are already fixed out of the box. \\ 
- 
  
 RISC-V ISA extension for graphs
 & \cite{yenimol2022}, \cite{tang2022gpgcn}
@@ -298,7 +262,6 @@ Large-scale graph processing on multi-FPGA architectures
 \end{tabular}
 \end{table*}
 
-
 \subsection{Observed Challenges}
 Based on the analysis in Section II and the summary presented in Table I, we can identify the main challenges that motivated this work. 
 The first challenge is that DFS parallelism is limited by contention over the shared traversal state. 
@@ -308,7 +271,6 @@ This limits their direct applicability to the problem of DFS on dense 2D matrice
 Taken together, these limitations highlight the absence of a specialized architecture that decouples DFS control from neighbor exploration computation, which defines the architectural gap that this work addresses in the following section.
 
 %=========================================================================
-
 
 \section{Proposed Solution}
 
@@ -330,7 +292,6 @@ The search state is stored in the following stages:
 \end{figure}
 
 \subsubsection{Configuration and data loading}
-
 
 Initially, the host system, based on a CPU/RISC-V processor, sends the information 
 necessary to initiate the search. This information includes the input 2D grid, the 
@@ -376,8 +337,7 @@ terminates execution and the \textit{Result Interface} module delivers the gener
 information to the host system. Depending on the application, the result
 can represent a path found, connected region, or the number of nodes explored.
 
-%=========================================================================
-\section{Resultados y An\'alisis}
+\section{Results and Analysis}
 
 \subsection{Plan de Experimento}
 
@@ -447,15 +407,7 @@ realiza mediante s\'intesis de alto nivel (HLS) con AMD Vitis HLS
 \pend{versi\'on} y Vivado \pend{versi\'on}, sobre una FPGA AMD Kria
 KV260.
 
-%=========================================================================
-% NOTA: La secci\'on siguiente NO es parte de la entrega actual.
-% Se deja comentada como esqueleto para el art\'iculo final.
-%
-% \section{Conclusiones y Trabajo Futuro}              % Articulo final
-%=========================================================================
-
-%=========================================================================
-\section*{Declaraci\'on sobre el uso de Inteligencia Artificial}
+\section*{Artificial Intelligence Use Declaration}
 Durante la elaboraci\'on de este trabajo se utilizaron herramientas de
 inteligencia artificial generativa como apoyo en tareas de validaci\'on de
 informaci\'on, mejora de la redacci\'on y consolidaci\'on de contenido. En
@@ -467,7 +419,6 @@ de los 10 art\'iculos y c\'italos correctamente seg\'un la t\'ecnica con que
 mejoran el DFS''}. Todo el contenido t\'ecnico, las decisiones de dise\~no y la
 selecci\'on final de referencias fueron revisados y validados por los autores.
 
-%=========================================================================
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
 
