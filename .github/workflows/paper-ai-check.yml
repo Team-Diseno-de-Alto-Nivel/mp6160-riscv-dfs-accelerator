@@ -11,8 +11,6 @@ on:
   pull_request:
     paths:
       - 'docs/paper/**'
-      - 'scripts/ai_check.py'
-      - '.github/workflows/paper-ai-check.yml'
 
 permissions:
   contents: read
@@ -42,10 +40,12 @@ jobs:
           path: ~/.cache/huggingface
           key: hf-${{ hashFiles('scripts/ai_check.py') }}
 
+      # The script prints the full report (score + flagged sentences) to stdout
+      # and to the run Summary, then exits non-zero if it exceeds the threshold.
+      # So when this step turns red, the report is right here in its own log —
+      # and a real crash (model/deps) shows its traceback instead of being
+      # masked by a generic message.
       - name: Run AI writing check
-        id: aicheck
-        # Don't fail the job yet: we still want to post the report comment.
-        continue-on-error: true
         env:
           AI_THRESHOLD: '0.20'   # professor's rule: under 20% AI
           AI_REPORT_FILE: ai-report.md
@@ -57,9 +57,3 @@ jobs:
         with:
           file-path: ai-report.md
           comment-tag: paper-ai-check
-
-      - name: Enforce threshold
-        if: steps.aicheck.outcome == 'failure'
-        run: |
-          echo "AI-writing check exceeded the threshold. See the PR comment / job summary."
-          exit 1
