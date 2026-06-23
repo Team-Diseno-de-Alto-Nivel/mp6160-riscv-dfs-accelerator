@@ -9,8 +9,10 @@ name: Paper AI Check
 
 on:
   pull_request:
-    paths:
-      - 'docs/paper/**'
+    # TEMPORARY: paths filter commented out so the check runs on this PR for testing.
+    # Re-enable before merge so it only runs when the paper changes.
+    # paths:
+    #   - 'docs/paper/**'
 
 permissions:
   contents: read
