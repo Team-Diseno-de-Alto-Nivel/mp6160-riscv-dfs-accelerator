@@ -122,77 +122,74 @@ recursos. El mecanismo y el grano de la aceleraci\'on se precisar\'an a partir
 del estado del arte.
 
 %=========================================================================
-\section{Trabajo Previo y Antecedentes}
 
-% --- Parrafo introductorio
-El estado del arte ha abordado la aceleraci\'on de DFS y de recorridos de
-grafos desde tres frentes complementarios: la paralelizaci\'on del recorrido,
-la optimizaci\'on del acceso a memoria y la especializaci\'on en hardware. A
-continuaci\'on se revisan seg\'un la t\'ecnica que emplean para mejorar el
-desempe\~no.
 
-\subsection{Paralelizaci\'on del recorrido}
-La estrategia m\'as com\'un consiste en descomponer el espacio de b\'usqueda en
-tareas independientes ejecutadas en paralelo, con balanceo din\'amico de carga.
-Futuhi y Sturtevant proponen un marco CPU--GPU para DFS acotado por costo que
-desacopla las fases de b\'usqueda y de evaluaci\'on heur\'istica, agrupa las
-evaluaciones en lotes y reparte los sub\'arboles entre trabajadores
-as\'incronos; el resultado es una aceleraci\'on de un orden de magnitud sobre
-problemas como el cubo de Rubik y los \textit{sliding-tile puzzles}, sin perder
-la optimalidad del recorrido \cite{futuhi2025}. Su aporte para este trabajo es
-la evidencia de que las fases de un DFS pueden separarse y distribuirse, idea
-que reutilizamos al delegar el patr\'on de c\'omputo a hardware. Naumov
-\textit{et al.} atacan el problema desde la estructura del grafo: presentan un
-algoritmo paralelo \textit{work-efficient} que recorre un grafo ac\'iclico
-dirigido en un estilo similar a BFS, a lo sumo tres veces, para obtener las
-relaciones de pre-order, post-order y padre de cada nodo; su implementaci\'on
-en CUDA alcanza hasta 6$\times$ de aceleraci\'on frente al DFS secuencial en
-CPU \cite{naumov2017}. Este trabajo aporta una t\'ecnica concreta para
-extraer paralelismo de un recorrido que la teor\'ia clasifica como
-inherentemente secuencial. Yuan \textit{et al.} llevan la misma idea al
-\textit{subgraph matching}: organizan la exploraci\'on en una cola de tareas
-sin bloqueo (\textit{lock-free}) repartida entre \textit{warps} de la GPU,
-introducen un mecanismo de \textit{timeout} que reasigna las tareas rezagadas
-para mantener el balance de carga, y emplean asignaci\'on din\'amica de memoria
-para los espacios de pila \cite{yuan2024}. De aqu\'i tomamos el manejo del
-desbalance de carga entre ramas de profundidad desigual, un problema central
-en DFS. En conjunto, estos trabajos confirman que DFS expone paralelismo a
-nivel de tareas, pero todos dependen de plataformas CPU+GPU y de espacios de
-estados distintos a las matrices 2D densas que aborda esta propuesta.
+\section{Prior work and background}
 
-\subsection{Optimizaci\'on del acceso a memoria y la localidad}
-Un segundo frente ataca el principal limitante del recorrido: los accesos
-irregulares a memoria. Dann \textit{et al.} realizan una caracterizaci\'on
-detallada de los patrones de acceso de varios aceleradores de grafos sobre
-FPGA y muestran que el rendimiento depende tanto de la capacidad de c\'omputo
-como de la organizaci\'on de los datos en memoria; a partir de ello se\~nalan
-que t\'ecnicas de partici\'on de datos, procesamiento de regiones
-independientes y mejora de la localidad espacial y temporal reducen de forma
-notable el tiempo de acceso \cite{dann2021}. Su aporte es un cat\'alogo de los
-factores de memoria que un acelerador de DFS debe atender. Mukkara \textit{et
-al.} convierten ese diagn\'ostico en mecanismo: introducen \textbf{BDFS}
-(\textit{Bounded Depth-First Scheduling}), una estrategia de planificaci\'on en
-l\'inea que restringe cada n\'ucleo a explorar una regi\'on conectada del grafo
-a la vez, y \textbf{HATS}, un planificador de recorrido acelerado por hardware
-que ejecuta dicha estrategia con un \textit{overhead} de apenas $0{,}4\%$ de
-\'area adicional sobre el n\'ucleo base \cite{mukkara2018}. Este trabajo adopta
-una filosof\'ia an\'aloga a la de la presente propuesta: en lugar de reordenar
-v\'ertices de un grafo general, se especializa el \textit{datapath} de un
-n\'ucleo RISC-V para ejecutar el patr\'on dominante del DFS sobre matrices 2D,
-trasladando el principio de aceleraci\'on ligada al patr\'on de recorrido a un
-dominio estructurado y de menor escala. SeqDFS persigue el mismo objetivo
-por software, reordenando el orden de visita de los v\'ertices para mejorar la
-eficiencia de cach\'e y reducir el costo del recorrido sobre grafos dispersos
-\cite{Lyu2021SeqDFS}; ambos coinciden en que el orden de visita es una palanca
-de optimizaci\'on, idea aplicable al recorrido de una matriz. Giorgi aborda la
-limitaci\'on de memoria interna del dispositivo: como esta obliga a transferir
-datos de forma repetida ---haciendo que el tiempo de transferencia domine sobre
-el de c\'omputo---, propone un particionamiento del grafo y una arquitectura
-distribuida multi-FPGA que supera a implementaciones equivalentes en CPU y GPU
-\cite{giorgi2023}. Estas soluciones evidencian que el manejo de memoria es tan
-decisivo como el c\'omputo, aunque se orientan a algoritmos iterativos sobre
-grafos de gran escala (como \textit{PageRank}) y no al recorrido DFS sobre
-matrices.
+Current research has addressed the acceleration of depth-first search (DFS) and 
+graph traversal from three complementary approaches: parallelization of the traversal, 
+optimization of memory access, and hardware specialization.
+
+\subsection{Traversal Parallelization}
+
+A common strategy involves breaking down the search space into independent tasks 
+that are executed in parallel, with dynamic load balancing. Futuhi and Sturtevant 
+propose a CPU-GPU framework for cost-bounded DFS that separates the search and 
+heuristic evaluation phases, groups evaluations into batches, and distributes subtree 
+among asynchronous workers. This achieves an order-of-magnitude speedup on problems 
+such as the Rubiks Cube and sliding-tile puzzles, without sacrificing the optimality 
+of the traversal \cite{futuhi2025}. 
+
+Their approach suggests that the phases of a DFS can be separated and distributed, 
+an idea we reuse when offloading the computation to hardware. 
+Naumov \textit{et al.} approach the problem from the perspective of 
+graph structure. They present an efficient parallel algorithm that traverses a directed 
+acyclic graph in a manner similar to BFS—up to three times—to obtain the preorder, postorder, 
+and parent relationships for each node. Their CUDA implementation achieves up to a 6x 
+speedup compared to sequential DFS on a CPU\cite{naumov2017}. 
+
+This work provides us with a concrete technique for extracting parallelism from a 
+traversal that is theoretically considered sequential. Yuan \textit{et al.} extend 
+this idea to subgraph matching. They organize the search into a non-blocking task 
+queue distributed across GPU warps, introduce a timeout mechanism that reassigns tasks 
+to maintain load balance, and employ dynamic memory allocation for stack spaces.\cite{yuan2024}. 
+From this, we adopt the approach to managing load imbalance among branches of unequal 
+depth—a central problem in DFS. Taken together, these works confirm that DFS exposes 
+task-level parallelism. However, they all rely on CPU+GPU platforms and state spaces 
+other than the dense 2D matrices addressed by this proposal.
+
+
+\subsection{Optimizing Memory Access and Locality}
+
+A second line of research aims to address the main obstacle in the traversal: irregular memory accesses.
+Dann \textit{et al.} have conducted a detailed study on how various FPGA-based 
+graph accelerators access memory. They have found that performance depends 
+both on computational capacity and on how data is organized in memory. Based 
+on this, they point out that techniques such as partitioning data, processing 
+independent regions, and improving spatial and temporal locality can significantly 
+reduce access time \cite{dann2021}. Their contribution is a catalog of memory factors 
+that a traversal accelerator must take into account.
+
+Mukkara \textit{et al.} have developed a mechanism based on this analysis: they have introduced 
+\textbf{BDFS} (Bound Depth-First Search), an online planning strategy that limits each core 
+to exploring one connected region of the graph at a time. They have also created \textbf{HATS}, 
+a hardware-accelerated path planner that executes this strategy with very low overhead ($0{,}4\%$) \cite{mukkara2018}.
+
+
+This work follows a philosophy similar to ours: instead of reordering vertices 
+in a general graph, it specializes the datapath of a RISC-V core to execute the 
+dominant traversal pattern on 2D matrices. SeqDFS pursues the same goal through 
+software, reordering the visit sequence of vertices to improve cache efficiency 
+and reduce the cost of traversing sparse graphs. \cite{Lyu2021SeqDFS}; Both agree 
+that the order of visitation is key to optimizing the traversal.
+
+Giorgi \textit{et al.} have addressed the limitation of devices internal memory: since this 
+forces repeated data transfers, causing transfer time to exceed computation time, 
+he proposes dividing the graph and using a distributed multi-FPGA architecture that 
+outperforms equivalent implementations on CPUs and GPUs.\cite{giorgi2023}. These solutions demonstrate 
+that memory management is just as important as computation, although they focus on 
+iterative algorithms on large-scale graphs rather than on traversing matrices.
+
 
 \subsection{Especializaci\'on en hardware reconfigurable}
 Un tercer frente mapea el recorrido o su l\'ogica de control a \textit{hardware}
@@ -302,14 +299,17 @@ Large-scale graph processing on multi-FPGA architectures
 \end{table*}
 
 
-\subsection{Desaf\'ios observados}
-A partir del análisis de la Sección II y la síntesis presentada en la Tabla I, se identifican los principales desafíos que motivan este trabajo.
-En primer lugar, el paralelismo de DFS se ve limitado por la contenci\'on sobre el estado compartido del recorrido.
-En segundo lugar, el recorrido sobre matrices 2D presenta patrones de acceso a memoria irregulares, lo que reduce el aprovechamiento de caché y aumenta la latencia en arquitecturas de propósito general.
-En tercer lugar, las soluciones del estado del arte se enfocan principalmente en grafos dispersos, aceleración en GPU o dominios especializados como SAT o \textit{subgraph matching}. Esto limita su aplicabilidad directa al problema de DFS sobre matrices 2D densas en un entorno embebido basado en RISC-V.
-En conjunto, estas limitaciones evidencian la ausencia de una arquitectura especializada que desacople el control del DFS del cómputo de exploración de vecinos, lo cual define el vacío arquitectónico que este trabajo aborda en la siguiente sección.
+\subsection{Challenges Observed}
+Based on the analysis in Section II and the summary presented in Table I, we can identify the main challenges that motivated this work. 
+The first challenge is that DFS parallelism is limited by contention over the shared traversal state. 
+Second, traversal of 2D matrices exhibits irregular memory access patterns, which reduces cache utilization and increases latency in general-purpose architectures. 
+Third, state-of-the-art solutions focus primarily on sparse graphs, GPU acceleration, or specialized domains such as SAT or subgraph matching. 
+This limits their direct applicability to the problem of DFS on dense 2D matrices in a RISC-V-based embedded environment. 
+Taken together, these limitations highlight the absence of a specialized architecture that decouples DFS control from neighbor exploration computation, which defines the architectural gap that this work addresses in the following section.
 
 %=========================================================================
+
+
 \section{Proposed Solution}
 
 \subsection{DFS Accelerator Operation Flow}
