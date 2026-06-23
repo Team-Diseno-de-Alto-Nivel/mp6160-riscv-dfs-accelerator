@@ -218,93 +218,89 @@ difieren del recorrido sobre matrices 2D.
 
 % =====================================================================
 % SECCIÓN NUEVA: II-E. Fortalezas y debilidades de las soluciones del SOTA
-% IMPORTANTE: esta tabla cita 14 referencias en total -- las 7 ya
-% existentes en main.pdf como [2]-[11] MÁS las 6 nuevas al SOTA.
 % =====================================================================
  
-\subsection{Fortalezas y debilidades de las soluciones del SOTA}
+\subsection{Strengths and Weaknesses of SOTA Solutions}
+
  
-La Tabla~\ref{tab:sota_fortalezas} resume, por frente de ataque, las
-fortalezas y debilidades identificadas en la Sección~II, así como las
-condiciones bajo las cuales cada frente resulta viable o no para el
-problema de DFS sobre matrices~2D densas que aborda este trabajo. Se
-incorporan además tres frentes adicionales no cubiertos en la revisión
-original: las extensiones de ISA RISC-V orientadas a grafos
-(Yenimol~et~al.~\cite{yenimol2022} y GPGCN~\cite{tang2022gpgcn}), los
-aceleradores de etiquetado de componentes conexas (CCL/CCA) sobre FPGA
-(Union-Retire~\cite{bailey2022unionretire},
-CCL~4K~\cite{kowalczyk2021ccl4k} y
-Run-Length~CCA~\cite{appiah2008runlength}), y los aceleradores de
-recorrido de grafos dispersos sobre FPGA con memoria de alto ancho de
-banda (ScalaBFS2~\cite{li2024scalabfs2}), por compartir con el
-recorrido DFS el patrón subyacente de exploración de vecindad sobre una
-estructura matricial o de grafo.
+Table~\ref{tab:sota_fortalezas} summarizes, by line of attack, the
+strengths and weaknesses identified in Section~II, along with the
+conditions that make each approach viable (or not) for the dense 2D
+matrix DFS problem tackled in this work. We also bring in three
+additional lines not covered in the original review: graph-oriented
+RISC-V ISA extensions (Yenimol~et~al.~\cite{yenimol2022} and
+GPGCN~\cite{tang2022gpgcn}), FPGA-based connected component labeling
+(CCL/CCA) accelerators (Union-Retire~\cite{bailey2022unionretire},
+CCL~4K~\cite{kowalczyk2021ccl4k}, and
+Run-Length~CCA~\cite{appiah2008runlength}), and sparse graph traversal
+accelerators on FPGA with high-bandwidth memory
+(ScalaBFS2~\cite{li2024scalabfs2}). These are included because they share
+the same underlying neighborhood exploration pattern over graph or matrix
+structures as our DFS traversal.
+
  
 \begin{table*}[t]
 \centering
-\caption{Fortalezas, debilidades y viabilidad de las soluciones del SOTA, por frente de ataque.}
+\caption{Strengths, weaknesses, and viability of SOTA solutions, by line of attack.}
 \label{tab:sota_fortalezas}
 \renewcommand{\arraystretch}{1.15}
 \begin{tabular}{@{}p{2.6cm}p{0.9cm}p{4.6cm}p{4.6cm}p{4.0cm}@{}}
 \toprule
-\textbf{Frente} & \textbf{Refs.} & \textbf{Fortalezas} & \textbf{Debilidades / no viable cuando\ldots} & \textbf{Viable cuando\ldots} \\
+\textbf{Line} & \textbf{Refs.} & \textbf{Strengths} & \textbf{Weaknesses / not viable when\ldots} & \textbf{Viable when\ldots} \\
 \midrule
  
-Paralelización del recorrido (CPU+GPU)
+Traversal parallelization (CPU+GPU)
 & \cite{futuhi2025}, \cite{naumov2017}, \cite{yuan2024}
-& Extraen paralelismo de tareas de un algoritmo formalmente secuencial; ganancias de un orden de magnitud (DFS acotado) hasta 6$\times$ (DAG en CUDA); resuelven desbalance de carga entre ramas de profundidad desigual.
-& Dependen de la dupla CPU+GPU como plataforma, no de un núcleo embebido aislado; el espacio de estados es un grafo general o un puzzle, no una matriz~2D con vecindad fija de 4 direcciones.
-& Se dispone de GPU y el dominio es un grafo/DAG general o un espacio de estados tipo puzzle con heurística costosa de evaluar. \\
+& Extracts task parallelism from sequential algorithms, achieving order-of-magnitude gains in bounded DFS and up to 6$\times$ in CUDA. It also mitigates load imbalance between asymmetric branches.
+& Demands a hybrid CPU+GPU platform, ruling out isolated embedded cores. It is also inefficient if the state space is a regular 2D matrix, as it requires the complexity of general graphs or puzzles.
+& A GPU is available and the domain requires a general graph or a complex space with a costly metric. \\
  
-Optimización de memoria y localidad
+Memory optimization and locality
 & \cite{giorgi2023}, \cite{dann2021}
-& Catalogan los factores de memoria que dominan el costo del recorrido (partición, localidad espacial/temporal, transferencia repetida); la arquitectura multi-FPGA de Giorgi supera a CPU/GPU equivalentes cuando el grafo no cabe en un solo dispositivo.
-& Dann~et~al. es un estudio de caracterización, no propone una arquitectura ejecutable; Giorgi paga el costo de transferencia entre FPGAs si el grafo excede la memoria interna de un dispositivo; ambos atienden algoritmos iterativos (p.~ej. PageRank) sobre grafos dispersos de gran escala, no DFS sobre matrices densas.
-& El grafo es de gran escala, no cabe en la memoria interna de un solo FPGA, y el algoritmo es iterativo tipo PageRank. \\
+& Pinpoints the memory bottlenecks that bloat traversal costs, such as locality or repeated transfers. Plus, Giorgi's multi-FPGA setup beats equivalent CPU/GPUs when the graph saturates a single chip.
+& Dann's work is a theoretical analysis lacking a real hardware proposal. Meanwhile, Giorgi's solution drops in efficiency due to inter-FPGA traffic if the graph overflows. Both target iterative methods like PageRank on sparse graphs, discarding DFS on dense matrices.
+& The graph is massive, exceeds a single FPGA's capacity, and the algorithm follows an iterative PageRank-like pattern. \\ 
  
-Especialización en hardware reconfigurable (Huffman/SAT)
+Specialization in reconfigurable hardware (Huffman/SAT)
 & \cite{mukherji2025}, \cite{article}, \cite{microsoftsat}
-& Prueban que el lazo de avance/retroceso del backtracking puede ejecutarse en un datapath dedicado con ganancias sustanciales (5--16$\times$ sobre software; 6--17 ciclos por implicación en SAT); bajo uso de recursos (LUTs) y alto throughput en codificación Huffman.
-& El recorrido DFS está embebido y acoplado a la lógica del dominio (codificación Huffman o propagación de cláusulas SAT); no es extraíble como motor de recorrido genérico reutilizable para otro problema.
-& La aplicación es compresión (Huffman) o SAT solving, donde la estructura de datos y la lógica de poda del dominio ya están fijadas de antemano. \\
+& Proves that moving the backtracking loop to dedicated hardware speeds up the process significantly, hitting 5 to 16$\times$ over software while consuming very few LUTs in SAT and Huffman.
+& The DFS engine is completely fused with the internal domain logic. Due to this rigidity, you cannot separate it to use it as a generic search engine in other applications.
+& The problem is restricted to compression or SAT solvers where the structures and discard rules are already fixed out of the box. \\ 
  
-\addlinespace
-\multicolumn{5}{@{}l}{\textit{Frentes adicionales identificados (no cubiertos en la revisión original):}} \\
-\addlinespace
  
-Extensión de ISA RISC-V para grafos
+RISC-V ISA extension for graphs
 & \cite{yenimol2022}, \cite{tang2022gpgcn}
-& Ofrecen programabilidad vía instrucciones personalizadas sin sacrificar aceleración; GPGCN reporta más de 1001$\times$ y 267$\times$ de aceleración frente a CPU tradicional y CPU con extensión vectorial, respectivamente, sobre el dataset Cora.
-& Yenimol~et~al. presenta solo el diseño de la micro-arquitectura y un estudio inicial (70\,\% de reducción en accesos bloqueantes), \emph{sin implementación física ni resultados reproducibles en hardware}; GPGCN está acoplado al cómputo de GCN sobre matrices dispersas en formato CSR, no al patrón de pila (\emph{push/pop}) de un DFS.
-& Como precedente metodológico de que una ISA RISC-V extendida puede acelerar cómputo irregular sobre estructuras tipo grafo; no como solución lista para contrastar cuantitativamente con DFS sobre matrices. \\
+& Allows programming via custom instructions without losing speed. GPGCN delivers unbeatable speedups of 1001$\times$ over standard CPUs and 267$\times$ against vector extensions using the Cora dataset.
+& Yenimol's work is just a theoretical paper design, without a real chip or empirical data to back it up. GPGCN is restricted to sparse matrices in CSR format, straying completely from the push/pop stack behavior of a DFS.
+& It works strictly as a proof of concept that modifying the RISC-V ISA speeds up complex operations, but it fails as a direct alternative to compete against a matrix DFS. \\
  
-Etiquetado de componentes conexas (CCL/CCA) sobre FPGA
+Connected component labeling (CCL/CCA) on FPGA
 & \cite{bailey2022unionretire}, \cite{kowalczyk2021ccl4k}, \cite{appiah2008runlength}
-& Resuelven en hardware un caso particular de recorrido tipo \emph{flood fill} sobre matrices binarias con muy bajo uso de recursos: Union-Retire ahorra 36\,\% de memoria frente al barrido zig-zag; el módulo de Kowalczyk~et~al. sostiene 60~fps en video 4K/UHD; Run-Length logra hasta 15$\times$ sobre una implementación equivalente en software.
-& Todos están especializados en el patrón \emph{single-pass}/\emph{raster-scan} sobre imágenes binarias (conectividad de píxeles), no en el recorrido DFS general con pila explícita, múltiples orígenes o \emph{backtracking} con deshacer (\emph{undo}) que exige este proyecto; el ahorro de memoria de Union-Retire se paga con +17\,\% de lógica y +36\,\% de registros; el módulo de Kowalczyk~et~al. degrada si ocurre más de un \emph{merger} sostenido por ciclo.
-& La matriz es binaria y basta una sola pasada \emph{raster} (sin necesidad de pila explícita ni \emph{backtracking}). \\
+& Optimizes the classic flood fill in binary matrices using minimal hardware. Thus, Union-Retire cuts memory by 36\,\%, Kowalczyk's design handles 4K video at a real 60~fps, and Run-Length accelerates 15$\times$ over software.
+& They are limited to a single-pass raster scan. Lacking an explicit stack or backtracking to undo steps, they are useless for the complex DFS in this project. Also, Union-Retire demands more logic and Kowalczyk chokes on simultaneous mergers.
+& The matrix is strictly binary and can be solved with a single linear sweep, eliminating the need for stacks or return paths. \\ 
  
-Aceleradores de grafos dispersos en FPGA con HBM
+Sparse graph accelerators on FPGA with HBM
 & \cite{li2024scalabfs2}
-& Escala el cómputo de BFS según los canales de memoria HBM disponibles mediante un \emph{crossbar} multi-capa y PEs de modo híbrido; ScalaBFS2 alcanza 56.92~GTEPS operando a 170--225~MHz sobre el chip Xilinx~XCU280, casi 3$\times$ el rendimiento de su versión anterior (ScalaBFS,~19.7~GTEPS) y equivalente al de GPUs de gama alta con la mitad del ancho de banda.
-& Requiere una FPGA con HBM (plataforma específica y costosa, p.~ej. Alveo/XCU280, distinta a la KV260 disponible en este curso); está orientado a BFS sobre grafos dispersos de gran escala en formato vértice-céntrico, no a DFS con pila sobre matrices densas de tamaño pequeño/mediano; el costo del \emph{crossbar} de despacho de vértices crece con el cuadrado del número de PEs, por lo que una matriz completa puede consumir más de la mitad de los LUTs disponibles si el número de PEs es grande, limitando cuánto puede escalar el diseño antes de agotar la lógica.
-& Se dispone de una FPGA con HBM y el cuello de botella del problema es el ancho de banda de acceso aleatorio sobre un grafo disperso de gran escala procesado vértice por vértice. \\
-
-Un acelerador de alto rendimiento y eficiencia energética para análisis de grafos
+& Maximize BFS computation by leveraging HBM channels via a multi-layer crossbar. ScalaBFS2 hits 56.92~GTEPS on an XCU280 chip, tripling its predecessor and matching high-end GPUs at half the bandwidth.
+& Requires expensive, prohibitive HBM boards, far from the course's KV260. Also, its logic is tailored for sparse BFS, not the matrix DFS of this project. Its crossbar scales quadratically, so a dense matrix would drain the LUTs fast.
+& The budget allows HBM hardware and the real bottleneck lies in random access over massive sparse graphs processed vertex by vertex. \\
+ 
+High-performance, energy-efficient accelerator for graph analytics
 & \cite{ham2016graphicionado}
-& Presenta una arquitectura especializada para algoritmos de grafos que integra procesamiento y memoria cercana al cómputo. Reduce significativamente los accesos a memoria externa y mejora el rendimiento energético frente a CPU y GPU.
-& Está orientado a grafos generales de gran escala almacenados en formatos dispersos. La complejidad del hardware y los requerimientos de memoria pueden resultar excesivos para problemas basados en matrices 2D de tamaño moderado.
-& Es especialmente adecuado cuando se procesan grafos muy grandes donde el cuello de botella principal es el acceso a memoria y se requiere maximizar throughput y eficiencia energética. \\
-
-Procesamiento de gráficos a gran escala en arquitecturas multi-FPGA
+& Designs an architecture that brings memory closer to processing to cut down energy waste. By reducing external memory trips, it vastly outperforms traditional CPUs and GPUs in efficiency.
+& Targets massive sparse graphs. Because of this, if you try to apply it to moderate 2D matrices, the hardware complexity and memory demands turn into an unnecessary burden.
+& Ideal when external memory traffic chokes the system and the absolute priority is squeezing every watt of power to the max. \\
+ 
+Large-scale graph processing on multi-FPGA architectures
 & \cite{dai2017foregraph}
-& Demuestra cómo particionar grafos y distribuir el procesamiento entre múltiples FPGA para escalar el rendimiento. Proporciona estrategias efectivas para balanceo de carga y comunicación entre dispositivos.
-& La complejidad de implementación aumenta considerablemente debido a la necesidad de múltiples FPGA y mecanismos de sincronización. No resulta práctico para sistemas embebidos o plataformas de bajo costo.
-& Es viable cuando se trabaja con grafos extremadamente grandes que exceden la capacidad de una única FPGA y se dispone de infraestructura multi-dispositivo. \\
-
+& Splits the graph to distribute the workload across multiple FPGAs and keep performance from hitting a ceiling. Its techniques for load balancing and chip communication are a great solution.
+& Synchronizing multiple FPGAs unleashes a development nightmare. That is why this option is completely out of the question if you are working with embedded systems or low-cost boards.
+& It only works if the graph overflows any single chip on the market and you happen to have a multi-FPGA hardware setup already in place. \\
 \bottomrule
 \end{tabular}
 \end{table*}
+
 
 \subsection{Desaf\'ios observados}
 A partir del análisis de la Sección II y la síntesis presentada en la Tabla I, se identifican los principales desafíos que motivan este trabajo.
