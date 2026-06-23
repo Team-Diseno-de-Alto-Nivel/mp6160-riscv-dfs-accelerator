@@ -314,76 +314,71 @@ En tercer lugar, las soluciones del estado del arte se enfocan principalmente en
 En conjunto, estas limitaciones evidencian la ausencia de una arquitectura especializada que desacople el control del DFS del cómputo de exploración de vecinos, lo cual define el vacío arquitectónico que este trabajo aborda en la siguiente sección.
 
 %=========================================================================
-\section{Propuesta de Soluci\'on}
+\section{Proposed Solution}
 
-\subsection{Flujo de operación del acelerador DFS}
+\subsection{DFS Accelerator Operation Flow}
 
-La arquitectura propuesta implementa un acelerador hardware especializado para la
-ejecución del algoritmo Depth First Search (DFS) sobre matrices 2D. El sistema
-desplaza la carga computacional desde el procesador principal hacia una unidad
-dedicada en FPGA, compuesta por módulos de control, exploración y almacenamiento
-del estado de búsqueda. El flujo de operación se divide en las siguientes etapas:
+The proposed architecture implements a specialized hardware accelerator for the execution of the Depth First Search (DFS) 
+algorithm on 2D arrays. The system shifts the computational load from the main processor to a dedicated FPGA unit, 
+composed of control, exploration, and storage modules.
+
+The search state is stored in the following stages:
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.17]{images/diagrama_segundo_nivel.png}
-    \caption{Arquitectura propuesta del acelerador hardware DFS para exploración de matrices 2D.
-             El sistema separa la ejecución del algoritmo DFS del procesador principal mediante un
-            motor especializado en FPGA compuesto por módulos de control, exploración y memoria.}
+    \includegraphics[scale=0.15]{images/diagrama_segundo_nivel2.png}
+    \caption{Proposed architecture of the DFS hardware accelerator for 2D matrix scanning.
+            The system separates the execution of the DFS algorithm from the main processor using a
+            specialized FPGA engine composed of control, scanning, and memory modules.}
     \label{fig:diagrama_segundo_nivel}
 \end{figure}
 
-\subsubsection{Configuración y carga de datos}
+\subsubsection{Configuration and data loading}
 
-Inicialmente, el sistema host, basado en un procesador CPU/RISC-V, envía la
-información necesaria para iniciar la búsqueda. Esta información incluye la
-matriz 2D de entrada, la posición inicial del recorrido y los parámetros de
-configuración del algoritmo. La matriz es almacenada en la memoria
-\textit{Grid Memory}, mientras que la memoria de nodos visitados
-(\textit{Visited Memory}) es inicializada para evitar recorridos repetidos.
 
-\subsubsection{Control de ejecución}
+Initially, the host system, based on a CPU/RISC-V processor, sends the information 
+necessary to initiate the search. This information includes the input 2D grid, the 
+initial traversal position, and the algorithm's configuration parameters. The grid 
+is stored in the \textit{grid memory}, while the \textit{visited memory} is initialized to prevent 
+repeated traversals.
 
-El módulo \textit{DFS Controller} administra la secuencia de operaciones del
-acelerador mediante una máquina de estados finitos (FSM). Este controlador
-coordina las etapas de lectura de nodos, exploración de vecinos, actualización
-del estado de memoria y finalización del recorrido. De esta forma, se mantiene
-el flujo de ejecución del algoritmo DFS sin requerir intervención continua del
-procesador principal.
+\subsubsection{DFS Controller}
 
-\subsubsection{Generación de vecinos}
+The DFS Controller module manages the sequence of operations of the accelerator 
+using a finite state machine (FSM). This controller coordinates the stages of 
+reading nodes, exploring neighbors, updating memory state, and completing the 
+traversal. In this way, the execution flow of the DFS algorithm is maintained 
+without requiring continuous intervention from the main processor.
 
-El módulo \textit{Neighbor Generator} se encarga de obtener las posiciones
-adyacentes al nodo actual dentro de la matriz 2D. Para una celda ubicada en la
-posición $(x,y)$, el hardware genera las posibles posiciones vecinas:
-$(x-1,y)$, $(x+1,y)$, $(x,y-1)$ y $(x,y+1)$. Esta operación permite realizar la
-exploración de la estructura matricial directamente en hardware, reduciendo el
-costo computacional asociado al cálculo repetitivo de vecinos.
+\subsubsection{Neighbor Generation}
 
-\subsubsection{Administración de la pila DFS}
+The Neighbor Generator module is responsible for obtaining the positions 
+adjacent to the current node within the 2D matrix. A cell located at 
+position $(x,y)$, the hardware generates the possible neighboring positions: 
+$(x-1,y)$, $(x+1,y)$, $(x,y-1)$, and $(x,y+1)$. This operation allows the 
+exploration of the matrix structure directly in hardware, reducing the 
+computational cost associated with the repetitive calculation of neighbors.
 
-Debido a la naturaleza iterativa del algoritmo DFS, es necesario mantener un
-registro de los nodos pendientes de exploración. El módulo
-\textit{Stack Manager} implementa esta función mediante operaciones de
-almacenamiento y recuperación (\textit{push/pop}), permitiendo conservar el
-orden de recorrido y administrar eficientemente el estado interno de la
-búsqueda.
+\subsubsection{Stack Manager}
 
-\subsubsection{Actualización de memoria}
+Due to the iterative nature of the DFS algorithm, it is necessary to maintain a
+record of the nodes pending exploration. The Stack Manager module implements this function using
+push/pop operations, allowing the traversal order to be preserved and the internal state of the
+search to be efficiently managed.
 
-Durante la exploración, el acelerador realiza accesos a las memorias internas
-para consultar la información de la matriz y actualizar los nodos visitados.
-La separación entre \textit{Grid Memory} y \textit{Visited Memory} permite
-mantener independiente la información de entrada y el estado dinámico del
-algoritmo, evitando exploraciones redundantes.
+\subsubsection{Memory subsystem}
 
-\subsubsection{Entrega de resultados}
+During the scan, the accelerator accesses internal memories
+to query the grid information and update visited nodes.
+The separation between Grid Memory and Visited Memory allows the input information 
+and the dynamic state of the algorithm to remain independent, preventing redundant scans.
 
-Finalmente, cuando no existen más nodos pendientes en la pila, el controlador
-finaliza la ejecución y el módulo \textit{Result Interface} entrega la
-información generada al sistema host. Dependiendo de la aplicación, el resultado
-puede representar un camino encontrado, una región conectada o la cantidad de
-nodos explorados.
+\subsubsection{Result Interface}
+
+Finally, when there are no more pending nodes in the stack, the controller
+terminates execution and the \textit{Result Interface} module delivers the generated 
+information to the host system. Depending on the application, the result
+can represent a path found, connected region, or the number of nodes explored.
 
 %=========================================================================
 \section{Resultados y An\'alisis}
