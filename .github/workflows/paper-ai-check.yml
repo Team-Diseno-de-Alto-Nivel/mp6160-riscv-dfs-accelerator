@@ -1,0 +1,65 @@
+name: Paper AI Check
+
+# Early-warning AI-writing check for the paper. NOT Turnitin and not comparable
+# to it — Turnitin exposes no public API. This runs a free, local open-source
+# detector (desklib/ai-text-detector) as a proxy so the team can spot
+# AI-sounding passages before the professor reviews the paper.
+#
+# No API key or secret required. Tune AI_THRESHOLD below.
+
+on:
+  pull_request:
+    paths:
+      - 'docs/paper/**'
+      - 'scripts/ai_check.py'
+      - '.github/workflows/paper-ai-check.yml'
+
+permissions:
+  contents: read
+  pull-requests: write   # to post the sticky report comment
+
+jobs:
+  ai-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install transformers sentencepiece
+
+      - name: Cache detector model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ hashFiles('scripts/ai_check.py') }}
+
+      - name: Run AI writing check
+        id: aicheck
+        # Don't fail the job yet: we still want to post the report comment.
+        continue-on-error: true
+        env:
+          AI_THRESHOLD: '0.20'   # professor's rule: under 20% AI
+          AI_REPORT_FILE: ai-report.md
+        run: python scripts/ai_check.py docs/paper/main.tex
+
+      - name: Post report to PR
+        if: always() && hashFiles('ai-report.md') != ''
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          file-path: ai-report.md
+          comment-tag: paper-ai-check
+
+      - name: Enforce threshold
+        if: steps.aicheck.outcome == 'failure'
+        run: |
+          echo "AI-writing check exceeded the threshold. See the PR comment / job summary."
+          exit 1
