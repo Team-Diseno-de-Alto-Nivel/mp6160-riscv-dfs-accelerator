@@ -63,8 +63,7 @@ discrete-space planning, and connected-component labeling.
 
 DFS efficiency depends on the problem. In a simple graph traversal, where each
 node is visited once, the cost is $O(m \cdot n)$ for an $m \times n$ matrix
-\cite{datacamp_dfs}. However, some problems trigger an independent search from
-each node, each performing its own DFS. Here the cost is no longer linear: with
+\cite{datacamp_dfs}. But other problems launch a separate DFS from every single node. Here the cost is no longer linear: with
 $m \cdot n$ origins, a branching factor $b$, and a maximum path length $L$, the
 work grows as $O(m \cdot n \cdot b^{L})$, exponentially with path length. This
 makes DFS a bottleneck in these applications and justifies exploring parallelism
@@ -82,16 +81,15 @@ rather than improving performance \cite{giorgi2023}. For this reason,
 specialized architectures have been adopted that tailor the \textit{datapath}
 and memory to the traversal's access pattern \cite{dann2021}.
 
-This paper addresses the optimization of DFS algorithms over 2D matrices,
-using a RISC-V processor with hardware acceleration modeled in SystemC. The main idea is to identify, in the code of multiple DFS problems, the leading
+In this paper we work on making DFS faster over 2D matrices, using a RISC-V
+processor with hardware acceleration that we model in SystemC. The main idea is to identify, in the code of multiple DFS problems, the leading
 algorithmic pattern and adapt the processor to execute it in an efficient way,
 using the core as an orchestrator. Our contributions are threefold. (i) An analysis of the algorithmic pattern
 shared across DFS problems, identifying promising candidates for acceleration.
 (ii) An architecture and its SystemC model for design-space exploration before
 RTL. (iii) An experimental methodology to compare the solution against a
 baseline RISC-V execution, reporting \textit{throughput}, latency, and resource
-metrics. The acceleration mechanism and its level will be determined from the state of
-the art.
+metrics.
 
 %=========================================================================
 
@@ -103,13 +101,12 @@ optimization of memory access, and hardware specialization.
 
 \subsection{Traversal Parallelization}
 
-A common strategy involves breaking down the search space into independent tasks 
-that are executed in parallel, with dynamic load balancing. Futuhi and Sturtevant 
+A common approach is to find independent tasks that can be executed in multiple flows. Futuhi and Sturtevant 
 propose a CPU-GPU framework for cost-bounded DFS that separates the search and 
 heuristic evaluation phases, groups evaluations into batches, and distributes subtree 
-among asynchronous workers. This achieves an order-of-magnitude speedup on problems 
-such as the Rubiks Cube and sliding-tile puzzles, without sacrificing the optimality 
-of the traversal \cite{futuhi2025}. 
+among asynchronous workers. Running the heuristic checks in GPU batches makes cost-bounded DFS tens of times
+faster than doing them one at a time, on problems like the Rubiks Cube and the
+sliding-tile puzzle \cite{futuhi2025}. 
 
 Their approach suggests that the phases of a DFS can be separated and distributed, 
 an idea we reuse when offloading the computation to hardware. 
@@ -132,19 +129,17 @@ other than the dense 2D matrices addressed by this proposal.
 
 \subsection{Optimizing Memory Access and Locality}
 
-A second line of research aims to address the main obstacle in the traversal: irregular memory accesses.
 Dann \textit{et al.} have conducted a detailed study on how various FPGA-based 
-graph accelerators access memory. They have found that performance depends 
-both on computational capacity and on how data is organized in memory. Based 
+graph accelerators access memory. Speed depends on two things: how much the accelerator is being used and how the data is handled in memory. Based 
 on this, they point out that techniques such as partitioning data, processing 
 independent regions, and improving spatial and temporal locality can significantly 
 reduce access time \cite{dann2021}. Their contribution is a catalog of memory factors 
 that a traversal accelerator must take into account.
 
 Mukkara \textit{et al.} have developed a mechanism based on this analysis: they have introduced 
-\textbf{BDFS} (Bound Depth-First Search), an online planning strategy that limits each core 
-to exploring one connected region of the graph at a time. They have also created \textbf{HATS}, 
-a hardware-accelerated path planner that executes this strategy with very low overhead ($0{,}4\%$) \cite{mukkara2018}.
+\textbf{BDFS} (Bounded Depth-First Scheduling), a locality-aware scheduling strategy that keeps each core
+working on one connected region of the graph at a time. They also built \textbf{HATS},
+a hardware-accelerated traversal scheduler that runs this strategy and improves performance by up to $3.1\times$ over a locality-oblivious baseline \cite{mukkara2018}.
 
 
 This work follows a philosophy similar to ours: instead of reordering vertices 
@@ -157,32 +152,30 @@ that the order of visitation is key to optimizing the traversal.
 Giorgi \textit{et al.} have addressed the limitation of devices internal memory: since this 
 forces repeated data transfers, causing transfer time to exceed computation time, 
 he proposes dividing the graph and using a distributed multi-FPGA architecture that 
-outperforms equivalent implementations on CPUs and GPUs.\cite{giorgi2023}. These solutions demonstrate 
-that memory management is just as important as computation, although they focus on 
-iterative algorithms on large-scale graphs rather than on traversing matrices.
+outperforms equivalent implementations on CPUs and GPUs.\cite{giorgi2023}.
 
 
-\subsection{Especializaci\'on en hardware reconfigurable}
-Un tercer frente mapea el recorrido o su l\'ogica de control a \textit{hardware}
-dedicado. Mukherji \textit{et al.} implementan un DFS sobre FPGA como parte de
-un acelerador de codificaci\'on Huffman, demostrando que el recorrido puede
-mapearse de forma eficiente a hardware reconfigurable \cite{mukherji2025};
-Mahammad \textit{et al.} refuerzan esta v\'ia con un codificador Huffman dual
-de selecci\'on din\'amica de \'arboles en FPGA que reduce la latencia y el uso
-de recursos (LUTs) frente a trabajos previos, alcanzando alto \textit{throughput}
-en aplicaciones de procesamiento de im\'agenes \cite{article}. Ambos validan la
-pertinencia del hardware especializado para sistemas embebidos donde la
-velocidad y el uso de recursos son cr\'iticos. En el dominio del
-\textit{backtracking}, Davis \textit{et al.} descargan el lazo de propagaci\'on
-de restricciones de un solucionador SAT a un motor de inferencia en FPGA que
-almacena la instancia en Block RAM y particiona el problema entre varios
-motores en paralelo; el acelerador infiere implicaciones en 6 a 17 ciclos de
-reloj y resulta de 5 a 16 veces m\'as r\'apido que la soluci\'on equivalente en
-software \cite{microsoftsat}. Su aporte es la prueba de que el lazo de avance y
-retroceso ---el coraz\'on del \textit{backtracking}--- puede ejecutarse en un
-\textit{datapath} dedicado con ganancias sustanciales. No obstante, estos
-dise\~nos atienden dominios cuyas estructuras de datos y l\'ogica de poda
-difieren del recorrido sobre matrices 2D.
+% \subsection{Especializaci\'on en hardware reconfigurable}
+% Un tercer frente mapea el recorrido o su l\'ogica de control a \textit{hardware}
+% dedicado. Mukherji \textit{et al.} implementan un DFS sobre FPGA como parte de
+% un acelerador de codificaci\'on Huffman, demostrando que el recorrido puede
+% mapearse de forma eficiente a hardware reconfigurable \cite{mukherji2025};
+% Mahammad \textit{et al.} refuerzan esta v\'ia con un codificador Huffman dual
+% de selecci\'on din\'amica de \'arboles en FPGA que reduce la latencia y el uso
+% de recursos (LUTs) frente a trabajos previos, alcanzando alto \textit{throughput}
+% en aplicaciones de procesamiento de im\'agenes \cite{article}. Ambos validan la
+% pertinencia del hardware especializado para sistemas embebidos donde la
+% velocidad y el uso de recursos son cr\'iticos. En el dominio del
+% \textit{backtracking}, Davis \textit{et al.} descargan el lazo de propagaci\'on
+% de restricciones de un solucionador SAT a un motor de inferencia en FPGA que
+% almacena la instancia en Block RAM y particiona el problema entre varios
+% motores en paralelo; el acelerador infiere implicaciones en 6 a 17 ciclos de
+% reloj y resulta de 5 a 16 veces m\'as r\'apido que la soluci\'on equivalente en
+% software \cite{microsoftsat}. Su aporte es la prueba de que el lazo de avance y
+% retroceso ---el coraz\'on del \textit{backtracking}--- puede ejecutarse en un
+% \textit{datapath} dedicado con ganancias sustanciales. No obstante, estos
+% dise\~nos atienden dominios cuyas estructuras de datos y l\'ogica de poda
+% difieren del recorrido sobre matrices 2D.
 
 \subsection{Strengths and Weaknesses of SOTA Solutions}
 
@@ -232,38 +225,38 @@ Specialization in reconfigurable hardware (Huffman/SAT)
 RISC-V ISA extension for graphs
 & \cite{yenimol2022}, \cite{tang2022gpgcn}
 & Allows programming via custom instructions without losing speed. GPGCN delivers unbeatable speedups of 1001$\times$ over standard CPUs and 267$\times$ against vector extensions using the Cora dataset.
-& Yenimol's work is just a theoretical paper design, without a real chip or empirical data to back it up. GPGCN is restricted to sparse matrices in CSR format, straying completely from the push/pop stack behavior of a DFS.
+& Yenimol's work is a paper without a real chip or empirical. GPGCN is restricted to sparse matrices in CSR format, straying completely from the push/pop stack behavior of a DFS.
 & It works strictly as a proof of concept that modifying the RISC-V ISA speeds up complex operations, but it fails as a direct alternative to compete against a matrix DFS. \\
  
 Connected component labeling (CCL/CCA) on FPGA
 & \cite{bailey2022unionretire}, \cite{kowalczyk2021ccl4k}, \cite{appiah2008runlength}
-& Optimizes the classic flood fill in binary matrices using minimal hardware. Thus, Union-Retire cuts memory by 36\,\%, Kowalczyk's design handles 4K video at a real 60~fps, and Run-Length accelerates 15$\times$ over software.
-& They are limited to a single-pass raster scan. Lacking an explicit stack or backtracking to undo steps, they are useless for the complex DFS in this project. Also, Union-Retire demands more logic and Kowalczyk chokes on simultaneous mergers.
+& Optimizes the classic flood fill in binary matrices using minimal hardware. Thus, Union-Retire cuts memory by 36\,\%, Kowalczyk's design handles 4K video at a real 60~fps, and Run-Length speeds up labeling over software.
+& They only do a single raster pass. With no real stack or backtracking to undo steps, they fall short for the DFS we need here. On top of that, Union-Retire needs more logic and Kowalczyk struggles when several merges happen at once.
 & The matrix is strictly binary and can be solved with a single linear sweep, eliminating the need for stacks or return paths. \\ 
  
 Sparse graph accelerators on FPGA with HBM
 & \cite{li2024scalabfs2}
-& Maximize BFS computation by leveraging HBM channels via a multi-layer crossbar. ScalaBFS2 hits 56.92~GTEPS on an XCU280 chip, tripling its predecessor and matching high-end GPUs at half the bandwidth.
+& Pushes BFS as far as it can go by using HBM channels through a multi-layer crossbar. ScalaBFS2 reaches 56.92~GTEPS on an XCU280 chip, three times its predecessor and on par with high-end GPUs while using half the bandwidth.
 & Requires expensive, prohibitive HBM boards, far from the course's KV260. Also, its logic is tailored for sparse BFS, not the matrix DFS of this project. Its crossbar scales quadratically, so a dense matrix would drain the LUTs fast.
 & The budget allows HBM hardware and the real bottleneck lies in random access over massive sparse graphs processed vertex by vertex. \\
  
 High-performance, energy-efficient accelerator for graph analytics
 & \cite{ham2016graphicionado}
-& Designs an architecture that brings memory closer to processing to cut down energy waste. By reducing external memory trips, it vastly outperforms traditional CPUs and GPUs in efficiency.
+& Puts memory closer to the processing to waste less energy. With fewer trips out to external memory, it beats regular CPUs and GPUs on efficiency by a wide margin.
 & Targets massive sparse graphs. Because of this, if you try to apply it to moderate 2D matrices, the hardware complexity and memory demands turn into an unnecessary burden.
 & Ideal when external memory traffic chokes the system and the absolute priority is squeezing every watt of power to the max. \\
  
 Large-scale graph processing on multi-FPGA architectures
 & \cite{dai2017foregraph}
-& Splits the graph to distribute the workload across multiple FPGAs and keep performance from hitting a ceiling. Its techniques for load balancing and chip communication are a great solution.
-& Synchronizing multiple FPGAs unleashes a development nightmare. That is why this option is completely out of the question if you are working with embedded systems or low-cost boards.
-& It only works if the graph overflows any single chip on the market and you happen to have a multi-FPGA hardware setup already in place. \\
+& Splits the graph so the work is shared across several FPGAs and performance does not stall on a single chip. Its load balancing and chip-to-chip communication hold up well.
+& Synchronizing multiple FPGAs unleashes a development nightmare. Leading to leave this out if you are working with embedded systems or low-cost boards.
+& It is specific to a setup were there is a multi-FPGA hardware and the graph overflows any single chip on the market. \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
 \subsection{Observed Challenges}
-Based on the analysis in Section II and the summary presented in Table I, we can identify the main challenges that motivated this work. 
+From the analysis in Section II and the summary in Table I, we can pull out the main problems that pushed us to do this work. 
 The first challenge is that DFS parallelism is limited by contention over the shared traversal state. 
 Second, traversal of 2D matrices exhibits irregular memory access patterns, which reduces cache utilization and increases latency in general-purpose architectures. 
 Third, state-of-the-art solutions focus primarily on sparse graphs, GPU acceleration, or specialized domains such as SAT or subgraph matching. 
@@ -276,8 +269,7 @@ Taken together, these limitations highlight the absence of a specialized archite
 
 \subsection{DFS Accelerator Operation Flow}
 
-The proposed architecture implements a specialized hardware accelerator for the execution of the Depth First Search (DFS) 
-algorithm on 2D arrays. The system shifts the computational load from the main processor to a dedicated FPGA unit, 
+The proposed architecture is a hardware accelerator built to run the Depth First Search (DFS) algorithm on 2D arrays. The system shifts the computational load from the main processor to a dedicated FPGA unit, 
 composed of control, exploration, and storage modules.
 
 The search state is stored in the following stages:
@@ -304,17 +296,13 @@ repeated traversals.
 The DFS Controller module manages the sequence of operations of the accelerator 
 using a finite state machine (FSM). This controller coordinates the stages of 
 reading nodes, exploring neighbors, updating memory state, and completing the 
-traversal. In this way, the execution flow of the DFS algorithm is maintained 
-without requiring continuous intervention from the main processor.
+traversal. Once it starts, the search runs on its own and the main processor does
+not have to step in at every node.
 
 \subsubsection{Neighbor Generation}
 
 The Neighbor Generator module is responsible for obtaining the positions 
-adjacent to the current node within the 2D matrix. A cell located at 
-position $(x,y)$, the hardware generates the possible neighboring positions: 
-$(x-1,y)$, $(x+1,y)$, $(x,y-1)$, and $(x,y+1)$. This operation allows the 
-exploration of the matrix structure directly in hardware, reducing the 
-computational cost associated with the repetitive calculation of neighbors.
+adjacent to the current node within the 2D matrix. For a cell at position $(x,y)$, the hardware produces its four neighbors: $(x-1,y)$, $(x+1,y)$, $(x,y-1)$, and $(x,y+1)$. Doing this in hardware avoids recomputing neighbors over and over in software.
 
 \subsubsection{Stack Manager}
 
@@ -401,16 +389,7 @@ implementation is carried out through high-level synthesis (HLS) with AMD Vitis
 HLS and Vivado, targeting an AMD Kria KV260 FPGA.
 
 \section*{Artificial Intelligence Use Declaration}
-During the preparation of this paper, generative AI tools were used to help with
-tasks such as information validation, grammar, and content organization.
-Specifically, they were used to verify technical claims against the cited
-sources, improve the clarity and style of the writing, and consolidate
-information from prior state-of-the-art work. An example of the kind of prompt
-used is: \textit{``consolidate the information we provided on the 10 articles
-and cite them correctly according to the technique by which they improve DFS,
-whether traversal parallelization, memory access optimization, or hardware
-specialization''}. All technical content, design decisions, and the final
-selection of references were reviewed and validated by the authors.
+This paper was made with the help of generative AI tools, specifically in technical claims against the cited sources, improve the writing style, and classify information from prior state-of-the-art work. An example of the kind of prompt used is: \textit{``classify the information we provided on the 10 articles and cite them correctly according to the technique by which they improve DFS, whether traversal parallelization, memory access optimization, or hardware specialization''}. All the content, design decisions, and the final selection of references were reviewed and validated by the authors.
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}

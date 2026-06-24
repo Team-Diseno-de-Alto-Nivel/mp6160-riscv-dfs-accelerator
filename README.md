@@ -66,6 +66,7 @@ If SystemC is already installed, export `SYSTEMC_HOME` before `make` to skip the
 
 - [`build.yml`](.github/workflows/build.yml): builds the model and the program, then runs the simulation, on every push/PR touching `src/`, `Makefile`, or `.devcontainer/`.
 - [`docs.yml`](.github/workflows/docs.yml): compiles the LaTeX paper (`docs/paper/`) on every push to `main` and every PR that modifies it, uploading the resulting PDF as a downloadable artifact for preview.
+- [`paper-ai-check.yml`](.github/workflows/paper-ai-check.yml): runs an **AI-writing pre-check** on the paper for every PR touching `docs/paper/**` (see below).
 
 ---
 
