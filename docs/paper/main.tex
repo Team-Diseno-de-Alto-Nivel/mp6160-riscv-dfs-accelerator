@@ -161,28 +161,20 @@ outperforms equivalent implementations on CPUs and GPUs.\cite{giorgi2023}. These
 that memory management is just as important as computation, although they focus on 
 iterative algorithms on large-scale graphs rather than on traversing matrices.
 
+\subsection{Specialization in reconfigurable hardware}
 
-\subsection{Especializaci\'on en hardware reconfigurable}
-Un tercer frente mapea el recorrido o su l\'ogica de control a \textit{hardware}
-dedicado. Mukherji \textit{et al.} implementan un DFS sobre FPGA como parte de
-un acelerador de codificaci\'on Huffman, demostrando que el recorrido puede
-mapearse de forma eficiente a hardware reconfigurable \cite{mukherji2025};
-Mahammad \textit{et al.} refuerzan esta v\'ia con un codificador Huffman dual
-de selecci\'on din\'amica de \'arboles en FPGA que reduce la latencia y el uso
-de recursos (LUTs) frente a trabajos previos, alcanzando alto \textit{throughput}
-en aplicaciones de procesamiento de im\'agenes \cite{article}. Ambos validan la
-pertinencia del hardware especializado para sistemas embebidos donde la
-velocidad y el uso de recursos son cr\'iticos. En el dominio del
-\textit{backtracking}, Davis \textit{et al.} descargan el lazo de propagaci\'on
-de restricciones de un solucionador SAT a un motor de inferencia en FPGA que
-almacena la instancia en Block RAM y particiona el problema entre varios
-motores en paralelo; el acelerador infiere implicaciones en 6 a 17 ciclos de
-reloj y resulta de 5 a 16 veces m\'as r\'apido que la soluci\'on equivalente en
-software \cite{microsoftsat}. Su aporte es la prueba de que el lazo de avance y
-retroceso ---el coraz\'on del \textit{backtracking}--- puede ejecutarse en un
-\textit{datapath} dedicado con ganancias sustanciales. No obstante, estos
-dise\~nos atienden dominios cuyas estructuras de datos y l\'ogica de poda
-difieren del recorrido sobre matrices 2D.
+A third approach maps its control logic to dedicated \textit{hardware}. Mukherji \textit{et al.} 
+implement a DFS on an FPGA as part of a Huffman encoding accelerator, demonstrating in this way that the path can be mapped to reconfigurable hardware
+\cite{mukherji2025};  Mahammad et al. reinforce this approach with a dual dynamic tree selection Huffman encoder 
+on an FPGA that reduces latency and resource usage compared to previous work, achieving high throughput in image processing applications \cite{article}. 
+Both validate the relevance of specialized hardware for embedded systems where speed and resource usage are critical. 
+In the domain of \textit{backtracking}, Davis \textit{et al.} offload the constraint propagation 
+loop from a SAT solver to an FPGA inference engine that stores the instance in Block RAM and 
+partitions the problem among several engines in parallel. The accelerator infers implications
+in 6 to 17 clock cycles and is 5 to 16 times faster than the equivalent solution in Microsoft SAT software \cite{microsoftsat}. 
+Their contribution proves that the forward-backtracking loop—the heart of backtracking—can be executed on a dedicated
+\textit{datapath} with substantial gains. However, these designs address domains whose data structures and pruning logic differ from traversal on 2D arrays
+
 
 \subsection{Strengths and Weaknesses of SOTA Solutions}
 
