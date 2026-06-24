@@ -1,0 +1,121 @@
+name: Paper
+
+# Combined paper CI:
+#   * push to main  -> build the clean PDF only.
+#   * pull request  -> build the clean PDF, run the AI-writing check, build an
+#     annotated PDF (AI-flagged paragraphs highlighted) and post a report comment.
+#
+# The AI check is a free, local proxy (desklib/ai-text-detector). It is NOT
+# Turnitin. It fails the PR if the average AI score exceeds AI_THRESHOLD (0.18,
+# a margin below the professor's 20%). No API key or secret required.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/paper/**'
+      - '.github/workflows/paper.yml'
+  pull_request:
+    paths:
+      - 'docs/paper/**'
+      - 'scripts/ai_check.py'
+      - '.github/workflows/paper.yml'
+
+permissions:
+  contents: read
+  pull-requests: write   # to post the report comment
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # -------- AI analysis (pull requests only) --------
+      - name: Install pandoc
+        if: github.event_name == 'pull_request'
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Set up Python
+        if: github.event_name == 'pull_request'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install AI-check dependencies
+        if: github.event_name == 'pull_request'
+        # transformers pinned <4.50: the desklib model ships custom model code
+        # that breaks on the newer weight-loading refactor.
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install "transformers==4.46.3" sentencepiece
+
+      - name: Cache detector model
+        if: github.event_name == 'pull_request'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ hashFiles('scripts/ai_check.py') }}
+
+      # Gate + report + annotated .tex in one run (model loads once). Does not
+      # abort the job here, so we still build the PDFs and post the comment.
+      - name: Run AI writing check
+        id: aicheck
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          AI_THRESHOLD: '0.18'                         # margin below the 20% rule
+          AI_REPORT_FILE: ai-report.md
+          AI_ANNOTATE_OUT: docs/paper/main_annotated.tex
+        run: python scripts/ai_check.py docs/paper/main.tex
+
+      # -------- Clean PDF (always) --------
+      - name: Compile clean PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          working_directory: docs/paper
+
+      - name: Upload clean PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'main' }}
+          path: docs/paper/main.pdf
+
+      # -------- Annotated PDF + comment (pull requests only) --------
+      - name: Compile annotated PDF
+        if: github.event_name == 'pull_request' && hashFiles('docs/paper/main_annotated.tex') != ''
+        continue-on-error: true   # best-effort highlight; never block on it
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main_annotated.tex
+          working_directory: docs/paper
+
+      - name: Upload annotated PDF
+        if: github.event_name == 'pull_request' && hashFiles('docs/paper/main_annotated.pdf') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-ai-annotated-pr-${{ github.event.pull_request.number }}
+          path: docs/paper/main_annotated.pdf
+
+      - name: Add PDF download links to report
+        if: github.event_name == 'pull_request' && always() && hashFiles('ai-report.md') != ''
+        run: |
+          {
+            echo ""
+            echo "---"
+            echo "📎 **Download the PDFs** (clean + AI-annotated) from this run's [artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)."
+          } >> ai-report.md
+
+      - name: Post AI report to PR
+        if: github.event_name == 'pull_request' && always() && hashFiles('ai-report.md') != ''
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          file-path: ai-report.md
+          comment-tag: paper-ai-check
+
+      # -------- Enforce the AI gate (pull requests only) --------
+      - name: Enforce AI threshold
+        if: github.event_name == 'pull_request' && steps.aicheck.outcome == 'failure'
+        run: |
+          echo "AI-writing check exceeded ${AI_THRESHOLD:-0.18} — see the PR comment / annotated PDF."
+          exit 1

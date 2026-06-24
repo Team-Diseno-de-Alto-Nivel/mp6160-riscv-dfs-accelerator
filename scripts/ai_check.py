@@ -1,30 +1,25 @@
 #!/usr/bin/env python3
 """AI-writing pre-check for the LaTeX paper.
 
-Extracts plain prose from a .tex file and scores it with a free, open-source
-AI-text detector that runs locally (desklib/ai-text-detector, a DeBERTa-v3
-model). Prints a Markdown report and exits non-zero when the document-level AI
-probability exceeds AI_THRESHOLD, so it can block a CI check. No API key, no
-quota, no cost.
-
-IMPORTANT: this is NOT Turnitin and does NOT reproduce Turnitin's numbers.
-Turnitin exposes no public API; this is an early-warning proxy only. Treat the
-score as a signal, not a verdict (Turnitin says the same about its own report).
+Scores the body prose of a .tex file with a free, local AI-text detector
+(desklib/ai-text-detector) and prints a Markdown report. Exits non-zero when the
+average AI score exceeds AI_THRESHOLD (default 0.18, below the professor's 20%),
+so it can gate a CI check. This is NOT Turnitin and does not reproduce its
+numbers — it is an aligned proxy that mirrors Turnitin's method: ~250-word
+sliding windows scored and averaged, non-prose (figures, captions, headings,
+bibliography, math) stripped. Tables and lists are kept in on purpose, a
+conservative (stricter-than-Turnitin) choice.
 
 Usage:
-    [AI_THRESHOLD=0.40] python scripts/ai_check.py docs/paper/main.tex
-
-The gating metric is the AI-flagged *share* of the document (fraction of the
-text the model attributes to AI), to mirror Turnitin's "% AI" number — the
-check fails when that share exceeds AI_THRESHOLD (default 0.20 == the
-professor's <20% rule).
+    python scripts/ai_check.py docs/paper/main.tex
 
 Environment:
-    AI_THRESHOLD      (optional)  Max AI share before failing. Default 0.20.
-    AI_SENT_THRESHOLD (optional)  Per-sentence AI cutoff. Default 0.50.
-    AI_TOP_N          (optional)  How many suspicious sentences to list. Default 10.
-    AI_MODEL          (optional)  HF model id. Default desklib/ai-text-detector-v1.01.
-    AI_REPORT_FILE    (optional)  Write the Markdown report to this path.
+    AI_THRESHOLD     Max average AI score before failing. Default 0.18.
+    AI_WINDOW_WORDS  Sliding-window size in words. Default 250.
+    AI_TOP_N         Max flagged passages to list. Default 50.
+    AI_MODEL         HF model id. Default desklib/ai-text-detector-v1.01.
+    AI_REPORT_FILE   Write the Markdown report to this path.
+    AI_ANNOTATE_OUT  Write a copy of the .tex with flagged paragraphs highlighted.
 """
 
 from __future__ import annotations
@@ -36,65 +31,69 @@ import sys
 import textwrap
 
 MODEL_DIR = os.environ.get("AI_MODEL", "desklib/ai-text-detector-v1.01")
-MAX_TOKENS = 768          # model context window used per inference
-BATCH_SIZE = 8            # sentences scored per forward pass
-MIN_SENTENCE_CHARS = 25   # ignore tiny fragments when ranking
-# Per-sentence decision: prob above this counts the sentence as AI-written.
-SENT_DECISION = float(os.environ.get("AI_SENT_THRESHOLD", "0.50"))
-# Document gate: fail when the AI-flagged SHARE of the text exceeds this.
-# Mirrors Turnitin's "% of the document detected as AI" — the professor's <20%.
-DEFAULT_THRESHOLD = 0.20
-DEFAULT_TOP_N = 10
+MAX_TOKENS = 768
+BATCH_SIZE = 4
+WINDOW_WORDS = int(os.environ.get("AI_WINDOW_WORDS", "250"))
+MIN_PROSE_WORDS = 50
+DISPLAY_CUTOFF = 0.50
+DEFAULT_THRESHOLD = 0.18
+DEFAULT_TOP_N = 50
 
 
-# --------------------------------------------------------------------------- #
-# Text extraction
-# --------------------------------------------------------------------------- #
+def _filter_body(tex: str) -> str:
+    """Strip non-prose so the analyzed text mirrors Turnitin's qualifying text:
+    title/author metadata, figures, captions, math, headings, bibliography and
+    citation commands. Tables and lists are kept in (conservative choice)."""
+    m = re.search(r"\\begin\{document\}(.*?)\\end\{document\}", tex, re.DOTALL)
+    tex = m.group(1) if m else tex
+    for env in ("figure", "tikzpicture", "thebibliography",
+                "equation", "align", "displaymath", "IEEEkeywords"):
+        tex = re.sub(rf"\\begin\{{{env}\*?\}}.*?\\end\{{{env}\*?\}}",
+                     "\n\n", tex, flags=re.DOTALL)
+    for cmd in ("title", "author"):
+        tex = re.sub(rf"\\{cmd}\s*\{{(?:[^{{}}]|\{{[^{{}}]*\}})*\}}",
+                     "\n\n", tex, flags=re.DOTALL)
+    tex = re.sub(r"\\maketitle", " ", tex)
+    tex = re.sub(r"\\(section|subsection|subsubsection|paragraph)\*?\s*\{[^}]*\}",
+                 "\n\n", tex)
+    tex = re.sub(r"\\caption\s*\{(?:[^{}]|\{[^{}]*\})*\}", " ", tex, flags=re.DOTALL)
+    tex = re.sub(r"\\(cite\w*|ref|label|bibliographystyle|bibliography|input|include)\s*\{[^}]*\}",
+                 " ", tex)
+    tex = re.sub(r"\$\$.*?\$\$", " ", tex, flags=re.DOTALL)
+    tex = re.sub(r"\$[^$]*\$", " ", tex)
+    return tex
+
+
 def extract_prose(tex_path: str) -> str:
-    """Return clean prose from a .tex file.
-
-    Prefers pandoc (best LaTeX->text fidelity); falls back to a regex stripper
-    if pandoc is missing or chokes on something like a tikzpicture.
-    """
+    """Return body prose, via pandoc, falling back to a regex stripper."""
+    with open(tex_path, "r", encoding="utf-8") as fh:
+        filtered = _filter_body(fh.read())
     try:
         result = subprocess.run(
-            ["pandoc", "-f", "latex", "-t", "plain", "--quiet", tex_path],
+            ["pandoc", "-f", "latex", "-t", "plain", "--quiet"],
+            input=filtered,
             capture_output=True,
             text=True,
             timeout=120,
         )
         if result.returncode == 0 and result.stdout.strip():
             return _normalize(result.stdout)
-        sys.stderr.write(
-            "pandoc failed or produced empty output; "
-            f"falling back to regex stripper.\n{result.stderr}\n"
-        )
+        sys.stderr.write(f"pandoc failed; using regex fallback.\n{result.stderr}\n")
     except FileNotFoundError:
-        sys.stderr.write("pandoc not found; falling back to regex stripper.\n")
+        sys.stderr.write("pandoc not found; using regex fallback.\n")
     except subprocess.TimeoutExpired:
-        sys.stderr.write("pandoc timed out; falling back to regex stripper.\n")
-
-    with open(tex_path, "r", encoding="utf-8") as fh:
-        return _strip_latex(fh.read())
+        sys.stderr.write("pandoc timed out; using regex fallback.\n")
+    return _strip_latex(filtered)
 
 
 def _strip_latex(tex: str) -> str:
-    """Crude LaTeX->prose fallback used only when pandoc is unavailable."""
-    # Keep only the document body.
-    body = re.search(r"\\begin\{document\}(.*?)\\end\{document\}", tex, re.DOTALL)
-    tex = body.group(1) if body else tex
-    # Drop noisy environments wholesale.
-    for env in ("figure", "table", "tikzpicture", "thebibliography", "equation", "align"):
-        tex = re.sub(rf"\\begin\{{{env}\*?\}}.*?\\end\{{{env}\*?\}}", " ", tex, flags=re.DOTALL)
-    tex = re.sub(r"%.*", "", tex)                  # comments
-    tex = re.sub(r"\$[^$]*\$", " ", tex)           # inline math
-    # Accent escapes (\'u, \"o, \^e, \~n, ...) -> keep the base letter.
-    tex = re.sub(r"\\[`'^\"~=.]\{?([a-zA-Z])\}?", r"\1", tex)
-    tex = tex.replace("\\\\", "\n")                # line breaks
-    # Commands taking a braced arg we don't want as text (refs/styling metadata).
-    tex = re.sub(r"\\(bibliographystyle|bibliography|label|ref|cite\w*|input|include)\b\s*\{[^}]*\}", " ", tex)
-    tex = re.sub(r"\\[a-zA-Z]+\*?(\[[^\]]*\])?", " ", tex)  # remaining commands + optional args
-    tex = re.sub(r"[{}]", " ", tex)                # braces
+    """Regex LaTeX->prose fallback used only when pandoc is unavailable."""
+    tex = re.sub(r"%.*", "", tex)
+    tex = re.sub(r"\$[^$]*\$", " ", tex)
+    tex = re.sub(r"\\[`'^\"~=.]\{?([a-zA-Z])\}?", r"\1", tex)   # accents -> base letter
+    tex = tex.replace("\\\\", "\n")
+    tex = re.sub(r"\\[a-zA-Z]+\*?(\[[^\]]*\])?", " ", tex)
+    tex = re.sub(r"[{}]", " ", tex)
     return _normalize(tex)
 
 
@@ -105,16 +104,29 @@ def _normalize(text: str) -> str:
 
 
 def split_sentences(text: str) -> list[str]:
-    """Split prose into sentences on terminal punctuation (good enough for
-    English academic prose; avoids an nltk dependency)."""
+    """Split prose into sentences on terminal punctuation."""
     flat = re.sub(r"\s+", " ", text).strip()
     parts = re.split(r"(?<=[.!?])\s+(?=[A-Z(])", flat)
     return [p.strip() for p in parts if len(p.strip()) >= 3]
 
 
-# --------------------------------------------------------------------------- #
-# Detector (local HF model). Encapsulated so it can be swapped.
-# --------------------------------------------------------------------------- #
+def build_windows(sentences: list[str], target_words: int = WINDOW_WORDS) -> list[str]:
+    """Overlapping ~target_words windows with a one-sentence stride, mirroring
+    Turnitin's segment windowing."""
+    windows: list[str] = []
+    n = len(sentences)
+    for i in range(n):
+        words, j, buf = 0, i, []
+        while j < n and words < target_words:
+            buf.append(sentences[j])
+            words += len(sentences[j].split())
+            j += 1
+        windows.append(" ".join(buf))
+        if j >= n:
+            break
+    return windows
+
+
 _MODEL = None
 _TOKENIZER = None
 _DEVICE = None
@@ -155,7 +167,7 @@ def _load_model():
 
 
 def _score_batch(texts: list[str]) -> list[float]:
-    """Return P(AI) for each text in [0,1]."""
+    """Return P(AI) in [0,1] for each text."""
     import torch
 
     _load_model()
@@ -173,59 +185,62 @@ def _score_batch(texts: list[str]) -> list[float]:
 
 
 def analyze(text: str) -> dict:
-    """Score every sentence and compute the AI-flagged share of the document.
-
-    ``ai_share`` = fraction of the text (weighted by sentence length) whose
-    per-sentence AI probability exceeds SENT_DECISION. This mirrors how Turnitin
-    reports "% of the document detected as AI", so it can be compared against
-    the professor's <20% criterion (still a different model, so not identical).
-    ``mean_prob`` is kept as a secondary signal.
-    """
+    """Score overlapping windows and average their AI scores (ai_pct), the way
+    Turnitin averages its segment scores."""
     sentences = split_sentences(text)
-    if not sentences:
-        return {"ai_share": 0.0, "mean_prob": 0.0, "sentences": []}
+    words = sum(len(s.split()) for s in sentences)
+    if words < MIN_PROSE_WORDS:
+        return {"ai_pct": 0.0, "words": words, "windows": []}
 
+    windows = build_windows(sentences)
     scored: list[dict] = []
-    for i in range(0, len(sentences), BATCH_SIZE):
-        batch = sentences[i : i + BATCH_SIZE]
-        for sent, prob in zip(batch, _score_batch(batch)):
-            scored.append({"text": sent, "prob": float(prob)})
+    for i in range(0, len(windows), BATCH_SIZE):
+        batch = windows[i : i + BATCH_SIZE]
+        for win, prob in zip(batch, _score_batch(batch)):
+            scored.append({"text": win, "prob": float(prob)})
 
-    total = sum(len(s["text"]) for s in scored) or 1
-    ai_chars = sum(len(s["text"]) for s in scored if s["prob"] >= SENT_DECISION)
-    mean_prob = sum(s["prob"] * len(s["text"]) for s in scored) / total
-    return {"ai_share": ai_chars / total, "mean_prob": mean_prob, "sentences": scored}
+    ai_pct = sum(s["prob"] for s in scored) / (len(scored) or 1)
+    return {"ai_pct": ai_pct, "words": words, "windows": scored}
 
 
-# --------------------------------------------------------------------------- #
-# Reporting
-# --------------------------------------------------------------------------- #
 def build_report(result: dict, threshold: float, top_n: int, passed: bool) -> str:
-    share = result["ai_share"]
+    pct = result["ai_pct"]
     status = "✅ PASS" if passed else "❌ FAIL"
     lines = [
-        "## 🤖 AI-writing pre-check",
+        "## 🤖 AI-writing check",
         "",
-        f"_Detector: `{MODEL_DIR}` (local, open-source)._",
+        f"_Detector: `{MODEL_DIR}` (local). Turnitin-style: ~{WINDOW_WORDS}-word "
+        f"sliding windows, scores averaged. {result['words']} prose words "
+        "(tables and lists kept in, unlike Turnitin)._",
         "",
-        f"**{status}** — share of the document detected as AI: **{share:.1%}** "
-        f"(must stay under {threshold:.0%})",
-        f"<sub>secondary signal — mean AI confidence: {result['mean_prob']:.1%}</sub>",
+        f"**{status}** — **{pct:.1%}** of the prose reads as AI-generated "
+        f"(must stay under {threshold:.0%}).",
         "",
-        "> ⚠️ Not Turnitin and not comparable to it. Early-warning proxy only — "
-        "treat as a signal, not a verdict.",
+        "> ⚠️ Mirrors Turnitin's method but uses a different model — NOT a "
+        "Turnitin score, a conservative early-warning signal.",
         "",
     ]
+    # Overlapping windows repeat content, so de-duplicate by leading text.
     suspicious = sorted(
-        (s for s in result["sentences"] if len(s["text"]) >= MIN_SENTENCE_CHARS),
+        (s for s in result["windows"] if s["prob"] >= DISPLAY_CUTOFF),
         key=lambda s: s["prob"],
         reverse=True,
-    )[:top_n]
-    if suspicious:
-        lines.append(f"### Top {len(suspicious)} most AI-like sentences")
+    )
+    seen: set[str] = set()
+    uniq: list[dict] = []
+    for s in suspicious:
+        key = s["text"][:60]
+        if key in seen:
+            continue
+        seen.add(key)
+        uniq.append(s)
+        if len(uniq) >= top_n:
+            break
+    if uniq:
+        lines.append(f"### Flagged passages to revise ({len(uniq)})")
         lines.append("")
-        for s in suspicious:
-            snippet = textwrap.shorten(s["text"], width=160, placeholder="…")
+        for s in uniq:
+            snippet = textwrap.shorten(s["text"], width=260, placeholder="…")
             lines.append(f"- **{s['prob']:.0%}** — {snippet}")
         lines.append("")
     return "\n".join(lines)
@@ -239,16 +254,88 @@ def write_step_summary(report: str) -> None:
 
 
 def write_report_file(report: str) -> None:
-    """Write the report to AI_REPORT_FILE so a PR-comment step can read it."""
     path = os.environ.get("AI_REPORT_FILE")
     if path:
         with open(path, "w", encoding="utf-8") as fh:
             fh.write(report + "\n")
 
 
-# --------------------------------------------------------------------------- #
-# Main
-# --------------------------------------------------------------------------- #
+# Annotated .tex: highlights AI-flagged source paragraphs.
+ENV_PROTECT = ("table", "figure", "tikzpicture", "thebibliography", "itemize",
+               "enumerate", "equation", "align", "displaymath", "abstract",
+               "IEEEkeywords")
+
+HIGHLIGHT_PREAMBLE = r"""
+% --- AI-writing annotation (auto-generated; do not edit by hand) ---
+\usepackage{xcolor}
+\usepackage[framemethod=default]{mdframed}
+\definecolor{aihlbg}{rgb}{1.0,0.92,0.55}
+\newmdenv[backgroundcolor=aihlbg,hidealllines=true,skipabove=3pt,skipbelow=3pt,
+innertopmargin=2pt,innerbottommargin=2pt,innerleftmargin=3pt,innerrightmargin=3pt]{aibox}
+\newcommand{\aitag}[1]{{\footnotesize\sffamily\bfseries\textcolor{orange!75!black}{[AI~#1\%]}~}}
+% --- end AI-writing annotation ---
+"""
+
+
+def _block_prose(block: str) -> str:
+    b = re.sub(r"\\(cite\w*|ref|label)\s*\{[^}]*\}", " ", block)
+    b = re.sub(r"\$[^$]*\$", " ", b)
+    b = re.sub(r"\\[a-zA-Z]+\*?(\[[^\]]*\])?", " ", b)
+    b = re.sub(r"[{}]", " ", b)
+    return re.sub(r"\s+", " ", b).strip()
+
+
+def _is_prose_block(block: str) -> bool:
+    """True for real body paragraphs (skip comments, headings, commands)."""
+    noncomment = [ln for ln in block.splitlines()
+                  if ln.strip() and not ln.strip().startswith("%")]
+    if not noncomment:
+        return False
+    if re.match(r"\\(section|subsection|subsubsection|paragraph|title|author|"
+                r"maketitle|bibliography|bibliographystyle|begin|end|item|caption|"
+                r"label|IEEE)", noncomment[0].lstrip()):
+        return False
+    return len(_block_prose(block).split()) >= 12
+
+
+def annotate_tex(tex_path: str, cutoff: float = DISPLAY_CUTOFF) -> str:
+    """Return a copy of the .tex with AI-flagged paragraphs wrapped in a tagged
+    highlight box. Environments (tables, figures, lists) are left untouched."""
+    with open(tex_path, "r", encoding="utf-8") as fh:
+        raw = fh.read()
+    m = re.search(r"\\begin\{document\}(.*)\\end\{document\}", raw, re.DOTALL)
+    if not m:
+        return raw
+    head, body, tail = raw[: m.start()], m.group(1), raw[m.end():]
+
+    placeholders: dict[str, str] = {}
+
+    def _protect(match: "re.Match") -> str:
+        key = f"@@AIPROT{len(placeholders)}@@"
+        placeholders[key] = match.group(0)
+        return f"\n\n{key}\n\n"
+
+    env_re = re.compile(
+        r"\\begin\{(" + "|".join(ENV_PROTECT) + r")\*?\}.*?\\end\{\1\*?\}", re.DOTALL)
+    body = env_re.sub(_protect, body)
+
+    blocks = re.split(r"(\n\s*\n)", body)
+    idx = [i for i, b in enumerate(blocks) if _is_prose_block(b)]
+    texts = [_block_prose(blocks[i]) for i in idx]
+    scores: dict[int, float] = {}
+    for k in range(0, len(texts), BATCH_SIZE):
+        for j, prob in zip(idx[k : k + BATCH_SIZE], _score_batch(texts[k : k + BATCH_SIZE])):
+            scores[j] = prob
+    for i in idx:
+        if scores[i] >= cutoff:
+            blocks[i] = (f"\\begin{{aibox}}\\aitag{{{round(scores[i] * 100)}}}"
+                         f"{blocks[i].strip()}\\end{{aibox}}")
+    body = "".join(blocks)
+    for key, val in placeholders.items():
+        body = body.replace(key, val)
+    return head + HIGHLIGHT_PREAMBLE + "\\begin{document}" + body + "\\end{document}" + tail
+
+
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
         sys.exit("Usage: python scripts/ai_check.py <path-to.tex>")
@@ -261,18 +348,20 @@ def main(argv: list[str]) -> int:
 
     prose = extract_prose(tex_path)
     if len(prose) < 200:
-        sys.exit(
-            f"ERROR: extracted only {len(prose)} chars of prose from {tex_path}; "
-            "extraction likely failed. Check pandoc output."
-        )
+        sys.exit(f"ERROR: extracted only {len(prose)} chars of prose; extraction failed.")
 
     result = analyze(prose)
-    passed = result["ai_share"] <= threshold
+    passed = result["ai_pct"] <= threshold
     report = build_report(result, threshold, top_n, passed)
 
     print(report)
     write_step_summary(report)
     write_report_file(report)
+
+    annotate_out = os.environ.get("AI_ANNOTATE_OUT")
+    if annotate_out:
+        with open(annotate_out, "w", encoding="utf-8") as fh:
+            fh.write(annotate_tex(tex_path))
 
     return 0 if passed else 1
 
