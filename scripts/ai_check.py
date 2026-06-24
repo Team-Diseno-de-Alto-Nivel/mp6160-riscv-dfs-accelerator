@@ -40,12 +40,45 @@ DEFAULT_THRESHOLD = 0.18
 DEFAULT_TOP_N = 50
 
 
+def _tabular_to_prose(tex: str) -> str:
+    """Replace each tabular with just its cell text, dropping the header row and
+    rules/column layout. Keeps the real written content of tables without the
+    ASCII-table noise (headers, dashes) that pandoc would otherwise produce."""
+    colspec = r"(?:\[[^\]]*\]\s*)?\{(?:[^{}]|\{[^{}]*\})*\}"
+
+    def repl(match: "re.Match") -> str:
+        inner = match.group(1)
+        inner = re.sub(r"\\(top|mid|bottom)rule|\\hline|\\cmidrule[^\n]*", " ", inner)
+        rows = re.split(r"\\\\", inner)
+        out = []
+        for r, row in enumerate(rows):
+            if r == 0:  # header row
+                continue
+            cells = []
+            for cell in row.split("&"):
+                cell = re.sub(r"\\textbf\{([^}]*)\}", r"\1", cell)
+                cell = re.sub(r"\\cite\w*\s*\{[^}]*\}", " ", cell)
+                cell = re.sub(r"\\[a-zA-Z]+\*?(\[[^\]]*\])?", " ", cell)
+                cell = re.sub(r"[{}$]", " ", cell)
+                cell = re.sub(r"\s+", " ", cell).strip()
+                if cell:
+                    cells.append(cell.rstrip("."))
+            if cells:
+                out.append(". ".join(cells))
+        return "\n\n" + "\n\n".join(out) + "\n\n"
+
+    return re.sub(rf"\\begin\{{tabular\}}\s*{colspec}(.*?)\\end\{{tabular\}}",
+                  repl, tex, flags=re.DOTALL)
+
+
 def _filter_body(tex: str) -> str:
     """Strip non-prose so the analyzed text mirrors Turnitin's qualifying text:
     title/author metadata, figures, captions, math, headings, bibliography and
-    citation commands. Tables and lists are kept in (conservative choice)."""
+    citation commands. Table cell text is kept (conservative choice) but the
+    table layout/headers are dropped."""
     m = re.search(r"\\begin\{document\}(.*?)\\end\{document\}", tex, re.DOTALL)
     tex = m.group(1) if m else tex
+    tex = _tabular_to_prose(tex)
     for env in ("figure", "tikzpicture", "thebibliography",
                 "equation", "align", "displaymath", "IEEEkeywords"):
         tex = re.sub(rf"\\begin\{{{env}\*?\}}.*?\\end\{{{env}\*?\}}",
