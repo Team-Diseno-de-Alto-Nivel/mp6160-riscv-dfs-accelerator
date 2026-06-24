@@ -276,9 +276,9 @@ Taken together, these limitations highlight the absence of a specialized archite
 
 \subsection{DFS Accelerator Operation Flow}
 
-The proposed architecture implements a specialized hardware accelerator for the execution of the Depth First Search (DFS) 
-algorithm on 2D arrays. The system shifts the computational load from the main processor to a dedicated FPGA unit, 
-composed of control, exploration, and storage modules.
+The proposed architecture implements a hardware accelerator for the execution of the Depth First Search (DFS) 
+algorithm on 2D arrays. The system shifts the computational load from the processor to the FPGA unit, 
+composed of 3 stages: control, exploration, and storage modules.
 
 The search state is stored in the following stages:
 
@@ -301,11 +301,11 @@ repeated traversals.
 
 \subsubsection{DFS Controller}
 
-The DFS Controller module manages the sequence of operations of the accelerator 
-using a finite state machine (FSM). This controller coordinates the stages of 
+The DFS Controller  manages the sequence of operations of the accelerator 
+using a state machine (FSM). This controller coordinates the stages of 
 reading nodes, exploring neighbors, updating memory state, and completing the 
 traversal. In this way, the execution flow of the DFS algorithm is maintained 
-without requiring continuous intervention from the main processor.
+without requiring intervention from the processor.
 
 \subsubsection{Neighbor Generation}
 
@@ -318,8 +318,8 @@ computational cost associated with the repetitive calculation of neighbors.
 
 \subsubsection{Stack Manager}
 
-Due to the iterative nature of the DFS algorithm, it is necessary to maintain a
-record of the nodes pending exploration. The Stack Manager module implements this function using
+Due to the iterative nature of the DFS algorithm, it's necessary maintain a
+record of the nodes no explored. The Stack Manager module implements this function using
 push/pop operations, allowing the traversal order to be preserved and the internal state of the
 search to be efficiently managed.
 
