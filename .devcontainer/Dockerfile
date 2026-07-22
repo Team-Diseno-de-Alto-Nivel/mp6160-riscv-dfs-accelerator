@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     g++-riscv64-linux-gnu \
+    qemu-user \
     texlive-latex-extra \
     texlive-lang-spanish \
     texlive-publishers \

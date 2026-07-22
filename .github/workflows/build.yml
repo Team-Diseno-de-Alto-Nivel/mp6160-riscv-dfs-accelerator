@@ -63,3 +63,19 @@ jobs:
             -w /workspace \
             dfs-riscv:ci \
             ./src/model/build/sim src/program/build/program
+
+      - name: Verify program under RISC-V emulation (qemu)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            dfs-riscv:ci \
+            qemu-riscv64 ./src/program/build/program
+
+      - name: Verify program native build
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            dfs-riscv:ci \
+            make -C src/program run-native

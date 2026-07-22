@@ -126,12 +126,15 @@ interface so the harness can run them uniformly, once with the accelerator OFF
 
 | Component | Path | Responsibility |
 |---|---|---|
-| DFS algorithms | `algorithms/<problem>/` | The five LeetCode DFS problems (`DfsAlgorithm` subclasses) |
-| Algorithm interface | `algorithms/dfs_algorithm.h` | `solve(case, accelerator)` contract + factory |
+| DFS algorithms | `algorithms/<problem>/` | The five LeetCode DFS problems as free functions (+ no-pruning / no-memo variants) |
+| Algorithm registry | `algorithms/dfs_algorithm.h` | `AlgoEntry` registry + `make_algorithms()` — the test bench that calls each function |
 | Accelerator seam | `harness/accelerator.h` | `Mode::{Off,On}` abstraction over the DFS primitives |
 | Harness | `harness/harness.{h,cpp}` | Runs every case × mode, validates, records metrics |
 | Metrics | `harness/metrics.h` | `RunMetrics` (latency, instr. count, throughput, …) |
-| Test cases | `cases/test_case.h` | Case format (grid, start, params, expected) + loader |
+| Test cases | `cases/test_case.h` + `cases/datasets.cpp` | `Problem` (algorithm input) + `TestCase` (`Problem` + expected) + embedded datasets |
+
+> **How it runs:** see the [software pipeline guide](docs/guides/software-pipeline.md)
+> for the pipeline flow diagram, the step-by-step walkthrough, and build/run instructions.
 
 ### Hardware — `src/model/`
 

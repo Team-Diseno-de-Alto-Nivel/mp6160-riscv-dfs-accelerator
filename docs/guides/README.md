@@ -8,3 +8,5 @@ notes that complement the [README](../../README.md) and the paper
 
 - [architecture.md](architecture.md) — code architecture of the software baseline
   and the SystemC hardware model, with block, sequence, and layer diagrams.
+- [software-pipeline.md](software-pipeline.md) — how the `src/program/` software
+  baseline runs: pipeline flow diagram, steps, components, and how to build/run it.

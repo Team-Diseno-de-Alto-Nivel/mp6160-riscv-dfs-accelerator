@@ -1,14 +1,10 @@
 #pragma once
-// Unique Paths III (SW-3): mark/unmark backtracking; vary obstacle density and size.
 
-#include "algorithms/dfs_algorithm.h"
+#include "dfs_types.h"
+#include "harness/accelerator.h"
 
 namespace dfs {
 
-class UniquePathsIII : public DfsAlgorithm {
-  public:
-    std::string name() const override { return "unique_paths_iii"; }
-    AlgoResult solve(const TestCase& tc, Accelerator& accel) override;  // TODO(SW-3)
-};
+long unique_paths_iii(const Grid& grid, Accelerator& accel);
 
 }  // namespace dfs

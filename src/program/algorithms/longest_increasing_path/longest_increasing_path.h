@@ -1,14 +1,10 @@
 #pragma once
-// Longest Increasing Path (SW-3): multi-source DFS; run with/without memoization.
 
-#include "algorithms/dfs_algorithm.h"
+#include "dfs_types.h"
+#include "harness/accelerator.h"
 
 namespace dfs {
 
-class LongestIncreasingPath : public DfsAlgorithm {
-  public:
-    std::string name() const override { return "longest_increasing_path"; }
-    AlgoResult solve(const TestCase& tc, Accelerator& accel) override;  // TODO(SW-3)
-};
+long longest_increasing_path(const Grid& matrix, Accelerator& accel, bool use_memo = true);
 
 }  // namespace dfs
