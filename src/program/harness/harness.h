@@ -1,6 +1,4 @@
 #pragma once
-// Harness (SW-1): runs each case against each algorithm twice (accelerator
-// ON/OFF), validates, and records metrics.
 
 #include <vector>
 
@@ -9,14 +7,14 @@
 
 namespace dfs {
 
-class DfsAlgorithm;
+struct AlgoEntry;
 
 class Harness {
   public:
-    std::vector<RunMetrics> run_all();  // TODO(SW-1)
+    std::vector<RunMetrics> run_all();
 
   private:
-    RunMetrics run_one(DfsAlgorithm& algo, const TestCase& tc, bool accelerator_on);  // TODO(SW-1)
+    RunMetrics run_one(const AlgoEntry& algo, const TestCase& tc, bool accelerator_on);
 };
 
 }  // namespace dfs

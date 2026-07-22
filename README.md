@@ -64,9 +64,10 @@ If SystemC is already installed, export `SYSTEMC_HOME` before `make` to skip the
 
 ### CI/CD
 
-- [`build.yml`](.github/workflows/build.yml): builds the model and the program, then runs the simulation, on every push/PR touching `src/`, `Makefile`, or `.devcontainer/`.
-- [`docs.yml`](.github/workflows/docs.yml): compiles the LaTeX paper (`docs/paper/`) on every push to `main` and every PR that modifies it, uploading the resulting PDF as a downloadable artifact for preview.
-- [`paper-ai-check.yml`](.github/workflows/paper-ai-check.yml): runs an **AI-writing pre-check** on the paper for every PR touching `docs/paper/**` (see below).
+- [`build.yml`](.github/workflows/build.yml): on every push/PR touching `src/`, `Makefile`, or `.devcontainer/`, builds the model and the program, runs the simulation, and verifies the program **both** under RISC-V emulation (qemu) and as a native build.
+- [`paper.yml`](.github/workflows/paper.yml): compiles the LaTeX paper (`docs/paper/`) on every push to `main` and every PR that modifies it (PDF uploaded as an artifact); on PRs it also runs an **AI-writing gate** (see below).
+
+See the [CI/CD guide](docs/guides/ci-cd.md) for flow diagrams and how each step verifies.
 
 ---
 
@@ -126,12 +127,15 @@ interface so the harness can run them uniformly, once with the accelerator OFF
 
 | Component | Path | Responsibility |
 |---|---|---|
-| DFS algorithms | `algorithms/<problem>/` | The five LeetCode DFS problems (`DfsAlgorithm` subclasses) |
-| Algorithm interface | `algorithms/dfs_algorithm.h` | `solve(case, accelerator)` contract + factory |
+| DFS algorithms | `algorithms/<problem>/` | The five LeetCode DFS problems as free functions (+ no-pruning / no-memo variants) |
+| Algorithm registry | `algorithms/dfs_algorithm.h` | `AlgoEntry` registry + `make_algorithms()` — the test bench that calls each function |
 | Accelerator seam | `harness/accelerator.h` | `Mode::{Off,On}` abstraction over the DFS primitives |
 | Harness | `harness/harness.{h,cpp}` | Runs every case × mode, validates, records metrics |
 | Metrics | `harness/metrics.h` | `RunMetrics` (latency, instr. count, throughput, …) |
-| Test cases | `cases/test_case.h` | Case format (grid, start, params, expected) + loader |
+| Test cases | `cases/test_case.h` + `cases/datasets.cpp` | `Problem` (algorithm input) + `TestCase` (`Problem` + expected) + embedded datasets |
+
+> **How it runs:** see the [software pipeline guide](docs/guides/software-pipeline.md)
+> for the pipeline flow diagram, the step-by-step walkthrough, and build/run instructions.
 
 ### Hardware — `src/model/`
 

@@ -1,5 +1,4 @@
 #pragma once
-// Common value types shared by the RISC-V software baseline.
 
 #include <cstdint>
 #include <string>
@@ -12,13 +11,18 @@ struct Coord {
     int col = 0;
 };
 
-// Row-major 2D grid; cell meaning is algorithm-specific.
+inline bool operator==(Coord a, Coord b) { return a.row == b.row && a.col == b.col; }
+
+enum class Connectivity { Four = 4, Eight = 8 };
+
 struct Grid {
     int rows = 0;
     int cols = 0;
     std::vector<int> cells;
 
-    int at(int r, int c) const;  // TODO(SW-2)
+    bool in_bounds(int r, int c) const { return r >= 0 && r < rows && c >= 0 && c < cols; }
+    int index(int r, int c) const { return r * cols + c; }
+    int at(int r, int c) const { return cells[index(r, c)]; }
 };
 
 struct AlgoResult {

@@ -7,6 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(program
     main.cpp
     harness/harness.cpp
+    harness/accelerator.cpp
+    harness/report.cpp
+    cases/datasets.cpp
+    algorithms/dfs_algorithm.cpp
     algorithms/number_of_islands/number_of_islands.cpp
     algorithms/unique_paths_iii/unique_paths_iii.cpp
     algorithms/word_search_ii/word_search_ii.cpp
