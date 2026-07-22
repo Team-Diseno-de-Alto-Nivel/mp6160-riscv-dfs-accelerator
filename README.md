@@ -64,9 +64,10 @@ If SystemC is already installed, export `SYSTEMC_HOME` before `make` to skip the
 
 ### CI/CD
 
-- [`build.yml`](.github/workflows/build.yml): builds the model and the program, then runs the simulation, on every push/PR touching `src/`, `Makefile`, or `.devcontainer/`.
-- [`docs.yml`](.github/workflows/docs.yml): compiles the LaTeX paper (`docs/paper/`) on every push to `main` and every PR that modifies it, uploading the resulting PDF as a downloadable artifact for preview.
-- [`paper-ai-check.yml`](.github/workflows/paper-ai-check.yml): runs an **AI-writing pre-check** on the paper for every PR touching `docs/paper/**` (see below).
+- [`build.yml`](.github/workflows/build.yml): on every push/PR touching `src/`, `Makefile`, or `.devcontainer/`, builds the model and the program, runs the simulation, and verifies the program **both** under RISC-V emulation (qemu) and as a native build.
+- [`paper.yml`](.github/workflows/paper.yml): compiles the LaTeX paper (`docs/paper/`) on every push to `main` and every PR that modifies it (PDF uploaded as an artifact); on PRs it also runs an **AI-writing gate** (see below).
+
+See the [CI/CD guide](docs/guides/ci-cd.md) for flow diagrams and how each step verifies.
 
 ---
 
