@@ -6,5 +6,5 @@ notes that complement the [README](../../README.md) and the paper
 
 ## Index
 
-_No guides yet. Add one per file (e.g. `build-environment.md`, `run-simulation.md`,
-`add-dfs-algorithm.md`) and link it here._
+- [architecture.md](architecture.md) — code architecture of the software baseline
+  and the SystemC hardware model, with block, sequence, and layer diagrams.

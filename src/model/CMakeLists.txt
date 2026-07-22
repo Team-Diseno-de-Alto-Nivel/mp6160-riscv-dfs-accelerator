@@ -31,6 +31,8 @@ else()
 endif()
 
 # ── Main simulation executable ────────────────────────────────────────────────
+# The accelerator modules are header-only skeletons under modules/, config/ and
+# utils/, included by directory prefix (e.g. "modules/dfs_accelerator.h").
 add_executable(sim
     sc_main.cpp
 )
