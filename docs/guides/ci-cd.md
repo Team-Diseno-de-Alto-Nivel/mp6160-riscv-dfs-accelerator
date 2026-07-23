@@ -31,7 +31,7 @@ flowchart TB
         B1["Build dev container<br/>.devcontainer/Dockerfile · GHA cache"]
         B2["make → sim (SystemC) + program (RISC-V ELF)"]
         B3["Run simulation<br/>sim + program"]
-        B4["Verify under qemu<br/>qemu-riscv64 program"]
+        B4["Verify under qemu<br/>qemu-system-riscv64 (bare-metal)"]
         B5["Verify native build<br/>make -C src/program run-native"]
         B1 --> B2 --> B3 --> B4 --> B5
     end

@@ -1,7 +1,10 @@
 BUILD_DIR := build
 NATIVE_DIR := build-native
 
-.PHONY: all configure native run-emu run-native clean
+QEMU_SYSTEM ?= qemu-system-riscv64
+QEMU_FLAGS := -machine virt -nographic -bios none -kernel
+
+.PHONY: all configure native run-emu run-native test clean
 
 all: configure
 	$(MAKE) -C $(BUILD_DIR)
@@ -14,10 +17,13 @@ native:
 	$(MAKE) -C $(NATIVE_DIR)
 
 run-emu: all
-	qemu-riscv64 $(BUILD_DIR)/program
+	$(QEMU_SYSTEM) $(QEMU_FLAGS) $(BUILD_DIR)/program
 
 run-native: native
 	./$(NATIVE_DIR)/program
+
+test: native
+	ctest --test-dir $(NATIVE_DIR) --output-on-failure
 
 clean:
 	rm -rf $(BUILD_DIR) $(NATIVE_DIR)

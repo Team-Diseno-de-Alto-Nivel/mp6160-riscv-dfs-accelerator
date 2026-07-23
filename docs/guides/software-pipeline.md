@@ -108,12 +108,13 @@ real `sc_time` is reconciled with the SystemC model at INT-1.
 
 ## Build and run
 
-Inside the dev container (RISC-V cross-compiler + `qemu-user` + native toolchain):
+Inside the dev container (bare-metal RISC-V toolchain + `qemu-system-riscv64` + native toolchain):
 
 ```bash
-make program                    # build the RISC-V ELF (src/program/build/program)
-make run-emu                    # RISC-V build, run under qemu-riscv64
+make program                    # build the bare-metal RISC-V ELF (src/program/build/program)
+make run-emu                    # bare-metal ELF, run on qemu-system-riscv64 -machine virt
 make run-native                 # native host build (build-native/program), run
+make test                       # native build + ctest (driver unit test)
 ```
 
 CI ([.github/workflows/build.yml](../../.github/workflows/build.yml)) verifies both
