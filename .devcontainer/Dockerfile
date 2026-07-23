@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     xz-utils \
+    python3 \
     qemu-system-misc \
     texlive-latex-extra \
     texlive-lang-spanish \
