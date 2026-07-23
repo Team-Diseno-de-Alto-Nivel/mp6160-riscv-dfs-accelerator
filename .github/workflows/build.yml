@@ -80,3 +80,26 @@ jobs:
             -w /workspace \
             dfs-riscv:ci \
             make -C src/program run-native
+
+      - name: Run experiments (OFF/ON) and program<->model co-simulation
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            dfs-riscv:ci \
+            bash scripts/run_experiments.sh
+
+      - name: Generate metrics tables and plots
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            dfs-riscv:ci \
+            python3 scripts/plot_results.py
+
+      - name: Upload experiment results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiment-results
+          path: results/

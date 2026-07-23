@@ -4,7 +4,7 @@ NATIVE_DIR := build-native
 QEMU_SYSTEM ?= qemu-system-riscv64
 QEMU_FLAGS := -machine virt -nographic -bios none -kernel
 
-.PHONY: all configure native run-emu run-native test clean
+.PHONY: all configure native run-emu run-native test integration clean
 
 all: configure
 	$(MAKE) -C $(BUILD_DIR)
@@ -24,6 +24,10 @@ run-native: native
 
 test: native
 	ctest --test-dir $(NATIVE_DIR) --output-on-failure
+
+# Program<->model co-simulation over TLM (built only when SystemC is available).
+integration: native
+	./$(NATIVE_DIR)/integration_sim
 
 clean:
 	rm -rf $(BUILD_DIR) $(NATIVE_DIR)
