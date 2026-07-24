@@ -2,15 +2,27 @@
 // DFS Controller (HWA-2): FSM driving the traversal without CPU intervention —
 // pop node -> mark visited -> generate neighbours -> push unvisited -> repeat.
 //
-// Assumed peer contracts (StackManager/HWB-2, NeighborGenerator/HWB-1,
-// VisitedMemory/HWC-1 are not implemented by this issue, so the FSM below is
-// written against the following expected handshakes):
-//   - StackManager: push_en/pop_en are single-cycle pulses; top_x/top_y show
-//     the current top *before* a same-cycle pop takes effect.
-//   - NeighborGenerator: a single-cycle valid_in pulse (with cur_x/cur_y held
-//     steady) starts generation; it then pulses valid_out once per neighbour
-//     (nbr_x/nbr_y valid that cycle) and finally raises done, held until the
-//     next valid_in pulse.
+// Peer contracts (StackManager/HWB-2 and NeighborGenerator/HWB-1 are
+// implemented against these; VisitedMemory/HWC-1 is not, so that part is
+// still an assumption):
+//   - StackManager: push_en/pop_en are single-cycle pulses. Because a signal
+//     write only becomes visible to a peer module one cycle later, top_x/
+//     top_y/empty preview the *result* of this cycle's push_en/pop_en
+//     combinationally, so the very next cycle already sees a just-pushed
+//     item as the top (see stack_manager.h) instead of needing a second
+//     round trip.
+//   - NeighborGenerator: valid_in is a request/ack pulse, not just a
+//     one-shot start — one pulse (with cur_x/cur_y held steady) is required
+//     per neighbour, including the first. It answers with exactly one
+//     valid_out pulse (nbr_x/nbr_y valid that cycle) per request, and raises
+//     done on a request once the candidates are exhausted. It does *not*
+//     auto-advance on its own: without a fresh valid_in pulse it would keep
+//     re-driving the same candidate (and a same-cycle cross-module write is
+//     never visible to the reader that triggered it), which is why
+//     PushNeighbor immediately latches ngen_x/ngen_y off of valid_out and
+//     re-pulses valid_in for the next candidate rather than re-reading
+//     ngen_x/ngen_y a cycle later — NeighborGenerator would already have
+//     moved on by then if it auto-advanced.
 //   - VisitedMemory: addr asserted one cycle is reflected on rdata/we by the
 //     following cycle (at least one clock of latency).
 //
@@ -18,9 +30,10 @@
 // traversal — it does not consult GridMemory, so it marks/expands every
 // in-bounds neighbour regardless of cell value. Grid-aware filtering needs a
 // read datapath from GridMemory into the controller that does not exist yet.
-// It also does not consult StackManager.full, so a dense grid can in
-// principle push more entries than kStackDepth before HWB-2 adds back-
-// pressure.
+// It also does not consult StackManager.full before pushing; StackManager
+// silently drops a push past kStackDepth (see stack_manager.h) rather than
+// corrupting memory, so a dense grid degrades by losing some pushed
+// neighbours instead of crashing, until HWB-2 back-pressure is added here.
 
 #include <cstdint>
 
@@ -101,6 +114,8 @@ SC_MODULE(DfsController) {
             visited_count.write(0);
             cur_node_x_ = 0;
             cur_node_y_ = 0;
+            nbr_latch_x_ = 0;
+            nbr_latch_y_ = 0;
             visited_count_ = 0;
             return;
         }
@@ -160,6 +175,12 @@ SC_MODULE(DfsController) {
             case State::GenNeighbors:
                 busy.write(true);
                 if (ngen_valid_out.read()) {
+                    // Latch now: NeighborGenerator only guarantees nbr_x/
+                    // nbr_y are valid the cycle valid_out is observed, and
+                    // PushNeighbor's own re-request for the next candidate
+                    // would otherwise race the read.
+                    nbr_latch_x_ = ngen_x.read();
+                    nbr_latch_y_ = ngen_y.read();
                     state_ = State::PushNeighbor;
                 } else if (ngen_done.read()) {
                     state_ = State::Pop;
@@ -168,9 +189,10 @@ SC_MODULE(DfsController) {
 
             case State::PushNeighbor:
                 busy.write(true);
-                stk_in_x.write(ngen_x.read());
-                stk_in_y.write(ngen_y.read());
+                stk_in_x.write(nbr_latch_x_);
+                stk_in_y.write(nbr_latch_y_);
                 stk_push.write(true);
+                ngen_valid_in.write(true);  // request the next candidate
                 state_ = State::GenNeighbors;
                 break;
 
@@ -201,6 +223,8 @@ SC_MODULE(DfsController) {
     State state_ = State::Idle;
     sc_uint<32> cur_node_x_ = 0;
     sc_uint<32> cur_node_y_ = 0;
+    sc_uint<32> nbr_latch_x_ = 0;
+    sc_uint<32> nbr_latch_y_ = 0;
     std::uint32_t visited_count_ = 0;
 };
 
