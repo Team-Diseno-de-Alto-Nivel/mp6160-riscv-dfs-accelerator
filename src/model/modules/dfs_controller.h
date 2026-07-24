@@ -22,7 +22,14 @@
 //     PushNeighbor immediately latches ngen_x/ngen_y off of valid_out and
 //     re-pulses valid_in for the next candidate rather than re-reading
 //     ngen_x/ngen_y a cycle later — NeighborGenerator would already have
-//     moved on by then if it auto-advanced.
+//     moved on by then if it auto-advanced. A subtler consequence: the cycle
+//     GenNeighbors is entered, ngen_valid_out/ngen_done still hold whatever
+//     was left over from the *previous* request (this one hasn't reached
+//     NeighborGenerator yet, let alone been answered) — a done left over
+//     from the prior node's exhaustion reads as true here even though this
+//     node's scan hasn't started. ngen_wait_ swallows exactly that one stale
+//     read after every valid_in pulse (from Visit or PushNeighbor) before
+//     trusting either signal.
 //   - VisitedMemory: addr asserted one cycle is reflected on rdata/we by the
 //     following cycle (at least one clock of latency).
 //
@@ -116,6 +123,7 @@ SC_MODULE(DfsController) {
             cur_node_y_ = 0;
             nbr_latch_x_ = 0;
             nbr_latch_y_ = 0;
+            ngen_wait_ = false;
             visited_count_ = 0;
             return;
         }
@@ -169,12 +177,23 @@ SC_MODULE(DfsController) {
                 cur_x.write(cur_node_x_);
                 cur_y.write(cur_node_y_);
                 ngen_valid_in.write(true);
+                ngen_wait_ = true;
                 state_ = State::GenNeighbors;
                 break;
 
             case State::GenNeighbors:
                 busy.write(true);
-                if (ngen_valid_out.read()) {
+                if (ngen_wait_) {
+                    // The valid_in pulse that got us here (from Visit or
+                    // PushNeighbor) isn't visible to NeighborGenerator until
+                    // next cycle, and its answer isn't visible back here
+                    // until the cycle after that — so ngen_valid_out/
+                    // ngen_done right now are still whatever was left over
+                    // from a *previous*, already-fully-consumed request
+                    // (e.g. still `done` from the last node's exhaustion).
+                    // Ignore this one read rather than act on stale data.
+                    ngen_wait_ = false;
+                } else if (ngen_valid_out.read()) {
                     // Latch now: NeighborGenerator only guarantees nbr_x/
                     // nbr_y are valid the cycle valid_out is observed, and
                     // PushNeighbor's own re-request for the next candidate
@@ -193,6 +212,7 @@ SC_MODULE(DfsController) {
                 stk_in_y.write(nbr_latch_y_);
                 stk_push.write(true);
                 ngen_valid_in.write(true);  // request the next candidate
+                ngen_wait_ = true;
                 state_ = State::GenNeighbors;
                 break;
 
@@ -225,6 +245,7 @@ SC_MODULE(DfsController) {
     sc_uint<32> cur_node_y_ = 0;
     sc_uint<32> nbr_latch_x_ = 0;
     sc_uint<32> nbr_latch_y_ = 0;
+    bool ngen_wait_ = false;
     std::uint32_t visited_count_ = 0;
 };
 

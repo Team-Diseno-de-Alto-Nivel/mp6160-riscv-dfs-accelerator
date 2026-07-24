@@ -13,6 +13,12 @@
 // note atop dfs_controller.h. The actual sp_/storage_ mutation still only
 // commits synchronously in commit(), one cycle after the request, exactly
 // like a normal register.
+//
+// clear resets sp_/peak_ for a fresh run (wired from the same Start pulse as
+// VisitedMemory.clear in dfs_accelerator.h) — without it, peak_depth would
+// report the highest depth ever seen since reset instead of this run's peak,
+// making run-by-run metrics (docs/guides/metrics-schema.md) meaningless
+// after the first run against a given accelerator instance.
 
 #include <algorithm>
 #include <cstdint>
@@ -27,6 +33,7 @@ namespace dfs {
 SC_MODULE(StackManager) {
     sc_in<bool> clk;
     sc_in<bool> rst_n;
+    sc_in<bool> clear;
     sc_in<bool> push_en;
     sc_in<bool> pop_en;
 
@@ -45,13 +52,13 @@ SC_MODULE(StackManager) {
         dont_initialize();
 
         SC_METHOD(preview);
-        sensitive << push_en << pop_en << in_x << in_y << rst_n;
+        sensitive << clear << push_en << pop_en << in_x << in_y << rst_n;
     }
 
     // Synchronous: the actual, persistent stack pointer/storage update, one
     // cycle after push_en/pop_en is asserted (a normal registered write).
     void commit() {
-        if (!rst_n.read()) {
+        if (!rst_n.read() || clear.read()) {
             sp_ = 0;
             peak_ = 0;
             return;
@@ -69,10 +76,11 @@ SC_MODULE(StackManager) {
         }
     }
 
-    // Combinational: previews the effect of *this* cycle's push_en/pop_en
-    // before commit() applies it at the next edge — see the file comment.
+    // Combinational: previews the effect of *this* cycle's clear/push_en/
+    // pop_en before commit() applies it at the next edge — see the file
+    // comment.
     void preview() {
-        if (!rst_n.read()) {
+        if (!rst_n.read() || clear.read()) {
             empty.write(true);
             full.write(false);
             peak_depth.write(0);
