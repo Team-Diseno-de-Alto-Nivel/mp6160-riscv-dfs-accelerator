@@ -4,11 +4,11 @@
 // Split into commit()/preview() for the same reason as StackManager/
 // VisitedMemory (see the timing note atop stack_manager.h): a purely
 // clocked design would only reflect a newly-asserted raddr on rdata two
-// cycles later. Currently nothing drives raddr — DfsController performs a
-// content-agnostic traversal and never looks up cell values (see
-// dfs_accelerator.h) — so the read port is wired but unused until that
-// datapath exists; this still gets the same one-cycle-latency contract as
-// every other memory in this design, ready for whoever wires it up.
+// cycles later. raddr is driven by DfsAccelerator off the same wire as
+// VisitedMemory.addr (both memories are indexed identically), so
+// DfsController's content check (see the peer-contract note atop
+// dfs_controller.h) sees rdata exactly one cycle after asserting the
+// address, same as vis_is_visited.
 //
 // load_cell() is a backdoor, non-signal write used by
 // DfsAccelerator::write_reg() to actually load the grid (see its call site
@@ -55,6 +55,14 @@ SC_MODULE(GridMemory) {
     // Backdoor bulk-load write — see the file comment.
     void load_cell(std::uint32_t index, CellValue value) {
         if (index < config::kMaxCells) cells_[index] = value;
+    }
+
+    // Backdoor read, same rationale as load_cell(): used by the fine-grained
+    // primitive TLM bridge (src/program/integration) to read a cell's value
+    // directly rather than through raddr/rdata's clocked handshake — see
+    // visited_memory.h's peek()/poke() comment for the fuller reasoning.
+    CellValue peek(std::uint32_t index) const {
+        return index < config::kMaxCells ? cells_[index] : 0;
     }
 
     // Synchronous: the actual, persistent array update, one cycle after we

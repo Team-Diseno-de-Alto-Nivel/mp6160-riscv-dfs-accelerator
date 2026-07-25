@@ -11,6 +11,13 @@
 // (held until the next request for a *new* node resets it). This module
 // never advances on its own — it always waits for the next request — so a
 // slower consumer can never see a candidate overwritten before reading it.
+//
+// connectivity selects 4 vs 8 neighbours: any value other than 8 is treated
+// as 4. It's exactly what the host writes to kRegParams (see
+// dfs_accelerator.h), matching src/program/dfs_types.h's Connectivity enum
+// values (Four=4, Eight=8). It's latched alongside cur_x/cur_y when a scan
+// (re)starts, so it can't change mid-scan even if the host writes a new
+// value while a traversal is still running.
 
 #include <cstdint>
 
@@ -28,6 +35,7 @@ SC_MODULE(NeighborGenerator) {
     sc_in<sc_uint<32>> cur_y;
     sc_in<sc_uint<32>> rows;
     sc_in<sc_uint<32>> cols;
+    sc_in<sc_uint<32>> connectivity;
 
     sc_out<bool> valid_out;
     sc_out<bool> done;
@@ -44,6 +52,7 @@ SC_MODULE(NeighborGenerator) {
         if (!rst_n.read()) {
             active_ = false;
             next_dir_ = 0;
+            num_dirs_ = 4;
             valid_out.write(false);
             done.write(false);
             nbr_x.write(0);
@@ -61,20 +70,20 @@ SC_MODULE(NeighborGenerator) {
             next_dir_ = 0;
             base_x_ = cur_x.read();
             base_y_ = cur_y.read();
+            num_dirs_ = (connectivity.read() == 8) ? 8 : 4;
         }
         done.write(false);
         emit_next();
     }
 
   private:
-    // 4-connectivity only: (x-1,y), (x+1,y), (x,y-1), (x,y+1). Diagonal
-    // (8-connectivity) support needs a connectivity input this module does
-    // not have yet — see the params_reg_ note in dfs_accelerator.h.
-    static constexpr int kDx[4] = {-1, 1, 0, 0};
-    static constexpr int kDy[4] = {0, 0, -1, 1};
+    // Orthogonal (x-1,y), (x+1,y), (x,y-1), (x,y+1) plus, for 8-connectivity,
+    // the four diagonals.
+    static constexpr int kDx[8] = {-1, 1, 0, 0, -1, -1, 1, 1};
+    static constexpr int kDy[8] = {0, 0, -1, 1, -1, 1, -1, 1};
 
     void emit_next() {
-        while (next_dir_ < 4) {
+        while (next_dir_ < num_dirs_) {
             const int dir = next_dir_++;
             const std::int64_t nx = static_cast<std::int64_t>(base_x_) + kDx[dir];
             const std::int64_t ny = static_cast<std::int64_t>(base_y_) + kDy[dir];
@@ -93,6 +102,7 @@ SC_MODULE(NeighborGenerator) {
 
     bool active_ = false;
     int next_dir_ = 0;
+    int num_dirs_ = 4;
     sc_uint<32> base_x_ = 0;
     sc_uint<32> base_y_ = 0;
 };

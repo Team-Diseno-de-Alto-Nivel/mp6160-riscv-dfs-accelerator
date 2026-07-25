@@ -27,7 +27,11 @@ inline constexpr std::uint32_t kControlStart  = 0x1;
 inline constexpr std::uint32_t kControlEnable = 0x2;  // ON/OFF toggle
 
 // Status-register bits.
-inline constexpr std::uint32_t kStatusBusy = 0x1;
-inline constexpr std::uint32_t kStatusDone = 0x2;
+inline constexpr std::uint32_t kStatusBusy     = 0x1;
+inline constexpr std::uint32_t kStatusDone     = 0x2;
+// Set for a run that dropped at least one push because the stack was at
+// capacity (kStackDepth) — that run's result under-counts real coverage.
+// Sticky for the run: cleared only when a new run starts.
+inline constexpr std::uint32_t kStatusOverflow = 0x4;
 
 }  // namespace dfs::memmap
