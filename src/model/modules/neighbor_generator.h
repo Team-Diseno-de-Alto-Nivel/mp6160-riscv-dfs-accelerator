@@ -2,22 +2,15 @@
 // Neighbor Generator (HWB-1): emits the 4/8 neighbours of a cell with boundary
 // handling.
 //
-// Protocol (see the peer-contract note atop dfs_controller.h): valid_in is a
-// request/ack pulse, not a one-shot "start" — the caller must pulse it once
-// per candidate it wants, including the first, holding cur_x/cur_y steady
-// for the whole sequence. Each pulse answers with at most one valid_out
-// pulse (nbr_x/nbr_y valid that same cycle); once every direction has been
-// produced or rejected as out-of-bounds, a further pulse raises done instead
-// (held until the next request for a *new* node resets it). This module
-// never advances on its own — it always waits for the next request — so a
-// slower consumer can never see a candidate overwritten before reading it.
+// valid_in is a request/ack pulse, not a one-shot start — one pulse per
+// candidate wanted (including the first), cur_x/cur_y held steady for the
+// whole sequence. Each pulse answers with at most one valid_out (or done
+// once exhausted). Never advances on its own, so a slower consumer can't
+// miss a candidate to an overwrite.
 //
-// connectivity selects 4 vs 8 neighbours: any value other than 8 is treated
-// as 4. It's exactly what the host writes to kRegParams (see
-// dfs_accelerator.h), matching src/program/dfs_types.h's Connectivity enum
-// values (Four=4, Eight=8). It's latched alongside cur_x/cur_y when a scan
-// (re)starts, so it can't change mid-scan even if the host writes a new
-// value while a traversal is still running.
+// connectivity is 4 or 8 (anything else treated as 4), matching what the
+// host writes to kRegParams. Latched at scan start so it can't change
+// mid-scan.
 
 #include <cstdint>
 
