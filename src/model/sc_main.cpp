@@ -5,9 +5,9 @@
 // This is a standalone smoke test for the model build (`make model` /
 // `make run`) — it does not run the RISC-V software (src/program, a
 // separate cross-compiled target) or the co-simulation cross-check harness
-// (src/program/integration, its own sc_main). Those still use their own
-// entry points; see the note atop mock_accelerator_model.h for why the
-// co-simulation harness isn't wired to this real model yet.
+// (src/program/integration, its own sc_main, wired to this same
+// DfsAccelerator via integration/dfs_accelerator_bridge.h). Those still use
+// their own entry points.
 
 #include <systemc.h>
 #include <tlm.h>

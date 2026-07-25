@@ -1,6 +1,28 @@
 #pragma once
-// DFS Controller (HWA-2): FSM driving the traversal without CPU intervention —
-// pop node -> mark visited -> generate neighbours -> push unvisited -> repeat.
+// DFS Controller (HWA-2): FSM driving the traversal without CPU intervention.
+//
+// Multi-source scan: LoadStart resets a row-major scan pointer to (0,0), and
+// ScanNext advances it, pushing each candidate cell onto the stack (like a
+// discovered neighbour) rather than a single host-given (start_x, start_y).
+// Whenever the stack drains (Pop sees it empty), control returns to ScanNext
+// to look for the next unvisited, passable cell instead of going straight to
+// Done — so the whole grid gets covered, matching real "number of islands"
+// semantics (this is the register/whole-traversal path's only real
+// consumer: AcceleratorDriver -> src/program/integration/integration_main.cpp
+// run_register_path()). start_x/start_y are consequently unused by this FSM
+// — kept in the register map and readable back, just never consulted here.
+//
+// Distinguishing "this push starts a new island" from "this push extends the
+// current one" doesn't need any per-entry stack metadata: ScanNext only ever
+// pushes when the stack is *empty* (that's the only time it runs), so the
+// item it pushes is guaranteed to be the very next one popped, with nothing
+// else able to interleave. is_new_island_start_ latches that fact across
+// exactly one Pop/Visit round-trip: set when ScanNext pushes, consumed (and
+// only then does island_count_ increment) the moment Visit finds that cell
+// genuinely unvisited and passable. If Visit instead skips it (already
+// visited/impassable), the flag simply stays set for whatever ScanNext tries
+// next — Pop is guaranteed empty again immediately afterward, so nothing
+// else could have consumed or invalidated it in between.
 //
 // Peer contracts (StackManager/HWB-2 and NeighborGenerator/HWB-1 are
 // implemented against these; VisitedMemory/HWC-1 is not, so that part is
@@ -32,15 +54,25 @@
 //     trusting either signal.
 //   - VisitedMemory: addr asserted one cycle is reflected on rdata/we by the
 //     following cycle (at least one clock of latency).
+//   - GridMemory: grid_value is read through the *same* address wire as
+//     vis_addr (dfs_accelerator.h ties GridMemory.raddr and
+//     VisitedMemory.addr to one signal — both memories are indexed
+//     identically, cell_index(x,y)), so it becomes valid on the same
+//     one-cycle schedule as vis_is_visited: address asserted in Pop,
+//     value read in Visit.
 //
-// Known scope limits: this FSM performs a content-agnostic reachability
-// traversal — it does not consult GridMemory, so it marks/expands every
-// in-bounds neighbour regardless of cell value. Grid-aware filtering needs a
-// read datapath from GridMemory into the controller that does not exist yet.
-// It also does not consult StackManager.full before pushing; StackManager
-// silently drops a push past kStackDepth (see stack_manager.h) rather than
-// corrupting memory, so a dense grid degrades by losing some pushed
-// neighbours instead of crashing, until HWB-2 back-pressure is added here.
+// A cell counts as passable when grid_value != 0 — matches
+// number_of_islands-style land/water grids, the only real consumer of this
+// path; the other four algorithms go through the fine-grained primitive
+// path instead (see TlmAccelerator), which doesn't touch this datapath.
+//
+// Before every push (ScanNext, PushNeighbor) the FSM checks stk_full and, if
+// the stack is already at capacity, drops that push and latches overflow_
+// instead of asserting stk_push — StackManager would silently drop it
+// anyway (see stack_manager.h), but checking here means the host gets an
+// explicit kStatusOverflow bit (memory_map.h) instead of a silently
+// under-counted result. The traversal still runs to completion on whatever
+// made it onto the stack; it does not stop or retry the dropped push.
 
 #include <cstdint>
 
@@ -57,10 +89,14 @@ SC_MODULE(DfsController) {
     sc_out<bool> busy;
     sc_out<bool> done;
 
-    // Host-configured traversal parameters.
+    // Host-configured traversal parameters. start_x/start_y are unused —
+    // see the file comment (multi-source scan replaces a single start
+    // point) — kept only so the register map still reads back what was
+    // written.
     sc_in<sc_uint<32>> start_x;
     sc_in<sc_uint<32>> start_y;
-    sc_in<sc_uint<32>> cols;  // row-major stride, used to address Visited Memory
+    sc_in<sc_uint<32>> rows;
+    sc_in<sc_uint<32>> cols;  // row-major stride, used to address memories
 
     // Stack Manager (HWB-2).
     sc_out<bool> stk_push;
@@ -68,6 +104,7 @@ SC_MODULE(DfsController) {
     sc_out<sc_uint<32>> stk_in_x;
     sc_out<sc_uint<32>> stk_in_y;
     sc_in<bool> stk_empty;
+    sc_in<bool> stk_full;
     sc_in<sc_uint<32>> stk_top_x;
     sc_in<sc_uint<32>> stk_top_y;
 
@@ -85,8 +122,15 @@ SC_MODULE(DfsController) {
     sc_out<sc_uint<32>> vis_addr;
     sc_in<bool> vis_is_visited;
 
-    // Result Interface (HWA-3): running count of cells marked visited so far.
-    sc_out<sc_uint<32>> visited_count;
+    // Grid Memory (HWC-1): read-only content check, addressed via vis_addr.
+    sc_in<sc_int<32>> grid_value;
+
+    // Result Interface (HWA-3).
+    sc_out<sc_uint<32>> visited_count;  // total cells marked, across all islands
+    sc_out<sc_uint<32>> island_count;   // number of distinct islands found
+    // Set if a push was ever dropped this run because the stack was full —
+    // see memory_map.h's kStatusOverflow.
+    sc_out<bool> overflow;
 
     enum class State {
         Idle,
@@ -95,6 +139,7 @@ SC_MODULE(DfsController) {
         Visit,
         GenNeighbors,
         PushNeighbor,
+        ScanNext,
         Done,
     };
 
@@ -119,12 +164,19 @@ SC_MODULE(DfsController) {
             vis_we.write(false);
             vis_addr.write(0);
             visited_count.write(0);
+            island_count.write(0);
+            overflow.write(false);
             cur_node_x_ = 0;
             cur_node_y_ = 0;
             nbr_latch_x_ = 0;
             nbr_latch_y_ = 0;
+            scan_x_ = 0;
+            scan_y_ = 0;
             ngen_wait_ = false;
+            is_new_island_start_ = false;
             visited_count_ = 0;
+            island_count_ = 0;
+            overflow_ = false;
             return;
         }
 
@@ -140,22 +192,48 @@ SC_MODULE(DfsController) {
                 done.write(false);
                 if (start.read()) {
                     visited_count_ = 0;
+                    island_count_ = 0;
+                    overflow_ = false;
                     state_ = State::LoadStart;
                 }
                 break;
 
             case State::LoadStart:
                 busy.write(true);
-                stk_in_x.write(start_x.read());
-                stk_in_y.write(start_y.read());
-                stk_push.write(true);
+                scan_x_ = 0;
+                scan_y_ = 0;
+                state_ = State::ScanNext;
+                break;
+
+            case State::ScanNext:
+                busy.write(true);
+                if (scan_y_ >= rows.read()) {
+                    // Swept the whole grid: nothing left to start from.
+                    state_ = State::Done;
+                    break;
+                }
+                if (stk_full.read()) {
+                    overflow_ = true;
+                } else {
+                    stk_in_x.write(scan_x_);
+                    stk_in_y.write(scan_y_);
+                    stk_push.write(true);
+                    is_new_island_start_ = true;
+                }
+                // Advance the pointer for next time, row-major.
+                if (scan_x_ + 1 >= cols.read()) {
+                    scan_x_ = 0;
+                    ++scan_y_;
+                } else {
+                    ++scan_x_;
+                }
                 state_ = State::Pop;
                 break;
 
             case State::Pop:
                 busy.write(true);
                 if (stk_empty.read()) {
-                    state_ = State::Done;
+                    state_ = State::ScanNext;
                     break;
                 }
                 cur_node_x_ = stk_top_x.read();
@@ -167,13 +245,20 @@ SC_MODULE(DfsController) {
 
             case State::Visit:
                 busy.write(true);
-                if (vis_is_visited.read()) {
-                    state_ = State::Pop;  // already seen: drop it, try the next one
+                if (vis_is_visited.read() || grid_value.read() == 0) {
+                    // Already seen, or an impassable cell (e.g. water): drop
+                    // it, try the next one. Leave is_new_island_start_ as-is
+                    // — ScanNext's next candidate inherits it.
+                    state_ = State::Pop;
                     break;
                 }
                 vis_we.write(true);
                 vis_addr.write(cell_index(cur_node_x_, cur_node_y_));
                 ++visited_count_;
+                if (is_new_island_start_) {
+                    ++island_count_;
+                    is_new_island_start_ = false;
+                }
                 cur_x.write(cur_node_x_);
                 cur_y.write(cur_node_y_);
                 ngen_valid_in.write(true);
@@ -208,9 +293,13 @@ SC_MODULE(DfsController) {
 
             case State::PushNeighbor:
                 busy.write(true);
-                stk_in_x.write(nbr_latch_x_);
-                stk_in_y.write(nbr_latch_y_);
-                stk_push.write(true);
+                if (stk_full.read()) {
+                    overflow_ = true;  // dropped this neighbour, keep going
+                } else {
+                    stk_in_x.write(nbr_latch_x_);
+                    stk_in_y.write(nbr_latch_y_);
+                    stk_push.write(true);
+                }
                 ngen_valid_in.write(true);  // request the next candidate
                 ngen_wait_ = true;
                 state_ = State::GenNeighbors;
@@ -225,6 +314,8 @@ SC_MODULE(DfsController) {
                     // is skipped on this direct Done -> LoadStart path).
                     done.write(false);
                     visited_count_ = 0;
+                    island_count_ = 0;
+                    overflow_ = false;
                     state_ = State::LoadStart;
                 } else {
                     done.write(true);
@@ -233,6 +324,8 @@ SC_MODULE(DfsController) {
         }
 
         visited_count.write(visited_count_);
+        island_count.write(island_count_);
+        overflow.write(overflow_);
     }
 
   private:
@@ -245,8 +338,13 @@ SC_MODULE(DfsController) {
     sc_uint<32> cur_node_y_ = 0;
     sc_uint<32> nbr_latch_x_ = 0;
     sc_uint<32> nbr_latch_y_ = 0;
+    sc_uint<32> scan_x_ = 0;
+    sc_uint<32> scan_y_ = 0;
     bool ngen_wait_ = false;
+    bool is_new_island_start_ = false;
     std::uint32_t visited_count_ = 0;
+    std::uint32_t island_count_ = 0;
+    bool overflow_ = false;
 };
 
 }  // namespace dfs

@@ -72,6 +72,7 @@ SC_MODULE(DfsAccelerator) {
         controller.stk_push(stk_push_sig_);
         controller.stk_pop(stk_pop_sig_);
         controller.stk_empty(stk_empty_sig_);
+        controller.stk_full(stk_full_sig_);
         controller.stk_top_x(stk_top_x_sig_);
         controller.stk_top_y(stk_top_y_sig_);
         stack_mgr.push_en(stk_push_sig_);
@@ -102,6 +103,7 @@ SC_MODULE(DfsAccelerator) {
         neighbor_gen.nbr_y(ngen_y_sig_);
         neighbor_gen.rows(rows_sig_);
         neighbor_gen.cols(cols_sig_);
+        neighbor_gen.connectivity(params_sig_);
         // The node under expansion, latched by the controller when it pops it
         // off the stack (stack top itself may have already advanced by then).
         controller.cur_x(ngen_cur_x_sig_);
@@ -120,29 +122,34 @@ SC_MODULE(DfsAccelerator) {
         // A host Start also begins a fresh traversal, so it clears Visited Memory.
         visited_mem.clear(start_pulse_sig_);
 
-        // Host-configured start coordinate + row stride (for Visited Memory
-        // addressing) feed the controller directly.
+        // Host-configured start coordinate (unused by the FSM — see the
+        // scope note atop dfs_controller.h) + grid dimensions feed the
+        // controller directly.
         controller.start_x(start_x_sig_);
         controller.start_y(start_y_sig_);
+        controller.rows(rows_sig_);
         controller.cols(cols_sig_);
         controller.visited_count(visited_count_sig_);
+        controller.island_count(island_count_sig_);
+        controller.overflow(overflow_sig_);
 
-        // Grid Memory: write port driven by the host (LoadGrid over TLM). The
-        // read port has no consumer: DfsController performs a content-agnostic
-        // reachability traversal and never looks up cell values (see the scope
-        // note atop dfs_controller.h). Grid-aware filtering needs a read
-        // datapath into the controller that does not exist yet.
+        // Grid Memory: write port driven by the host (LoadGrid over TLM).
+        // The read port shares the *same* address wire as Visited Memory —
+        // both are indexed identically (cell_index(x,y)), and the controller
+        // already asserts vis_addr for every node it checks, so this needs
+        // no separate address port on the controller.
         grid_mem.we(grid_we_sig_);
         grid_mem.waddr(grid_waddr_sig_);
         grid_mem.wdata(grid_wdata_sig_);
-        grid_mem.raddr(grid_raddr_sig_);
+        grid_mem.raddr(vis_addr_sig_);
         grid_mem.rdata(grid_rdata_sig_);
+        controller.grid_value(grid_rdata_sig_);
 
-        // Result Interface. The controller's running visited count doubles as
-        // this accelerator's scalar result (single-source reachability: the
-        // "value" is the size of the visited region).
+        // Result Interface. "value" is the island count (multi-source scan —
+        // see dfs_controller.h); visited_cells is the total across all
+        // islands, a separate, independently useful metric.
         result_if.done(done_sig_);
-        result_if.result_value(visited_count_sig_);
+        result_if.result_value(island_count_sig_);
         result_if.visited_cells(visited_count_sig_);
         result_if.peak_stack_depth(stk_peak_depth_sig_);
         result_if.result_valid(result_valid_sig_);
@@ -228,7 +235,7 @@ SC_MODULE(DfsAccelerator) {
             case memmap::kRegCols: cols_sig_.write(value); return true;
             case memmap::kRegStartX: start_x_sig_.write(value); return true;
             case memmap::kRegStartY: start_y_sig_.write(value); return true;
-            case memmap::kRegParams: params_reg_ = value; return true;
+            case memmap::kRegParams: params_sig_.write(value); return true;
             default: break;
         }
 
@@ -270,14 +277,21 @@ SC_MODULE(DfsAccelerator) {
                 // case after another) could read Done immediately after
                 // requesting the *new* run and get the *previous* run's
                 // still-latched result instead of waiting for this one.
+                //
+                // Overflow needs no such masking: DfsController resets it
+                // the same cycle it enters LoadStart for a new run (see
+                // dfs_controller.h), strictly before busy would ever clear
+                // run_pending_ — so it can't be read stale from a prior run
+                // either.
                 value = (busy_sig_.read() ? memmap::kStatusBusy : 0) |
-                        ((result_valid_sig_.read() && !run_pending_) ? memmap::kStatusDone : 0);
+                        ((result_valid_sig_.read() && !run_pending_) ? memmap::kStatusDone : 0) |
+                        (overflow_sig_.read() ? memmap::kStatusOverflow : 0);
                 return true;
             case memmap::kRegRows: value = rows_sig_.read(); return true;
             case memmap::kRegCols: value = cols_sig_.read(); return true;
             case memmap::kRegStartX: value = start_x_sig_.read(); return true;
             case memmap::kRegStartY: value = start_y_sig_.read(); return true;
-            case memmap::kRegParams: value = params_reg_; return true;
+            case memmap::kRegParams: value = params_sig_.read(); return true;
             case memmap::kRegResult:
             case memmap::kRegVisited:
             case memmap::kRegPeakStack: {
@@ -299,12 +313,13 @@ SC_MODULE(DfsAccelerator) {
     sc_signal<sc_uint<32>> cols_sig_{"cols_sig"};
     sc_signal<sc_uint<32>> start_x_sig_{"start_x_sig"};
     sc_signal<sc_uint<32>> start_y_sig_{"start_y_sig"};
-    std::uint32_t params_reg_ = 0;  // no consumer yet (connectivity 4 vs 8, HWB-1)
+    sc_signal<sc_uint<32>> params_sig_{"params_sig"};  // connectivity: 4 or 8
 
     // ── Host control handshake ──────────────────────────────────────────────
     sc_signal<bool> start_pulse_sig_{"start_pulse_sig"};  // one-cycle pulse, see drive_start_pulse()
     sc_signal<bool> busy_sig_{"busy_sig"};
     sc_signal<bool> done_sig_{"done_sig"};
+    sc_signal<bool> overflow_sig_{"overflow_sig"};
 
     // ── Controller <-> Stack Manager ─────────────────────────────────────────
     sc_signal<bool> stk_push_sig_{"stk_push_sig"};
@@ -336,11 +351,11 @@ SC_MODULE(DfsAccelerator) {
     sc_signal<bool> grid_we_sig_{"grid_we_sig"};
     sc_signal<sc_uint<32>> grid_waddr_sig_{"grid_waddr_sig"};
     sc_signal<sc_int<32>> grid_wdata_sig_{"grid_wdata_sig"};
-    sc_signal<sc_uint<32>> grid_raddr_sig_{"grid_raddr_sig"};
-    sc_signal<sc_int<32>> grid_rdata_sig_{"grid_rdata_sig"};
+    sc_signal<sc_int<32>> grid_rdata_sig_{"grid_rdata_sig"};  // raddr reuses vis_addr_sig_
 
     // ── Result Interface ─────────────────────────────────────────────────────
     sc_signal<sc_uint<32>> visited_count_sig_{"visited_count_sig"};
+    sc_signal<sc_uint<32>> island_count_sig_{"island_count_sig"};
     sc_signal<bool> result_valid_sig_{"result_valid_sig"};
 };
 

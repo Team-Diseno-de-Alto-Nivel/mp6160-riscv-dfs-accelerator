@@ -65,7 +65,7 @@ SC_MODULE(StackManager) {
         }
         if (push_en.read()) {
             if (sp_ < config::kStackDepth) {
-                storage_[sp_] = Coord{static_cast<std::uint32_t>(in_x.read()),
+                storage_[sp_] = CellCoord{static_cast<std::uint32_t>(in_x.read()),
                                        static_cast<std::uint32_t>(in_y.read())};
                 ++sp_;
                 if (sp_ > peak_) peak_ = sp_;
@@ -110,7 +110,7 @@ SC_MODULE(StackManager) {
     }
 
   private:
-    Coord storage_[config::kStackDepth];
+    CellCoord storage_[config::kStackDepth];
     std::uint32_t sp_ = 0;
     std::uint32_t peak_ = 0;
 };

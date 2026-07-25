@@ -1,13 +1,18 @@
 // Host co-simulation entry point (INT-1): the RISC-V-side program drives the
-// (mock) accelerator model over TLM 2.0 and the results are cross-checked against
-// the software baseline.
+// real accelerator model (src/model) over TLM 2.0 and the results are
+// cross-checked against the software baseline.
 //
 //   #29        end-to-end program <-> model over the register/MMIO surface.
 //   #38-#41    each of the five algorithms run along the ON path over TLM.
 //   #43        per-case cross-check: baseline (OFF) result == accelerator (ON).
 //
-// The model is MockAcceleratorModel today; swap it for src/model/DfsAccelerator
-// once the hardware modules are implemented (see the mock's TODO markers).
+// RealAcceleratorBridge (dfs_accelerator_bridge.h) wraps the real
+// src/model/DfsAccelerator and exposes the same reg_socket/prim_socket
+// surfaces MockAcceleratorModel used to — see its file comment for how each
+// surface maps onto the real hardware, and why the register path's
+// cross-check is specifically number_of_islands (that's what
+// DfsController's multi-source scan computes; see the scope note atop
+// dfs_controller.h).
 
 #include <systemc.h>
 #include <tlm.h>
@@ -24,7 +29,7 @@
 #include "harness/instrumentation.h"
 #include "harness/metrics.h"
 #include "harness/report.h"
-#include "integration/mock_accelerator_model.h"
+#include "integration/dfs_accelerator_bridge.h"
 #include "integration/tlm_accelerator.h"
 #include "integration/tlm_bus.h"
 
@@ -149,7 +154,7 @@ int sc_main(int, char*[]) {
     using namespace dfs;
     using namespace dfs::integration;
 
-    MockAcceleratorModel model("model");
+    RealAcceleratorBridge model("model");
     Initiator initiator("initiator");
     initiator.reg_init.bind(model.reg_socket);
     initiator.prim_init.bind(model.prim_socket);

@@ -3,6 +3,20 @@
 // TLM 2.0 initiator socket: every write32/read32 becomes a b_transport call on the
 // accelerator's register/memory-map surface. This is the coarse whole-traversal
 // integration path exercised by INT-1 (#29) end-to-end.
+//
+// access() calls wait(delay) after every transaction (standard TLM2.0 LT
+// "catch up" — see any tlm_quantumkeeper-based example for the fuller
+// pattern; this is the direct, unmanaged version of it). This matters more
+// than it looks: AcceleratorDriver::wait_done() is a plain `while
+// (!done()) {}` spin with no SystemC awareness of its own (it also has to
+// work unmodified on bare-metal RISC-V, where busy-waiting on a real MMIO
+// register is correct and there's no kernel to yield to). Against the mock
+// accelerator that was harmless — it answered synchronously within the same
+// call, no clock involved. Against the real DfsAccelerator (a genuine
+// clocked FSM) it deadlocks: with no wait() anywhere in the loop, simulated
+// time — and therefore every clock edge DfsController needs to ever make
+// progress — never advances, so `done()` can never become true. wait(delay)
+// here is what lets each poll actually advance the clock.
 
 #include <tlm.h>
 
@@ -42,6 +56,7 @@ class TlmBus final : public driver::Bus {
         trans.set_dmi_allowed(false);
         trans.set_response_status(tlm::TLM_INCOMPLETE_RESPONSE);
         transport_(trans, delay);
+        sc_core::wait(delay);
     }
 
     TransportFn transport_;
