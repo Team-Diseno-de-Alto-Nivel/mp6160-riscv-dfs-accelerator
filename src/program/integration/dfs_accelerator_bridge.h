@@ -89,24 +89,24 @@ SC_MODULE(RealAcceleratorBridge) {
                 grid_ = msg.grid;
                 conn_ = msg.connectivity;
                 for (std::size_t i = 0; i < grid_->cells.size(); ++i) {
-                    accel.grid_mem.load_cell(static_cast<std::uint32_t>(i), grid_->cells[i]);
+                    accel.engine.grid_mem.load_cell(static_cast<std::uint32_t>(i), grid_->cells[i]);
                 }
-                accel.visited_mem.clear_all();
+                accel.engine.visited_mem.clear_all();
                 return;
             case PrimOp::ResetVisited:
-                accel.visited_mem.clear_all();
+                accel.engine.visited_mem.clear_all();
                 return;
             case PrimOp::IsVisited:
-                msg.visited_out = accel.visited_mem.peek(index(msg.cell));
+                msg.visited_out = accel.engine.visited_mem.peek(index(msg.cell));
                 return;
             case PrimOp::MarkVisited: {
                 const std::uint32_t i = index(msg.cell);
-                msg.newly_marked_out = !accel.visited_mem.peek(i);
-                accel.visited_mem.poke(i, true);
+                msg.newly_marked_out = !accel.engine.visited_mem.peek(i);
+                accel.engine.visited_mem.poke(i, true);
                 return;
             }
             case PrimOp::UnmarkVisited:
-                accel.visited_mem.poke(index(msg.cell), false);
+                accel.engine.visited_mem.poke(index(msg.cell), false);
                 return;
             case PrimOp::Neighbors: {
                 const int count = (conn_ == Connectivity::Eight) ? 8 : 4;

@@ -11,11 +11,8 @@
 #include "config/accelerator_config.h"
 #include "config/memory_map.h"
 #include "modules/dfs_controller.h"
-#include "modules/grid_memory.h"
-#include "modules/neighbor_generator.h"
+#include "modules/dfs_processing_engine.h"
 #include "modules/result_interface.h"
-#include "modules/stack_manager.h"
-#include "modules/visited_memory.h"
 #include "utils/types.h"
 
 namespace dfs {
@@ -27,19 +24,13 @@ SC_MODULE(DfsAccelerator) {
     sc_in<bool> rst_n;
 
     DfsController controller;
-    NeighborGenerator neighbor_gen;
-    StackManager stack_mgr;
-    GridMemory grid_mem;
-    VisitedMemory visited_mem;
+    DfsProcessingEngine engine;
     ResultInterface result_if;
 
     SC_CTOR(DfsAccelerator)
         : socket("socket"),
           controller("controller"),
-          neighbor_gen("neighbor_gen"),
-          stack_mgr("stack_mgr"),
-          grid_mem("grid_mem"),
-          visited_mem("visited_mem"),
+          engine("engine"),
           result_if("result_if") {
         socket.register_b_transport(this, &DfsAccelerator::b_transport);
 
@@ -53,13 +44,8 @@ SC_MODULE(DfsAccelerator) {
         // Clock / reset fan-out.
         controller.clk(clk);
         controller.rst_n(rst_n);
-        neighbor_gen.clk(clk);
-        neighbor_gen.rst_n(rst_n);
-        stack_mgr.clk(clk);
-        stack_mgr.rst_n(rst_n);
-        stack_mgr.clear(start_pulse_sig_);
-        grid_mem.clk(clk);
-        visited_mem.clk(clk);
+        engine.clk(clk);
+        engine.rst_n(rst_n);
         result_if.clk(clk);
         result_if.rst_n(rst_n);
 
@@ -75,18 +61,23 @@ SC_MODULE(DfsAccelerator) {
         controller.stk_full(stk_full_sig_);
         controller.stk_top_x(stk_top_x_sig_);
         controller.stk_top_y(stk_top_y_sig_);
-        stack_mgr.push_en(stk_push_sig_);
-        stack_mgr.pop_en(stk_pop_sig_);
-        stack_mgr.empty(stk_empty_sig_);
-        stack_mgr.top_x(stk_top_x_sig_);
-        stack_mgr.top_y(stk_top_y_sig_);
-        stack_mgr.full(stk_full_sig_);
-        stack_mgr.peak_depth(stk_peak_depth_sig_);
+        engine.stack_mgr.push_en(stk_push_sig_);
+        engine.stack_mgr.pop_en(stk_pop_sig_);
+        engine.stack_mgr.empty(stk_empty_sig_);
+        engine.stack_mgr.top_x(stk_top_x_sig_);
+        engine.stack_mgr.top_y(stk_top_y_sig_);
+        engine.stack_mgr.full(stk_full_sig_);
+        engine.stack_mgr.peak_depth(stk_peak_depth_sig_);
         // Push data: scan candidate or discovered neighbour, see run_fsm().
         controller.stk_in_x(stk_in_x_sig_);
         controller.stk_in_y(stk_in_y_sig_);
-        stack_mgr.in_x(stk_in_x_sig_);
-        stack_mgr.in_y(stk_in_y_sig_);
+        engine.stack_mgr.in_x(stk_in_x_sig_);
+        engine.stack_mgr.in_y(stk_in_y_sig_);
+        // A host Start also begins a fresh traversal, so it clears the stack.
+        // (moved here from the clk/rst_n fan-out block above — same signal,
+        // same behaviour, just grouped with the rest of the Stack Manager
+        // wiring for readability.)
+        engine.stack_mgr.clear(start_pulse_sig_);
 
         // Controller <-> Neighbor Generator.
         controller.ngen_valid_in(ngen_valid_in_sig_);
@@ -94,30 +85,30 @@ SC_MODULE(DfsAccelerator) {
         controller.ngen_done(ngen_done_sig_);
         controller.ngen_x(ngen_x_sig_);
         controller.ngen_y(ngen_y_sig_);
-        neighbor_gen.valid_in(ngen_valid_in_sig_);
-        neighbor_gen.valid_out(ngen_valid_out_sig_);
-        neighbor_gen.done(ngen_done_sig_);
-        neighbor_gen.nbr_x(ngen_x_sig_);
-        neighbor_gen.nbr_y(ngen_y_sig_);
-        neighbor_gen.rows(rows_sig_);
-        neighbor_gen.cols(cols_sig_);
-        neighbor_gen.connectivity(params_sig_);
+        engine.neighbor_gen.valid_in(ngen_valid_in_sig_);
+        engine.neighbor_gen.valid_out(ngen_valid_out_sig_);
+        engine.neighbor_gen.done(ngen_done_sig_);
+        engine.neighbor_gen.nbr_x(ngen_x_sig_);
+        engine.neighbor_gen.nbr_y(ngen_y_sig_);
+        engine.neighbor_gen.rows(rows_sig_);
+        engine.neighbor_gen.cols(cols_sig_);
+        engine.neighbor_gen.connectivity(params_sig_);
         // Node under expansion, latched by the controller on pop.
         controller.cur_x(ngen_cur_x_sig_);
         controller.cur_y(ngen_cur_y_sig_);
-        neighbor_gen.cur_x(ngen_cur_x_sig_);
-        neighbor_gen.cur_y(ngen_cur_y_sig_);
+        engine.neighbor_gen.cur_x(ngen_cur_x_sig_);
+        engine.neighbor_gen.cur_y(ngen_cur_y_sig_);
 
         // Controller <-> Visited Memory.
         controller.vis_we(vis_we_sig_);
         controller.vis_addr(vis_addr_sig_);
         controller.vis_is_visited(vis_is_visited_sig_);
-        visited_mem.we(vis_we_sig_);
-        visited_mem.addr(vis_addr_sig_);
-        visited_mem.rdata(vis_is_visited_sig_);
-        visited_mem.wdata(vis_mark_sig_);  // controller only marks, never unmarks
+        engine.visited_mem.we(vis_we_sig_);
+        engine.visited_mem.addr(vis_addr_sig_);
+        engine.visited_mem.rdata(vis_is_visited_sig_);
+        engine.visited_mem.wdata(vis_mark_sig_);  // controller only marks, never unmarks
         // A host Start also begins a fresh traversal, so it clears Visited Memory.
-        visited_mem.clear(start_pulse_sig_);
+        engine.visited_mem.clear(start_pulse_sig_);
 
         // start_x/y unused by the FSM, see dfs_controller.h.
         controller.start_x(start_x_sig_);
@@ -130,11 +121,11 @@ SC_MODULE(DfsAccelerator) {
 
         // Grid read port shares Visited Memory's address wire — both are
         // indexed the same way, so no separate address port needed.
-        grid_mem.we(grid_we_sig_);
-        grid_mem.waddr(grid_waddr_sig_);
-        grid_mem.wdata(grid_wdata_sig_);
-        grid_mem.raddr(vis_addr_sig_);
-        grid_mem.rdata(grid_rdata_sig_);
+        engine.grid_mem.we(grid_we_sig_);
+        engine.grid_mem.waddr(grid_waddr_sig_);
+        engine.grid_mem.wdata(grid_wdata_sig_);
+        engine.grid_mem.raddr(vis_addr_sig_);
+        engine.grid_mem.rdata(grid_rdata_sig_);
         controller.grid_value(grid_rdata_sig_);
 
         // "value" is the island count; visited_cells is the total across
@@ -222,9 +213,10 @@ SC_MODULE(DfsAccelerator) {
         grid_waddr_sig_.write(static_cast<std::uint32_t>(idx));
         grid_wdata_sig_.write(static_cast<std::int32_t>(value));
         grid_we_sig_.write(true);
+        
         // Real load happens through this backdoor, not the signal path
         // above — see load_cell() in grid_memory.h for why.
-        grid_mem.load_cell(static_cast<std::uint32_t>(idx), static_cast<CellValue>(value));
+        engine.grid_mem.load_cell(static_cast<std::uint32_t>(idx), static_cast<CellValue>(value));
         return true;
     }
 
