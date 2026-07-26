@@ -1,24 +1,17 @@
 #pragma once
 // Stack Manager (HWB-2): LIFO of unexplored nodes; tracks peak depth.
 //
-// top_x/top_y/empty/full/peak_depth are driven by a *combinational* preview
-// of this cycle's push_en/pop_en request, not by the registered storage_/sp_
-// alone. Reason: a cross-module signal write only becomes visible to a peer
-// one cycle after it is made, so if these outputs only reflected the
-// already-committed state, a push at cycle T would only appear as the new
-// top at cycle T+2 (T+1 for the push to reach commit(), T+2 for that commit
-// to reach the reader). DfsController's Pop state reads top_x/top_y/empty
-// unconditionally the cycle right after a push (it does not poll/retry), so
-// it needs the T+1 visibility this preview provides — see the peer-contract
-// note atop dfs_controller.h. The actual sp_/storage_ mutation still only
-// commits synchronously in commit(), one cycle after the request, exactly
-// like a normal register.
+// top_x/top_y/empty/full/peak_depth are a *combinational* preview of this
+// cycle's push_en/pop_en, not the registered state — a cross-module signal
+// takes a cycle to reach a peer, so a plain registered output would show a
+// push as the new top two cycles late. DfsController's Pop reads top/empty
+// unconditionally the cycle right after a push (no poll/retry), so it needs
+// that one-cycle visibility. The actual sp_/storage_ write still only
+// commits in commit(), one cycle later, like a normal register.
 //
-// clear resets sp_/peak_ for a fresh run (wired from the same Start pulse as
-// VisitedMemory.clear in dfs_accelerator.h) — without it, peak_depth would
-// report the highest depth ever seen since reset instead of this run's peak,
-// making run-by-run metrics (docs/guides/metrics-schema.md) meaningless
-// after the first run against a given accelerator instance.
+// clear resets sp_/peak_ for a fresh run (same Start pulse as
+// VisitedMemory.clear) — otherwise peak_depth would report the max since
+// reset instead of this run's peak.
 
 #include <algorithm>
 #include <cstdint>
@@ -55,8 +48,7 @@ SC_MODULE(StackManager) {
         sensitive << clear << push_en << pop_en << in_x << in_y << rst_n;
     }
 
-    // Synchronous: the actual, persistent stack pointer/storage update, one
-    // cycle after push_en/pop_en is asserted (a normal registered write).
+    // Actual registered push/pop, one cycle after the request.
     void commit() {
         if (!rst_n.read() || clear.read()) {
             sp_ = 0;
@@ -76,9 +68,7 @@ SC_MODULE(StackManager) {
         }
     }
 
-    // Combinational: previews the effect of *this* cycle's clear/push_en/
-    // pop_en before commit() applies it at the next edge — see the file
-    // comment.
+    // Preview of this cycle's request, see file comment.
     void preview() {
         if (!rst_n.read() || clear.read()) {
             empty.write(true);

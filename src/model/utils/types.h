@@ -1,12 +1,9 @@
 #pragma once
 // Common value types shared across the SystemC model.
 //
-// Named CellCoord (not Coord) deliberately: src/program/dfs_types.h defines
-// its own dfs::Coord ({row, col}, not {x, y}) for the software side, and
-// nothing in src/model included src/program headers until the INT-1
-// integration bridge needed to reach into both — at that point a same-name,
-// different-layout dfs::Coord in each half would collide (ODR violation) the
-// instant one file includes both.
+// Named CellCoord, not Coord: src/program/dfs_types.h has its own dfs::Coord
+// ({row, col}) for the software side. Same name, different layout, same
+// namespace — including both headers in one file would be an ODR violation.
 
 #include <cstdint>
 

@@ -1,13 +1,11 @@
-// Simulation entry point (INT-1): instantiates the accelerator top-level,
-// drives it with a small demonstration traversal over its TLM register/MMIO
-// surface, and reports the result.
+// Simulation entry point (INT-1): instantiates the accelerator, drives a
+// small demonstration traversal over its TLM register/MMIO surface, and
+// reports the result.
 //
-// This is a standalone smoke test for the model build (`make model` /
-// `make run`) — it does not run the RISC-V software (src/program, a
-// separate cross-compiled target) or the co-simulation cross-check harness
-// (src/program/integration, its own sc_main, wired to this same
-// DfsAccelerator via integration/dfs_accelerator_bridge.h). Those still use
-// their own entry points.
+// Standalone smoke test for `make model` / `make run` — the RISC-V software
+// (src/program) and the co-simulation cross-check (src/program/integration,
+// wired to this same DfsAccelerator via dfs_accelerator_bridge.h) have their
+// own entry points.
 
 #include <systemc.h>
 #include <tlm.h>
