@@ -381,6 +381,54 @@ software is compiled with \texttt{riscv64-unknown-elf-gcc/g++}. The hardware
 implementation is carried out through high-level synthesis (HLS) with AMD Vitis
 HLS and Vivado, targeting an AMD Kria KV260 FPGA.
 
+\subsection{Preliminary Results}
+
+The experiment plan above has been executed end to end: the RISC-V software
+baseline and the real, synthesizable SystemC/TLM~2.0 accelerator model (not a
+behavioral stand-in) were co-simulated over the same TLM~2.0 register
+interface used by the hardware, for all five problems and their variants,
+with the accelerator off and on. Every one of the 21 resulting cases matches
+the software baseline exactly, confirming that the accelerator logic is
+correct ahead of physical implementation. Table~\ref{tab:prelim_results}
+summarizes the simulated-latency speedup observed per problem; the
+per-case data (instruction count, throughput, visited cells, and peak
+stack depth) is in the project repository.
+
+\begin{table}[h]
+\centering
+\caption{Preliminary speedup (accelerator on vs.\ off), simulated latency.}
+\label{tab:prelim_results}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{3.55cm}cc@{}}
+\toprule
+\textbf{Problem (variant)} & \textbf{Cases} & \textbf{Speedup range} \\
+\midrule
+Number of Islands & 6 & 1.39$\times$--1.97$\times$ \\
+Unique Paths III & 3 & 1.47$\times$--1.50$\times$ \\
+Word Search II & 2 & 1.47$\times$--1.60$\times$ \\
+Word Search II (no pruning) & 2 & 1.55$\times$--1.67$\times$ \\
+Longest Increasing Path & 3 & 4.00$\times$ (constant) \\
+Longest Increasing Path (no memo) & 3 & 4.00$\times$ (constant) \\
+Pacific Atlantic & 2 & 1.33$\times$--1.50$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two patterns stand out. First, \textit{Number of Islands} gains more from the
+accelerator on denser, more fragmented grids (checkerboard, 1.60--1.97$\times$)
+than on a single connected region (1.39--1.47$\times$): the more islands the
+multi-source scan has to restart from, the more of the traversal's
+visited/neighbour bookkeeping the controller takes over from the software.
+Second, \textit{Longest Increasing Path} shows an exact, constant
+4$\times$ speedup regardless of memoization. That problem is driven entirely
+through the fine-grained primitive interface (\textit{is\_visited},
+\textit{mark\_visited}, \textit{neighbours}), so the ratio reflects the fixed
+per-primitive cost difference between the software and accelerator paths in
+the simulation's cost model, not an algorithm-dependent effect.
+
+\pend{Resource usage, Fmax, and OP/s from the Vitis HLS/Vivado synthesis on
+the Kria KV260 are in progress and will be added once available.}
+
 \section*{Artificial Intelligence Use Declaration}
 This paper was made with the help of generative AI tools, specifically in technical claims against the cited sources, improve the writing style, and classify information from prior state-of-the-art work. An example of the kind of prompt used is: \textit{``classify the information we provided on the 10 articles and cite them correctly according to the technique by which they improve DFS, whether traversal parallelization, memory access optimization, or hardware specialization''}. All the content, design decisions, and the final selection of references were reviewed and validated by the authors.
 
