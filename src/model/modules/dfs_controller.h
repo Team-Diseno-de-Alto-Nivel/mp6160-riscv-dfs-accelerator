@@ -216,7 +216,7 @@ SC_MODULE(DfsController) {
 
             case State::Visit:
                 busy.write(true);
-                ++timing_.visit_cycles;
+                ++timing_.visited_cycles;
                 ++timing_.total_cycles;
                 if (vis_is_visited.read() || grid_value.read() == 0) {
                     // already seen or impassable, skip it
