@@ -1,26 +1,16 @@
 #pragma once
 // Grid Memory (HWC-1): read-only input grid, loaded by the host.
 //
-// Split into commit()/preview() for the same reason as StackManager/
-// VisitedMemory (see the timing note atop stack_manager.h): a purely
-// clocked design would only reflect a newly-asserted raddr on rdata two
-// cycles later. raddr is driven by DfsAccelerator off the same wire as
-// VisitedMemory.addr (both memories are indexed identically), so
-// DfsController's content check (see the peer-contract note atop
-// dfs_controller.h) sees rdata exactly one cycle after asserting the
-// address, same as vis_is_visited.
+// commit()/preview() split for the same reason as StackManager/
+// VisitedMemory: raddr is driven off the same wire as VisitedMemory.addr,
+// so rdata needs to line up with vis_is_visited one cycle after the address.
 //
-// load_cell() is a backdoor, non-signal write used by
-// DfsAccelerator::write_reg() to actually load the grid (see its call site
-// for why): the host issues one TLM write per cell in a tight loop with no
-// wait() in between (AcceleratorDriver::load_grid()), and sc_signal only
-// keeps the *last* pending value written to it before the kernel next
-// processes deltas — so every write but the final cell would otherwise be
-// silently lost before this module's own clocked process ever saw them,
-// regardless of whether that process is combinational or clocked. The we/
-// waddr/wdata port below is kept for a hypothetical cycle-accurate write
-// path (e.g. one word per clock, properly spaced with wait()) but is not
-// what the host loading path actually uses.
+// load_cell() is a backdoor write used by DfsAccelerator::write_reg(): the
+// host loads the grid with one TLM write per cell and no wait() in between,
+// and sc_signal only keeps the last pending write before the kernel catches
+// up — so the we/waddr/wdata port below would silently lose every cell but
+// the last. It's kept for a hypothetical properly-paced write path, just
+// not what the real loading path uses.
 
 #include <cstdint>
 
@@ -57,16 +47,7 @@ SC_MODULE(GridMemory) {
         if (index < config::kMaxCells) cells_[index] = value;
     }
 
-    // Backdoor read, same rationale as load_cell(): used by the fine-grained
-    // primitive TLM bridge (src/program/integration) to read a cell's value
-    // directly rather than through raddr/rdata's clocked handshake — see
-    // visited_memory.h's peek()/poke() comment for the fuller reasoning.
-    CellValue peek(std::uint32_t index) const {
-        return index < config::kMaxCells ? cells_[index] : 0;
-    }
-
-    // Synchronous: the actual, persistent array update, one cycle after we
-    // is asserted (a normal registered write) — the cycle-accurate path.
+    // Actual registered write, one cycle after we is asserted.
     void commit() {
         const std::uint32_t w = waddr.read();
         if (we.read() && w < config::kMaxCells) {
@@ -74,9 +55,7 @@ SC_MODULE(GridMemory) {
         }
     }
 
-    // Combinational: previews the effect of *this* cycle's we/waddr/wdata
-    // request on rdata before commit() applies it at the next edge — see
-    // the file comment.
+    // Preview of this cycle's request, see file comment.
     void preview() {
         const std::uint32_t r = raddr.read();
         if (we.read() && waddr.read() == r && r < config::kMaxCells) {

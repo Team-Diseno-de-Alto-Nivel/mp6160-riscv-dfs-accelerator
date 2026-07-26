@@ -82,9 +82,7 @@ SC_MODULE(DfsAccelerator) {
         stack_mgr.top_y(stk_top_y_sig_);
         stack_mgr.full(stk_full_sig_);
         stack_mgr.peak_depth(stk_peak_depth_sig_);
-        // Stack push data comes from the controller: either the host-configured
-        // start coordinate (LoadStart) or the neighbour it just consumed
-        // (PushNeighbor) — see DfsController::run_fsm.
+        // Push data: scan candidate or discovered neighbour, see run_fsm().
         controller.stk_in_x(stk_in_x_sig_);
         controller.stk_in_y(stk_in_y_sig_);
         stack_mgr.in_x(stk_in_x_sig_);
@@ -104,8 +102,7 @@ SC_MODULE(DfsAccelerator) {
         neighbor_gen.rows(rows_sig_);
         neighbor_gen.cols(cols_sig_);
         neighbor_gen.connectivity(params_sig_);
-        // The node under expansion, latched by the controller when it pops it
-        // off the stack (stack top itself may have already advanced by then).
+        // Node under expansion, latched by the controller on pop.
         controller.cur_x(ngen_cur_x_sig_);
         controller.cur_y(ngen_cur_y_sig_);
         neighbor_gen.cur_x(ngen_cur_x_sig_);
@@ -122,9 +119,7 @@ SC_MODULE(DfsAccelerator) {
         // A host Start also begins a fresh traversal, so it clears Visited Memory.
         visited_mem.clear(start_pulse_sig_);
 
-        // Host-configured start coordinate (unused by the FSM — see the
-        // scope note atop dfs_controller.h) + grid dimensions feed the
-        // controller directly.
+        // start_x/y unused by the FSM, see dfs_controller.h.
         controller.start_x(start_x_sig_);
         controller.start_y(start_y_sig_);
         controller.rows(rows_sig_);
@@ -133,11 +128,8 @@ SC_MODULE(DfsAccelerator) {
         controller.island_count(island_count_sig_);
         controller.overflow(overflow_sig_);
 
-        // Grid Memory: write port driven by the host (LoadGrid over TLM).
-        // The read port shares the *same* address wire as Visited Memory —
-        // both are indexed identically (cell_index(x,y)), and the controller
-        // already asserts vis_addr for every node it checks, so this needs
-        // no separate address port on the controller.
+        // Grid read port shares Visited Memory's address wire — both are
+        // indexed the same way, so no separate address port needed.
         grid_mem.we(grid_we_sig_);
         grid_mem.waddr(grid_waddr_sig_);
         grid_mem.wdata(grid_wdata_sig_);
@@ -145,9 +137,8 @@ SC_MODULE(DfsAccelerator) {
         grid_mem.rdata(grid_rdata_sig_);
         controller.grid_value(grid_rdata_sig_);
 
-        // Result Interface. "value" is the island count (multi-source scan —
-        // see dfs_controller.h); visited_cells is the total across all
-        // islands, a separate, independently useful metric.
+        // "value" is the island count; visited_cells is the total across
+        // all islands.
         result_if.done(done_sig_);
         result_if.result_value(island_count_sig_);
         result_if.visited_cells(visited_count_sig_);
@@ -184,35 +175,17 @@ SC_MODULE(DfsAccelerator) {
     }
 
   private:
-    // The host's AcceleratorDriver::start() only ever *sets* the Control.Start
-    // bit (src/program/driver/accelerator_driver.h never clears it back) —
-    // every call writes read-modify-write style, so a *second* start() call
-    // writes the exact same value the register already holds. A level-held
-    // signal would stay asserted forever (permanently holding Visited Memory
-    // in `clear` and making DfsController re-launch a new run every time it
-    // reaches Done); edge-detecting a signal doesn't work either, since
-    // sc_signal only generates a change event when the value actually
-    // *changes* — a same-value rewrite is a no-op and would silently drop
-    // every run after the first (this bit us: the second and third
-    // start()-driven runs in the scratch harness never actually started,
-    // they just re-read the first run's still-latched result).
-    //
-    // start_requested_ instead is a plain bool (not an sc_signal), set
-    // unconditionally by write_reg() on *every* Control write with Start
-    // set, regardless of the bit's previous value, and consumed once per
-    // clock by drive_start_pulse() below. It has to be a plain member rather
-    // than something write_reg() drives directly into start_pulse_sig_: an
-    // sc_signal (default SC_ONE_WRITER policy) requires every write to come
-    // from the same process, and write_reg() runs as part of whatever
-    // process calls b_transport() (the host/initiator side), not as part of
-    // this module's own processes — so the host-triggered request and this
-    // module's derived one-cycle pulse have to be bridged through something
-    // that isn't itself an sc_signal.
+    // AcceleratorDriver::start() never clears the Start bit, just
+    // read-modify-writes it back — so a second start() writes the same
+    // value and an edge-detected signal would never re-fire. start_requested_
+    // is a plain bool instead, unconditionally set true by every Control
+    // write with Start set and consumed once per clock by
+    // drive_start_pulse(). Has to be a plain member rather than an sc_signal
+    // written directly: write_reg() runs in the caller's process (b_transport),
+    // not ours, and sc_signal requires a single writer.
     bool start_requested_ = false;
-    // Unlike start_requested_ (consumed after exactly one cycle), this stays
-    // set across the *whole* request -> DfsController-confirms-busy window —
-    // see the kRegStatus comment in read_reg() for why kStatusDone needs a
-    // mask that lives that long, not just one cycle.
+    // Like start_requested_ but stays set until DfsController reports busy —
+    // see the kRegStatus masking below.
     bool run_pending_ = false;
 
     void drive_start_pulse() {
@@ -245,11 +218,8 @@ SC_MODULE(DfsAccelerator) {
         grid_waddr_sig_.write(static_cast<std::uint32_t>(idx));
         grid_wdata_sig_.write(static_cast<std::int32_t>(value));
         grid_we_sig_.write(true);
-        // The signal path above models one cycle-accurate write; the actual
-        // load happens through this backdoor instead, since LoadGrid issues
-        // one TLM write per cell with no wait() in between — see the
-        // load_cell() comment in grid_memory.h for why that would otherwise
-        // lose every write but the last.
+        // Real load happens through this backdoor, not the signal path
+        // above — see load_cell() in grid_memory.h for why.
         grid_mem.load_cell(static_cast<std::uint32_t>(idx), static_cast<CellValue>(value));
         return true;
     }
@@ -257,32 +227,18 @@ SC_MODULE(DfsAccelerator) {
     bool read_reg(std::uint64_t addr, std::uint32_t& value) const {
         switch (addr) {
             case memmap::kRegControl:
-                // Start reads back as whatever start_requested_ currently
-                // holds: usually 0, since drive_start_pulse() clears it by
-                // the very next clock edge (self-clearing "go" bit).
+                // Start reads back as ~0 most of the time: it self-clears
+                // the next cycle via drive_start_pulse().
                 value = (enabled_ ? memmap::kControlEnable : 0) |
                         (start_requested_ ? memmap::kControlStart : 0);
                 return true;
             case memmap::kRegStatus:
-                // Done tracks ResultInterface's result_valid, not the
-                // controller's raw done, so the host can never observe Done
-                // before latch() has actually captured the result one cycle
-                // later — otherwise a host reading kRegResult right after
-                // seeing Done (as AcceleratorDriver::run() does) could race
-                // ahead of the latch and read a stale value.
-                //
-                // It's also masked by run_pending_: a fresh Start takes a few
-                // cycles to reach DfsController and leave Done, so without
-                // this, a host re-running the accelerator (e.g. one test
-                // case after another) could read Done immediately after
-                // requesting the *new* run and get the *previous* run's
-                // still-latched result instead of waiting for this one.
-                //
-                // Overflow needs no such masking: DfsController resets it
-                // the same cycle it enters LoadStart for a new run (see
-                // dfs_controller.h), strictly before busy would ever clear
-                // run_pending_ — so it can't be read stale from a prior run
-                // either.
+                // Done tracks result_valid (not the controller's raw done)
+                // so a host can't read kRegResult before latch() captures
+                // it. Also masked by run_pending_ until DfsController is
+                // actually busy, so a host re-running back-to-back can't
+                // see the *previous* run's still-latched Done. Overflow
+                // needs no such masking — it's cleared before that window.
                 value = (busy_sig_.read() ? memmap::kStatusBusy : 0) |
                         ((result_valid_sig_.read() && !run_pending_) ? memmap::kStatusDone : 0) |
                         (overflow_sig_.read() ? memmap::kStatusOverflow : 0);

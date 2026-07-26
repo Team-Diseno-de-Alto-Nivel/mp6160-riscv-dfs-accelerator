@@ -30,10 +30,8 @@ SC_MODULE(ResultInterface) {
             return;
         }
 
-        // While the controller holds Done, its outputs are steady, so it is
-        // safe to keep re-latching them every cycle; once a new run starts
-        // (done drops), the last-known result is kept for the host to read
-        // even though result_valid is deasserted immediately.
+        // Re-latch every cycle Done holds (its outputs are steady); once a
+        // new run starts, keep the last result around but drop valid.
         const bool d = done.read();
         if (d) {
             result_.value = result_value.read();

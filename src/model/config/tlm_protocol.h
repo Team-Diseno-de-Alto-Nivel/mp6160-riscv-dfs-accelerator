@@ -1,13 +1,9 @@
 #pragma once
 // TLM 2.0 transaction format between host and accelerator (HWC-3).
 //
-// Not currently wired into DfsAccelerator::b_transport (HWA-1): the actual
-// host paths (src/program/driver/accelerator_driver.h via
-// src/program/integration/tlm_bus.h) issue plain TLM_READ_COMMAND/
-// TLM_WRITE_COMMAND transactions decoded by address against the memory map
-// (config/memory_map.h), not this extension. It's kept available as a
-// properly implemented tlm_extension for a future out-of-band or
-// finer-grained command channel.
+// Not wired into DfsAccelerator::b_transport — the real host paths decode
+// by address against the memory map instead (config/memory_map.h). Kept
+// around for a possible future out-of-band command channel.
 
 #include <cstdint>
 
