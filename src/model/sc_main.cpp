@@ -94,69 +94,21 @@ SC_MODULE(Stimulus) {
         }
 
         if (done) {
-            const uint32_t result = read_reg(memmap::kRegResult);
-            const uint32_t visited = read_reg(memmap::kRegVisited);
-            const uint32_t peak_stack = read_reg(memmap::kRegPeakStack);
-
-            // nuevos registros
-            const uint32_t total_cycles = read_reg(memmap::kRegTotalCycles);
-            const uint32_t pop_cycles = read_reg(memmap::kRegPopCycles);
-            const uint32_t visit_cycles = read_reg(memmap::kRegVisitCycles);
-            const uint32_t neighbor_cycles = read_reg(memmap::kRegNeighborCycles);
-            const uint32_t push_cycles = read_reg(memmap::kRegPushCycles);
-
-            std::cout << ...
-
+            std::cout << "Traversal done: result=" << read_reg(memmap::kRegResult)
+                      << " visited=" << read_reg(memmap::kRegVisited)
+                      << " peak_stack=" << read_reg(memmap::kRegPeakStack) << std::endl;
         } else {
             std::cout << "Traversal did not complete in time" << std::endl;
         }
 
         sc_stop();
     }
-
-    void Stimulus::print_metrics()
-    {
-
-    std::cout << "\n========== DFS Accelerator ==========\n";
-
-    std::cout << "Result            : "
-              << result << '\n';
-
-    std::cout << "Visited cells     : "
-              << visited << '\n';
-
-    std::cout << "Peak stack depth  : "
-              << peak_stack << '\n';
-
-    // Cuando exista HW-TIMING
-
-    /*
-    const sc_time latency =
-        total_cycles * clk.period();
-
-    std::cout << "Total cycles      : "
-              << total_cycles << '\n';
-
-    std::cout << "Latency           : "
-              << latency.to_string() << '\n';
-
-    std::cout << "POP cycles        : "
-              << pop_cycles << '\n';
-    */
-
-    std::cout << "=====================================\n";
-    }
-
 };
 
 }  // namespace dfs
 
 int sc_main(int argc, char* argv[]) {
     sc_clock clk("clk", 10, SC_NS);
-    sc_time latency = total_cycles * clk.period(); // Latency calculation based on total cycles and clock period
-    std::cout << "Total cycles      : "
-              << total_cycles << '\n';  
-
     sc_signal<bool> rst_n;
 
     dfs::DfsAccelerator accelerator("accelerator");
