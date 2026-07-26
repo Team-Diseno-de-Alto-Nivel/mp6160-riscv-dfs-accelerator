@@ -12,12 +12,14 @@ struct RunMetrics {
 
     double sim_latency_ns = 0.0;
     
-    uint64_t hw_cycles;
-    uint64_t pop_cycles;
-    uint64_t visited_cycles;
-    uint64_t mark_cycles;
-    uint64_t neighbor_cycles;
-    uint64_t push_cycles;
+    // Hardware timing metrics
+    std::uint64_t hw_total_cycles = 0;
+    std::uint64_t hw_pop_cycles = 0;
+    std::uint64_t hw_visited_cycles = 0;
+    std::uint64_t hw_mark_cycles = 0;
+    std::uint64_t hw_neighbor_cycles = 0;
+    std::uint64_t hw_push_cycles = 0;
+    double hw_latency_ns = 0.0;
 
     std::uint64_t instruction_count = 0;
     double throughput_cells_per_s = 0.0;
