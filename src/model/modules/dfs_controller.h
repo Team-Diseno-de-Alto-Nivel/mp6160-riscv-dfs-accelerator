@@ -1,78 +1,38 @@
 #pragma once
 // DFS Controller (HWA-2): FSM driving the traversal without CPU intervention.
 //
-// Multi-source scan: LoadStart resets a row-major scan pointer to (0,0), and
-// ScanNext advances it, pushing each candidate cell onto the stack (like a
-// discovered neighbour) rather than a single host-given (start_x, start_y).
-// Whenever the stack drains (Pop sees it empty), control returns to ScanNext
-// to look for the next unvisited, passable cell instead of going straight to
-// Done — so the whole grid gets covered, matching real "number of islands"
-// semantics (this is the register/whole-traversal path's only real
-// consumer: AcceleratorDriver -> src/program/integration/integration_main.cpp
-// run_register_path()). start_x/start_y are consequently unused by this FSM
-// — kept in the register map and readable back, just never consulted here.
+// Multi-source scan (real "number of islands", not single-source
+// reachability): ScanNext walks the grid row-major and pushes each
+// unvisited/passable cell it finds, same as a discovered neighbour would be
+// pushed. start_x/start_y are unused as a result — still readable back, just
+// ignored by the FSM.
 //
-// Distinguishing "this push starts a new island" from "this push extends the
-// current one" doesn't need any per-entry stack metadata: ScanNext only ever
-// pushes when the stack is *empty* (that's the only time it runs), so the
-// item it pushes is guaranteed to be the very next one popped, with nothing
-// else able to interleave. is_new_island_start_ latches that fact across
-// exactly one Pop/Visit round-trip: set when ScanNext pushes, consumed (and
-// only then does island_count_ increment) the moment Visit finds that cell
-// genuinely unvisited and passable. If Visit instead skips it (already
-// visited/impassable), the flag simply stays set for whatever ScanNext tries
-// next — Pop is guaranteed empty again immediately afterward, so nothing
-// else could have consumed or invalidated it in between.
+// island_count_ only bumps for the *first* cell of a region. No per-entry
+// stack tagging needed for that: ScanNext only pushes when the stack is
+// empty, so that push is always the very next thing popped. One bool
+// (is_new_island_start_) tracks it across that single Pop/Visit hop.
 //
-// Peer contracts (StackManager/HWB-2 and NeighborGenerator/HWB-1 are
-// implemented against these; VisitedMemory/HWC-1 is not, so that part is
-// still an assumption):
-//   - StackManager: push_en/pop_en are single-cycle pulses. Because a signal
-//     write only becomes visible to a peer module one cycle later, top_x/
-//     top_y/empty preview the *result* of this cycle's push_en/pop_en
-//     combinationally, so the very next cycle already sees a just-pushed
-//     item as the top (see stack_manager.h) instead of needing a second
-//     round trip.
-//   - NeighborGenerator: valid_in is a request/ack pulse, not just a
-//     one-shot start — one pulse (with cur_x/cur_y held steady) is required
-//     per neighbour, including the first. It answers with exactly one
-//     valid_out pulse (nbr_x/nbr_y valid that cycle) per request, and raises
-//     done on a request once the candidates are exhausted. It does *not*
-//     auto-advance on its own: without a fresh valid_in pulse it would keep
-//     re-driving the same candidate (and a same-cycle cross-module write is
-//     never visible to the reader that triggered it), which is why
-//     PushNeighbor immediately latches ngen_x/ngen_y off of valid_out and
-//     re-pulses valid_in for the next candidate rather than re-reading
-//     ngen_x/ngen_y a cycle later — NeighborGenerator would already have
-//     moved on by then if it auto-advanced. A subtler consequence: the cycle
-//     GenNeighbors is entered, ngen_valid_out/ngen_done still hold whatever
-//     was left over from the *previous* request (this one hasn't reached
-//     NeighborGenerator yet, let alone been answered) — a done left over
-//     from the prior node's exhaustion reads as true here even though this
-//     node's scan hasn't started. ngen_wait_ swallows exactly that one stale
-//     read after every valid_in pulse (from Visit or PushNeighbor) before
-//     trusting either signal.
-//   - VisitedMemory: addr asserted one cycle is reflected on rdata/we by the
-//     following cycle (at least one clock of latency).
-//   - GridMemory: grid_value is read through the *same* address wire as
-//     vis_addr (dfs_accelerator.h ties GridMemory.raddr and
-//     VisitedMemory.addr to one signal — both memories are indexed
-//     identically, cell_index(x,y)), so it becomes valid on the same
-//     one-cycle schedule as vis_is_visited: address asserted in Pop,
-//     value read in Visit.
+// Timing notes for the peer modules (StackManager/NeighborGenerator are
+// implemented to this; VisitedMemory isn't yet):
+//   - StackManager previews push/pop combinationally so top_x/top_y/empty
+//     reflect this cycle's request next cycle, not two cycles later.
+//   - NeighborGenerator: valid_in is request/ack, one pulse per candidate
+//     (including the first), not a one-shot start. PushNeighbor latches
+//     nbr_x/y off of valid_out immediately rather than re-reading a cycle
+//     later, since NeighborGenerator would've already moved on by then.
+//     ngen_wait_ exists because the cycle GenNeighbors is entered,
+//     ngen_valid_out/done still hold the *previous* request's answer for
+//     one cycle — it just eats that stale read.
+//   - VisitedMemory/GridMemory: addr asserted this cycle, data back next
+//     cycle. Grid and visited share the same address wire (vis_addr), so
+//     grid_value lines up with vis_is_visited automatically.
 //
-// A cell counts as passable when grid_value != 0 — matches
-// number_of_islands-style land/water grids, the only real consumer of this
-// path; the other four algorithms go through the fine-grained primitive
-// path instead (see TlmAccelerator), which doesn't touch this datapath.
+// Passable = grid_value != 0 (land/water). Only number_of_islands uses this
+// path; the other four algorithms go through the primitive path instead.
 //
-// Before every push (ScanNext, PushNeighbor) the FSM checks stk_full and, if
-// the stack is already at capacity, drops that push and latches overflow_
-// instead of asserting stk_push — StackManager would silently drop it
-// anyway (see stack_manager.h), but checking here means the host gets an
-// explicit kStatusOverflow bit (memory_map.h) instead of a silently
-// under-counted result. The traversal still runs to completion on whatever
-// made it onto the stack; it does not stop or retry the dropped push.
+// Every push (ScanNext, PushNeighbor) checks stk_full first and sets
+// overflow_ instead of pushing when the stack's already at capacity — the
+// run keeps going on whatever made it onto the stack, just under-counts.
 
 #include <cstdint>
 
@@ -89,10 +49,7 @@ SC_MODULE(DfsController) {
     sc_out<bool> busy;
     sc_out<bool> done;
 
-    // Host-configured traversal parameters. start_x/start_y are unused —
-    // see the file comment (multi-source scan replaces a single start
-    // point) — kept only so the register map still reads back what was
-    // written.
+    // start_x/start_y unused, see file comment.
     sc_in<sc_uint<32>> start_x;
     sc_in<sc_uint<32>> start_y;
     sc_in<sc_uint<32>> rows;
@@ -128,9 +85,7 @@ SC_MODULE(DfsController) {
     // Result Interface (HWA-3).
     sc_out<sc_uint<32>> visited_count;  // total cells marked, across all islands
     sc_out<sc_uint<32>> island_count;   // number of distinct islands found
-    // Set if a push was ever dropped this run because the stack was full —
-    // see memory_map.h's kStatusOverflow.
-    sc_out<bool> overflow;
+    sc_out<bool> overflow;              // kStatusOverflow, see memory_map.h
 
     enum class State {
         Idle,
@@ -246,9 +201,7 @@ SC_MODULE(DfsController) {
             case State::Visit:
                 busy.write(true);
                 if (vis_is_visited.read() || grid_value.read() == 0) {
-                    // Already seen, or an impassable cell (e.g. water): drop
-                    // it, try the next one. Leave is_new_island_start_ as-is
-                    // — ScanNext's next candidate inherits it.
+                    // already seen or impassable, skip it
                     state_ = State::Pop;
                     break;
                 }
@@ -269,20 +222,12 @@ SC_MODULE(DfsController) {
             case State::GenNeighbors:
                 busy.write(true);
                 if (ngen_wait_) {
-                    // The valid_in pulse that got us here (from Visit or
-                    // PushNeighbor) isn't visible to NeighborGenerator until
-                    // next cycle, and its answer isn't visible back here
-                    // until the cycle after that — so ngen_valid_out/
-                    // ngen_done right now are still whatever was left over
-                    // from a *previous*, already-fully-consumed request
-                    // (e.g. still `done` from the last node's exhaustion).
-                    // Ignore this one read rather than act on stale data.
+                    // ngen_valid_out/done still hold the previous request's
+                    // answer for one cycle — ignore it, see file comment.
                     ngen_wait_ = false;
                 } else if (ngen_valid_out.read()) {
-                    // Latch now: NeighborGenerator only guarantees nbr_x/
-                    // nbr_y are valid the cycle valid_out is observed, and
-                    // PushNeighbor's own re-request for the next candidate
-                    // would otherwise race the read.
+                    // latch now, PushNeighbor's re-request would race a
+                    // delayed read of nbr_x/y
                     nbr_latch_x_ = ngen_x.read();
                     nbr_latch_y_ = ngen_y.read();
                     state_ = State::PushNeighbor;
@@ -308,10 +253,8 @@ SC_MODULE(DfsController) {
             case State::Done:
                 busy.write(false);
                 if (start.read()) {
-                    // A new run begins: drop Done immediately so the host's
-                    // status poll can't mistake this for the previous run's
-                    // completion (it would never clear otherwise, since Idle
-                    // is skipped on this direct Done -> LoadStart path).
+                    // clear done right away — Idle is skipped on this path,
+                    // so nothing else would ever clear it
                     done.write(false);
                     visited_count_ = 0;
                     island_count_ = 0;

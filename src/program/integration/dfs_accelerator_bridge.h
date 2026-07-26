@@ -1,33 +1,21 @@
 #pragma once
-// Bridges the real hardware model (src/model) onto both TLM surfaces the
-// integration harness expects — reg_socket/prim_socket, previously served
-// by a (now removed) MockAcceleratorModel stand-in:
+// Bridges the real hardware model (src/model) onto the two TLM surfaces the
+// integration harness expects:
 //
-//   reg_socket  — whole-traversal register/MMIO. Forwarded to the real
-//                 dfs::DfsAccelerator's own socket unchanged: it already
-//                 speaks this exact protocol (see modules/dfs_accelerator.h).
+//   reg_socket  — whole-traversal register/MMIO, forwarded straight to
+//                 DfsAccelerator's own socket, unchanged.
 //   prim_socket — fine-grained primitives (is_visited/mark_visited/
-//                 neighbours), used by the four algorithms that don't go
-//                 through DfsController at all — see the scope note atop
-//                 modules/dfs_controller.h for why the register path only
-//                 ever handles number_of_islands-style land/water grids.
+//                 neighbours) for the four algorithms that skip
+//                 DfsController entirely — see dfs_controller.h.
 //
-// prim_socket does NOT go through DfsController's cycle-accurate FSM or TLM
-// decode — it reaches directly into GridMemory/VisitedMemory's backdoor
-// accessors (peek()/poke()/load_cell(), see their comments), one call per
-// software-side primitive, with no clock stepping in between. That matches
-// how the primitive interface itself is defined: an instant, delay-
-// annotated call (see TlmAccelerator::send()), not a clocked protocol — and
-// it's exactly how MockAcceleratorModel's prim_socket already behaved, just
-// now backed by the real memories instead of a std::vector<char>.
+// prim_socket skips the cycle-accurate FSM/TLM decode and reaches straight
+// into GridMemory/VisitedMemory's backdoor accessors, one call per
+// primitive with no clock stepping — that's how the primitive interface
+// itself works (see TlmAccelerator::send()).
 //
-// Note: this file includes headers from both src/model (dfs::CellCoord,
-// dfs::CellValue, ...) and src/program (dfs::Coord, dfs::Grid,
-// dfs::Connectivity, ...). Those two halves define same-named-but-different
-// types in the same dfs:: namespace in a few places (Coord in particular),
-// which is why src/model's version is called CellCoord — see the comment
-// atop src/model/utils/types.h. Don't reintroduce a colliding name on
-// either side.
+// This file includes headers from both src/model and src/program, which
+// each define a different dfs::Coord — that's why the model side is called
+// CellCoord (see utils/types.h). Don't reintroduce the collision.
 
 #include <systemc.h>
 #include <tlm.h>
@@ -59,10 +47,9 @@ SC_MODULE(RealAcceleratorBridge) {
           accel_init("accel_init") {
         accel.clk(clk);
         accel.rst_n(rst_n);
-        // No reset stimulus needed: per-run state (Visited Memory, counters)
-        // is cleared via the LoadGrid/ResetVisited primitives below and via
-        // DfsController's own self-clearing Start pulse on the register
-        // path — not by toggling this pin. Released once, at elaboration.
+        // Released once at elaboration and never toggled again — per-run
+        // state gets cleared via LoadGrid/ResetVisited and DfsController's
+        // own self-clearing Start, not via this pin.
         rst_n.write(true);
         accel_init.bind(accel.socket);
 

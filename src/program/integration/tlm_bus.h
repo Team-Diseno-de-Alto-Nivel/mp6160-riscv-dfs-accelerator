@@ -4,19 +4,11 @@
 // accelerator's register/memory-map surface. This is the coarse whole-traversal
 // integration path exercised by INT-1 (#29) end-to-end.
 //
-// access() calls wait(delay) after every transaction (standard TLM2.0 LT
-// "catch up" — see any tlm_quantumkeeper-based example for the fuller
-// pattern; this is the direct, unmanaged version of it). This matters more
-// than it looks: AcceleratorDriver::wait_done() is a plain `while
-// (!done()) {}` spin with no SystemC awareness of its own (it also has to
-// work unmodified on bare-metal RISC-V, where busy-waiting on a real MMIO
-// register is correct and there's no kernel to yield to). Against the mock
-// accelerator that was harmless — it answered synchronously within the same
-// call, no clock involved. Against the real DfsAccelerator (a genuine
-// clocked FSM) it deadlocks: with no wait() anywhere in the loop, simulated
-// time — and therefore every clock edge DfsController needs to ever make
-// progress — never advances, so `done()` can never become true. wait(delay)
-// here is what lets each poll actually advance the clock.
+// access() calls wait(delay) after every transaction (the plain TLM2.0 LT
+// "catch up", no quantum keeper). Without it, AcceleratorDriver::wait_done()
+// — a bare `while (!done()) {}`, since it also has to work unmodified on
+// bare-metal RISC-V — deadlocks against a real clocked FSM: simulated time
+// never advances, so DfsController never ticks and done() never flips.
 
 #include <tlm.h>
 
