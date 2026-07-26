@@ -44,12 +44,13 @@ bool report(const std::vector<RunMetrics>& metrics) {
     }
 
     printf("\n=== CSV ===\n");
-    printf("algorithm,case,accelerator_on,passed,result,latency_ns,instruction_count,"
-           "expanded_nodes,visited_cells,peak_stack_depth,throughput_cells_per_s\n");
+    printf("algorithm,case,accelerator_on,passed,result,latency_ns,hw_cycles,instruction_count,pop_cycles,visit_cycles,mark_cycles,"
+           "neighbor_cycles,push_cycles,expanded_nodes,visited_cells,peak_stack_depth,throughput_cells_per_s\n");
     for (const RunMetrics& m : metrics) {
         printf("%s,%s,%d,%d,%ld,%.0f,%llu,%llu,%llu,%llu,%.2f\n", m.algorithm.c_str(),
                m.case_name.c_str(), m.accelerator_on ? 1 : 0, m.passed ? 1 : 0,
-               m.result_value, m.sim_latency_ns,
+               m.result_value, m.sim_latency_ns,m.hw_cycles,m.pop_cycles,m.visit_cycles, m.mark_cycles,
+               m.neighbor_cycles,m.push_cycles,
                static_cast<unsigned long long>(m.instruction_count),
                static_cast<unsigned long long>(m.expanded_nodes),
                static_cast<unsigned long long>(m.visited_cells),
