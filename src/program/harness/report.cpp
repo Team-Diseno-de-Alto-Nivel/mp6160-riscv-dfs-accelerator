@@ -20,13 +20,13 @@ bool report(const std::vector<RunMetrics>& metrics) {
     bool all_passed = true;
 
     printf("\n=== Per-run metrics ===\n");
-    printf("%-30s %-16s %-4s %-4s %8s %10s %8s %6s\n", "ALGORITHM", "CASE", "ACC",
+    printf("%-30s %-16s %-4s %-4s %8s %10s %10s %8s %6s\n", "ALGORITHM", "CASE", "ACC",
            "OK", "RESULT", "LAT(ns)", "OPS", "PEAK");
     for (const RunMetrics& m : metrics) {
         if (!m.passed) all_passed = false;
         printf("%-30s %-16s %-4s %-4s %8ld %10.0f %8llu %6llu\n", m.algorithm.c_str(),
                m.case_name.c_str(), m.accelerator_on ? "ON" : "OFF",
-               m.passed ? "ok" : "FAIL", m.result_value, m.sim_latency_ns,
+               m.passed ? "ok" : "FAIL", m.result_value, m.sim_latency_ns, m.hw_cycles,
                static_cast<unsigned long long>(m.instruction_count),
                static_cast<unsigned long long>(m.peak_stack_depth));
     }

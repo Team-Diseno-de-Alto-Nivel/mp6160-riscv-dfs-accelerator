@@ -182,7 +182,12 @@ SC_MODULE(DfsAccelerator) {
 
         trans.set_response_status(ok ? tlm::TLM_OK_RESPONSE : tlm::TLM_ADDRESS_ERROR_RESPONSE);
     }
-
+    public:
+        const Counters& timing() const
+        {
+            return controller.timing_;
+        }
+        
   private:
     // The host's AcceleratorDriver::start() only ever *sets* the Control.Start
     // bit (src/program/driver/accelerator_driver.h never clears it back) —

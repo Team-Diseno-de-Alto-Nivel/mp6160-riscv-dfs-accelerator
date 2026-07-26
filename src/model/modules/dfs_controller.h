@@ -79,6 +79,7 @@
 #include <systemc.h>
 
 #include "utils/types.h"
+#include "program/harness/instrumentation.h"
 
 namespace dfs {
 
@@ -231,6 +232,8 @@ SC_MODULE(DfsController) {
                 break;
 
             case State::Pop:
+                ++timing_.pop_cycles;
+                wait(1,SC_NS);
                 busy.write(true);
                 if (stk_empty.read()) {
                     state_ = State::ScanNext;
@@ -245,6 +248,8 @@ SC_MODULE(DfsController) {
 
             case State::Visit:
                 busy.write(true);
+                ++timing_.visited_cycles;
+                wait(2,SC_NS);
                 if (vis_is_visited.read() || grid_value.read() == 0) {
                     // Already seen, or an impassable cell (e.g. water): drop
                     // it, try the next one. Leave is_new_island_start_ as-is
@@ -268,6 +273,9 @@ SC_MODULE(DfsController) {
 
             case State::GenNeighbors:
                 busy.write(true);
+                ++timing_.neighbor_cycles;              
+                wait(1,SC_NS);
+
                 if (ngen_wait_) {
                     // The valid_in pulse that got us here (from Visit or
                     // PushNeighbor) isn't visible to NeighborGenerator until
@@ -292,6 +300,8 @@ SC_MODULE(DfsController) {
                 break;
 
             case State::PushNeighbor:
+                ++timing_.push_cycles;
+                wait(1,SC_NS);
                 busy.write(true);
                 if (stk_full.read()) {
                     overflow_ = true;  // dropped this neighbour, keep going
@@ -332,7 +342,7 @@ SC_MODULE(DfsController) {
     sc_uint<32> cell_index(const sc_uint<32>& x, const sc_uint<32>& y) const {
         return y * cols.read() + x;
     }
-
+    Counters timing_;
     State state_ = State::Idle;
     sc_uint<32> cur_node_x_ = 0;
     sc_uint<32> cur_node_y_ = 0;
