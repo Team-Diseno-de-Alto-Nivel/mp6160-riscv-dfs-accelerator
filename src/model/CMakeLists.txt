@@ -55,3 +55,10 @@ add_executable(dfs_controller_engine_test
 target_include_directories(dfs_controller_engine_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(dfs_controller_engine_test ${SYSTEMC_LIB})
 add_test(NAME dfs_controller_engine_test COMMAND dfs_controller_engine_test)
+
+add_executable(neighbor_stack_memory_test
+    tests/neighbor_stack_memory_test.cpp
+)
+target_include_directories(neighbor_stack_memory_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(neighbor_stack_memory_test ${SYSTEMC_LIB})
+add_test(NAME neighbor_stack_memory_test COMMAND neighbor_stack_memory_test)
