@@ -383,12 +383,12 @@ HLS and Vivado, targeting an AMD Kria KV260 FPGA.
 
 \section{From SystemC to RTL Design Proposed}
 
-The proposed DFS accelerator was developed following a hardware design methodology in which the functional validation was prioritized. The project starts from the description of the high-level software intead of implementing the architecture directly in RTL and then it is refined it into a hardware-oriented model. This development strategy reduces debugging effort and allows architectural exploration at the early stage.
+The proposed DFS accelerator was developed following a design methodology of the hardware in which the functional validation was prioritized. The project starts from the description of the high-level software intead of implementing the architecture directly in RTL and then it is refined it into a hardware-oriented model. This development strategy reduces debugging effort from the beginning of the project.
 
 
 \subsection{Overall Development Flow}
 
-In this methodology the accelerator moves forward from a software reference implementation into a complete FPGA-based hardware system. Figure~\ref{fig:development_flow} illustrates the main stages of this process.
+The development process starts with a software reference model of the DFS algorithm and progressively refines it into a hardware implementation for FPGA deployment. This incremental approach allows the design to be verified at each stage before continuing with the next one. Figure~\ref{fig:development_flow} illustrates the main stages of this process.
 
 
 \begin{figure}[h]
@@ -439,7 +439,7 @@ FPGA Integration};
 
 \end{figure}
 
-SystemC was chosen as the primary modeling language because it provides a suitable balance between a high-level description of the system and a close representation of hardware behavior. At the transaction level, it allows the behavior of the accelerator, its communication interfaces, and its internal hardware modules to be verified without the complexity of traditional RTL development.
+SystemC was adopted as the main modeling language during the early stages of the accelerator development. The goal was to validate the behavior of the DFS architecture before moving to an RTL implementation. Using SystemC/TLM made it possible to model the communication between the hardware modules and verify the functionality of the accelerator while keeping the design at a higher level of abstraction.
 
 Additionally, SystemC enables early evaluation of design by allowing latency analysis and architectural exploration before moving to the synthesis stage. This makes it possible to compare different approaches and refine the design while development time is reduced.
 
