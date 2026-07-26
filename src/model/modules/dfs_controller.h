@@ -79,8 +79,6 @@
 #include <systemc.h>
 
 #include "utils/types.h"
-#include "program/harness/instrumentation.h"
-
 namespace dfs {
 
 SC_MODULE(DfsController) {
@@ -144,10 +142,23 @@ SC_MODULE(DfsController) {
         Done,
     };
 
+    struct TimingStats {
+        uint64_t total_cycles = 0;
+        uint64_t pop_cycles = 0;
+        uint64_t visited_cycles = 0;
+        uint64_t mark_cycles = 0;
+        uint64_t neighbor_cycles = 0;
+        uint64_t push_cycles = 0;
+    };
+
     SC_CTOR(DfsController) {
         SC_METHOD(run_fsm);
         sensitive << clk.pos();
         dont_initialize();
+    }
+    
+    const TimingStats& timing() const {
+    return timing_;
     }
 
     void run_fsm() {
@@ -178,6 +189,7 @@ SC_MODULE(DfsController) {
             visited_count_ = 0;
             island_count_ = 0;
             overflow_ = false;
+            timing_ = {};
             return;
         }
 
@@ -203,6 +215,7 @@ SC_MODULE(DfsController) {
                 busy.write(true);
                 scan_x_ = 0;
                 scan_y_ = 0;
+                ++timing_.total_cycles;
                 state_ = State::ScanNext;
                 break;
 
@@ -240,16 +253,16 @@ SC_MODULE(DfsController) {
                 cur_node_x_ = stk_top_x.read();
                 cur_node_y_ = stk_top_y.read();
                 vis_addr.write(cell_index(cur_node_x_, cur_node_y_));
-                timing_.pop_cycles++;
-                timing_.total_cycles++;
                 stk_pop.write(true);
+                ++timing_.pop_cycles;
+                ++timing_.total_cycles;
                 state_ = State::Visit;
                 break;
 
             case State::Visit:
                 busy.write(true);
-                timing_.visit_cycles++;
-                timing_.total_cycles++;
+                ++timing_.visit_cycles;
+                ++timing_.total_cycles;
                 if (vis_is_visited.read() || grid_value.read() == 0) {
                     // Already seen, or an impassable cell (e.g. water): drop
                     // it, try the next one. Leave is_new_island_start_ as-is
@@ -258,6 +271,8 @@ SC_MODULE(DfsController) {
                     break;
                 }
                 vis_we.write(true);
+                ++timing_.mark_cycles;
+                ++timing_.total_cycles;
                 vis_addr.write(cell_index(cur_node_x_, cur_node_y_));
                 ++visited_count_;
                 if (is_new_island_start_) {
@@ -272,8 +287,6 @@ SC_MODULE(DfsController) {
                 break;
 
             case State::GenNeighbors:
-                timing_.neighbor_cycles++;
-                timing_.total_cycles++;
                 busy.write(true);
                 if (ngen_wait_) {
                     // The valid_in pulse that got us here (from Visit or
@@ -290,6 +303,8 @@ SC_MODULE(DfsController) {
                     // nbr_y are valid the cycle valid_out is observed, and
                     // PushNeighbor's own re-request for the next candidate
                     // would otherwise race the read.
+                    ++timing_.neighbor_cycles;
+                    ++timing_.total_cycles;
                     nbr_latch_x_ = ngen_x.read();
                     nbr_latch_y_ = ngen_y.read();
                     state_ = State::PushNeighbor;
@@ -308,6 +323,8 @@ SC_MODULE(DfsController) {
                     timing_.push_cycles++;
                     timing_.total_cycles++;
                     stk_push.write(true);
+                    ++timing_.push_cycles;
+                    ++timing_.total_cycles;
                 }
                 ngen_valid_in.write(true);  // request the next candidate
                 ngen_wait_ = true;
@@ -354,6 +371,7 @@ SC_MODULE(DfsController) {
     std::uint32_t visited_count_ = 0;
     std::uint32_t island_count_ = 0;
     bool overflow_ = false;
+    TimingStats timing_;
 };
 
 }  // namespace dfs
