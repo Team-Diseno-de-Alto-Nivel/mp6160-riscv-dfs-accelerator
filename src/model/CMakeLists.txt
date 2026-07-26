@@ -48,3 +48,10 @@ add_executable(control_result_interface_test
 target_include_directories(control_result_interface_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(control_result_interface_test ${SYSTEMC_LIB})
 add_test(NAME control_result_interface_test COMMAND control_result_interface_test)
+
+add_executable(dfs_controller_engine_test
+    tests/dfs_controller_engine_test.cpp
+)
+target_include_directories(dfs_controller_engine_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(dfs_controller_engine_test ${SYSTEMC_LIB})
+add_test(NAME dfs_controller_engine_test COMMAND dfs_controller_engine_test)
