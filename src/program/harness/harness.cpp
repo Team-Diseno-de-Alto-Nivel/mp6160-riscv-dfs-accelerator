@@ -17,26 +17,10 @@ RunMetrics Harness::run_one(const AlgoEntry& algo, const TestCase& tc, bool acce
 
     const CostModel cost;
     RunMetrics m;
-    auto t = accelerator.timing();
-    m.hw_cycles = t.total_cycles;
-    m.pop_cycles = t.pop_cycles;
-    m.visit_cycles = t.visit_cycles;
-
     m.algorithm = algo.name;
     m.case_name = tc.name;
     m.accelerator_on = accelerator_on;
     m.sim_latency_ns = cost.latency_ns(counters);
-    auto t = accelerator.timing();
-
-    m.hw_cycles =
-        t.pop_cycles +
-        t.visited_cycles +
-        t.mark_cycles +
-        t.neighbor_cycles +
-        t.push_cycles;
-
-    m.pop_cycles=t.pop_cycles;
-
     m.instruction_count = counters.ops;
     m.visited_cells = counters.visited_cells;
     m.expanded_nodes = counters.expanded_nodes;

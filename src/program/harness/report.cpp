@@ -20,13 +20,13 @@ bool report(const std::vector<RunMetrics>& metrics) {
     bool all_passed = true;
 
     printf("\n=== Per-run metrics ===\n");
-    printf("%-30s %-16s %-4s %-4s %8s %10s %10s %8s %6s\n", "ALGORITHM", "CASE", "ACC",
+    printf("%-30s %-16s %-4s %-4s %8s %10s %8s %6s\n", "ALGORITHM", "CASE", "ACC",
            "OK", "RESULT", "LAT(ns)", "OPS", "PEAK");
     for (const RunMetrics& m : metrics) {
         if (!m.passed) all_passed = false;
         printf("%-30s %-16s %-4s %-4s %8ld %10.0f %8llu %6llu\n", m.algorithm.c_str(),
                m.case_name.c_str(), m.accelerator_on ? "ON" : "OFF",
-               m.passed ? "ok" : "FAIL", m.result_value, m.sim_latency_ns, m.hw_cycles,
+               m.passed ? "ok" : "FAIL", m.result_value, m.sim_latency_ns,
                static_cast<unsigned long long>(m.instruction_count),
                static_cast<unsigned long long>(m.peak_stack_depth));
     }
@@ -44,13 +44,12 @@ bool report(const std::vector<RunMetrics>& metrics) {
     }
 
     printf("\n=== CSV ===\n");
-    printf("algorithm,case,accelerator_on,passed,result,latency_ns,hw_cycles,instruction_count,pop_cycles,visit_cycles,mark_cycles,"
-           "neighbor_cycles,push_cycles,expanded_nodes,visited_cells,peak_stack_depth,throughput_cells_per_s\n");
+    printf("algorithm,case,accelerator_on,passed,result,latency_ns,instruction_count,"
+           "expanded_nodes,visited_cells,peak_stack_depth,throughput_cells_per_s\n");
     for (const RunMetrics& m : metrics) {
         printf("%s,%s,%d,%d,%ld,%.0f,%llu,%llu,%llu,%llu,%.2f\n", m.algorithm.c_str(),
                m.case_name.c_str(), m.accelerator_on ? 1 : 0, m.passed ? 1 : 0,
-               m.result_value, m.sim_latency_ns,m.hw_cycles,m.pop_cycles,m.visit_cycles, m.mark_cycles,
-               m.neighbor_cycles,m.push_cycles,
+               m.result_value, m.sim_latency_ns,
                static_cast<unsigned long long>(m.instruction_count),
                static_cast<unsigned long long>(m.expanded_nodes),
                static_cast<unsigned long long>(m.visited_cells),
