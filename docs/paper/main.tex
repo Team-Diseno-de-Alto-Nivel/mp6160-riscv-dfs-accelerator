@@ -381,6 +381,192 @@ software is compiled with \texttt{riscv64-unknown-elf-gcc/g++}. The hardware
 implementation is carried out through high-level synthesis (HLS) with AMD Vitis
 HLS and Vivado, targeting an AMD Kria KV260 FPGA.
 
+\section{From SystemC to RTL Design Proposed}
+
+The proposed DFS accelerator was developed following a hardware design methodology in which functional validation prior to hardware synthesis was prioritized. Rather than implementing the architecture directly in RTL, the project starts from the description of the high-level software and gradually refines it into a hardware-oriented model. This development strategy reduces debugging effort, allows architectural exploration at an early stage, and minimizes propagating design errors risks into the final hardware implementation.
+
+
+\subsection{Overall Development Flow}
+
+The development process follows a refinement methodology, in which the accelerator moves forward from a software reference implementation into a complete FPGA-based hardware system. Figure~\ref{fig:development_flow} illustrates the main stages of this process.
+
+
+\begin{figure}[h]
+\centering
+
+\begin{tikzpicture}[
+node distance=1.2cm,
+block/.style={
+rectangle,
+draw,
+rounded corners,
+minimum width=5cm,
+minimum height=0.8cm,
+align=center
+},
+arrow/.style={
+-{Latex[length=3mm]},
+thick
+}
+]
+
+\node[block] (dfs) {DFS Algorithms\\(C++ Reference)};
+
+\node[block, below=of dfs] (systemc) 
+{SystemC/TLM Model\\
+Functional + Timing Validation};
+
+\node[block, below=of systemc] (hls)
+{AMD Vitis HLS\\
+RTL Generation};
+
+\node[block, below=of hls] (vivado)
+{Vivado\\
+FPGA Integration};
+
+\node[block, below=of vivado] (kv260)
+{AMD Kria KV260};
+
+\draw[arrow] (dfs) -- (systemc);
+\draw[arrow] (systemc) -- (hls);
+\draw[arrow] (hls) -- (vivado);
+\draw[arrow] (vivado) -- (kv260);
+
+\end{tikzpicture}
+
+\caption{Progressive development flow adopted for the DFS accelerator.}
+\label{fig:development_flow}
+
+\end{figure}
+
+SystemC was chosen as the primary modeling language for this project because it provides a suitable balance between a high-level description of the system and an close representation of hardware behavior. At the transaction level, it allows the behavior of the accelerator, its communication interfaces, and its internal hardware modules to be verified without the complexity of traditional RTL development.
+
+Additionally, SystemC enables early evaluation of design by allowing latency analysis and architectural exploration before moving to the synthesis stage. This makes it possible to compare different approaches and refine the design while development time is reduced.
+
+To improve scalability, maintainability, and support future hardware optimizations, the accelerator was implemented using a modular architecture instead of a single complex block. Each module is responsible for a specific task and communicates with the rest of the system through the defined interfaces. This organization provides a structure similar to a real hardware accelerator and reduces future modifications or extensions.
+
+\subsection{Accelerator Architecture}
+
+The proposed accelerator architecture is composed of independent hardware modules which are controlled by a centralized DFS controller. Figure~\ref{fig:accelerator_architecture} presents the organization of the main components.
+
+\begin{figure}[h]
+\centering
+
+\begin{tikzpicture}[
+node distance=1cm,
+block/.style={
+rectangle,
+draw,
+rounded corners,
+minimum width=2.4cm,
+minimum height=0.8cm,
+align=center
+},
+arrow/.style={
+-{Latex[length=3mm]},
+thick
+}
+]
+
+\node[block] (controller)
+{DFS\\Controller};
+
+\node[block, below left=1.3cm and 4cm of controller] (stack)
+{Stack\\Manager};
+
+\node[block, below left=1.3cm and 2cm of controller] (neighbor)
+{Neighbor\\Generator};
+
+\node[block, below=1.8cm of controller] (visited)
+{Visited\\Memory};
+
+\node[block, below right=1.3cm and 2cm of controller] (grid)
+{Grid\\Memory};
+
+\node[block, below right=1.3cm and 4cm of controller] (result)
+{Result\\Interface};
+
+
+\foreach \x in {stack,neighbor,visited,grid,result}
+{
+\draw[arrow] (controller) -- (\x);
+}
+
+\end{tikzpicture}
+
+\caption{Modular architecture of the DFS hardware accelerator}
+\label{fig:accelerator_architecture}
+
+\end{figure}
+
+
+The communication between software and hardware accelerator is modeled through a memory-mapped register interface using Transaction-Level Modeling (TLM). From the software perspective, the accelerator behaves as a conventional memory-mapped peripheral, while internally the SystemC model captures the interactions among the hardware modules.
+Since this communication scheme follows a structure similar to an AXI-Lite peripheral, the transition from the SystemC model to the FPGA implementation requires only minor architectural changes. This approach reduces the hardware integration process and allows the validated model to be reused during the synthesis and deployment stages.
+
+
+\subsection{Hardware Generation Strategy}
+
+AMD Vitis High-Level Synthesis (HLS) was selected as the hardware generation approach instead of manually developing the accelerator using the traditional RTL design. This decision reduces development complexity and allows the hardware implementation to be derived from a higher-level behavioral description.
+After the SystemC model has been functionally validated and its timing characteristics have been analyzed, the design can be further refined and synthesized into RTL using Vitis HLS. This enables a smoother transition from architectural modeling to hardware implementation while preserving the validated functionality.
+Using HLS also allows the application of hardware-specific optimizations, such as loop pipelining, interface generation, and resource utilization improvements without compromising code  long-term maintainability and readability.
+
+\subsection{Target Platform Selection}
+The AMD Kria KV260 was selected as the target platform because it provides a suitable environment for hardware/software co-design and FPGA-based deployment.
+The combination of programmable logic, an embedded processing system, AXI-based communication infrastructure, and native support for the AMD Vitis toolchain makes the KV260 a suitable platform for integrating and evaluating custom hardware accelerators \cite{amd_kv260_user_guide, amd_vitis_hls_user_guide}. 
+Additionally, the communication architecture adopted throughout this project is compatible with the AXI-based infrastructure available on the KV260 platform \cite{arm_axi_protocol}. This compatibility simplifies the integration process and enables a more direct transition from the SystemC model to the final FPGA implementation.
+
+\subsection{Hardware/Software Integration}
+\begin{figure}[h]
+\centering
+
+\begin{tikzpicture}[
+node distance=1.2cm,
+block/.style={
+rectangle,
+draw,
+rounded corners,
+minimum width=5cm,
+minimum height=0.8cm,
+align=center
+},
+arrow/.style={
+-{Latex[length=3mm]},
+thick
+}
+]
+
+\node[block] (app)
+{Bare-metal Application\\
+(RISC-V / Host)};
+
+\node[block, below=of app] (acc)
+{DFS Accelerator\\
+(SystemC Model)};
+
+\node[block, below=of acc] (rtl)
+{RTL Accelerator};
+
+\node[block, below=of rtl] (fpga)
+{AMD Kria KV260 FPGA};
+
+
+\draw[arrow] (app) -- node[right]{MMIO / TLM} (acc);
+\draw[arrow] (acc) -- node[right]{HLS} (rtl);
+\draw[arrow] (rtl) -- node[right]{AXI-Lite} (fpga);
+
+
+\end{tikzpicture}
+
+\caption{Hardware/software integration flow.}
+\label{fig:hw_sw_integration}
+
+\end{figure}
+
+Overall, these design decisions establish a structured development methodology that progresses from algorithm validation to architectural modeling, hardware synthesis and FPGA deployment.
+
+By validating the accelerator functionality and performance before generating the RTL implementation, the proposed workflow increases confidence in the correctness of the design while reducing development complexity and enabling future improvements or extensions to the architecture.
+
+
 \subsection{Preliminary Results}
 
 The experiment plan above has been executed end to end: the RISC-V software
