@@ -269,11 +269,9 @@ SC_MODULE(DfsController) {
                 } else {
                     stk_in_x.write(nbr_latch_x_);
                     stk_in_y.write(nbr_latch_y_);
-                    timing_.push_cycles++;
-                    timing_.total_cycles++;
-                    stk_push.write(true);
                     ++timing_.push_cycles;
                     ++timing_.total_cycles;
+                    stk_push.write(true);
                 }
                 ngen_valid_in.write(true);  // request the next candidate
                 ngen_wait_ = true;
@@ -305,7 +303,7 @@ SC_MODULE(DfsController) {
     sc_uint<32> cell_index(const sc_uint<32>& x, const sc_uint<32>& y) const {
         return y * cols.read() + x;
     }
-    Counters timing_;
+
     State state_ = State::Idle;
     sc_uint<32> cur_node_x_ = 0;
     sc_uint<32> cur_node_y_ = 0;
