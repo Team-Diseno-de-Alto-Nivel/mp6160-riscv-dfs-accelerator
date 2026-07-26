@@ -232,8 +232,6 @@ SC_MODULE(DfsController) {
                 break;
 
             case State::Pop:
-                ++timing_.pop_cycles;
-                wait(1,SC_NS);
                 busy.write(true);
                 if (stk_empty.read()) {
                     state_ = State::ScanNext;
@@ -242,14 +240,16 @@ SC_MODULE(DfsController) {
                 cur_node_x_ = stk_top_x.read();
                 cur_node_y_ = stk_top_y.read();
                 vis_addr.write(cell_index(cur_node_x_, cur_node_y_));
+                timing_.pop_cycles++;
+                timing_.total_cycles++;
                 stk_pop.write(true);
                 state_ = State::Visit;
                 break;
 
             case State::Visit:
                 busy.write(true);
-                ++timing_.visited_cycles;
-                wait(2,SC_NS);
+                timing_.visit_cycles++;
+                timing_.total_cycles++;
                 if (vis_is_visited.read() || grid_value.read() == 0) {
                     // Already seen, or an impassable cell (e.g. water): drop
                     // it, try the next one. Leave is_new_island_start_ as-is
@@ -272,10 +272,9 @@ SC_MODULE(DfsController) {
                 break;
 
             case State::GenNeighbors:
+                timing_.neighbor_cycles++;
+                timing_.total_cycles++;
                 busy.write(true);
-                ++timing_.neighbor_cycles;              
-                wait(1,SC_NS);
-
                 if (ngen_wait_) {
                     // The valid_in pulse that got us here (from Visit or
                     // PushNeighbor) isn't visible to NeighborGenerator until
@@ -300,14 +299,14 @@ SC_MODULE(DfsController) {
                 break;
 
             case State::PushNeighbor:
-                ++timing_.push_cycles;
-                wait(1,SC_NS);
                 busy.write(true);
                 if (stk_full.read()) {
                     overflow_ = true;  // dropped this neighbour, keep going
                 } else {
                     stk_in_x.write(nbr_latch_x_);
                     stk_in_y.write(nbr_latch_y_);
+                    timing_.push_cycles++;
+                    timing_.total_cycles++;
                     stk_push.write(true);
                 }
                 ngen_valid_in.write(true);  // request the next candidate
