@@ -38,3 +38,13 @@ add_executable(sim
 )
 target_include_directories(sim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(sim ${SYSTEMC_LIB})
+
+# ── Unit testbenches (HW-TB, #55) ──────────────────────────────────────────────
+enable_testing()
+
+add_executable(control_result_interface_test
+    tests/control_result_interface_test.cpp
+)
+target_include_directories(control_result_interface_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(control_result_interface_test ${SYSTEMC_LIB})
+add_test(NAME control_result_interface_test COMMAND control_result_interface_test)
