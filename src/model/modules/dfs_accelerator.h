@@ -145,11 +145,11 @@ SC_MODULE(DfsAccelerator) {
         result_if.peak_stack_depth(stk_peak_depth_sig_);
         result_if.result_valid(result_valid_sig_);
     }
-    
-const DfsController::TimingStats& timing() const {
-    return controller.timing();
-        }
-    
+
+    const DfsController::TimingStats& timing() const {
+        return controller.timing();
+    }
+
     void b_transport(tlm::tlm_generic_payload& trans, sc_time& delay) {
         delay += sc_time(10, SC_NS);
 
@@ -177,7 +177,7 @@ const DfsController::TimingStats& timing() const {
 
         trans.set_response_status(ok ? tlm::TLM_OK_RESPONSE : tlm::TLM_ADDRESS_ERROR_RESPONSE);
     }
-        
+
   private:
     // AcceleratorDriver::start() never clears the Start bit, just
     // read-modify-writes it back — so a second start() writes the same
