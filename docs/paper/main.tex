@@ -383,12 +383,12 @@ HLS and Vivado, targeting an AMD Kria KV260 FPGA.
 
 \section{From SystemC to RTL Design Proposed}
 
-The proposed DFS accelerator was developed following a hardware design methodology in which functional validation prior to hardware synthesis was prioritized. Rather than implementing the architecture directly in RTL, the project starts from the description of the high-level software and gradually refines it into a hardware-oriented model. This development strategy reduces debugging effort, allows architectural exploration at an early stage, and minimizes propagating design errors risks into the final hardware implementation.
+The proposed DFS accelerator was developed following a hardware design methodology in which the functional validation was prioritized. The project starts from the description of the high-level software intead of implementing the architecture directly in RTL and then it is refined it into a hardware-oriented model. This development strategy reduces debugging effort and allows architectural exploration at the early stage.
 
 
 \subsection{Overall Development Flow}
 
-The development process follows a refinement methodology, in which the accelerator moves forward from a software reference implementation into a complete FPGA-based hardware system. Figure~\ref{fig:development_flow} illustrates the main stages of this process.
+In this methodology the accelerator moves forward from a software reference implementation into a complete FPGA-based hardware system. Figure~\ref{fig:development_flow} illustrates the main stages of this process.
 
 
 \begin{figure}[h]
@@ -439,15 +439,15 @@ FPGA Integration};
 
 \end{figure}
 
-SystemC was chosen as the primary modeling language for this project because it provides a suitable balance between a high-level description of the system and an close representation of hardware behavior. At the transaction level, it allows the behavior of the accelerator, its communication interfaces, and its internal hardware modules to be verified without the complexity of traditional RTL development.
+SystemC was chosen as the primary modeling language because it provides a suitable balance between a high-level description of the system and a close representation of hardware behavior. At the transaction level, it allows the behavior of the accelerator, its communication interfaces, and its internal hardware modules to be verified without the complexity of traditional RTL development.
 
 Additionally, SystemC enables early evaluation of design by allowing latency analysis and architectural exploration before moving to the synthesis stage. This makes it possible to compare different approaches and refine the design while development time is reduced.
 
-To improve scalability, maintainability, and support future hardware optimizations, the accelerator was implemented using a modular architecture instead of a single complex block. Each module is responsible for a specific task and communicates with the rest of the system through the defined interfaces. This organization provides a structure similar to a real hardware accelerator and reduces future modifications or extensions.
+To improve scalability, maintainability, and support future hardware optimizations, the accelerator was implemented using a modular architecture instead of a single complex block. Each module is responsible for a specific task and communicates with the rest of the system through the interfaces. This organization provides a structure similar to a real hardware accelerator.
 
 \subsection{Accelerator Architecture}
 
-The proposed accelerator architecture is composed of independent hardware modules which are controlled by a centralized DFS controller. Figure~\ref{fig:accelerator_architecture} presents the organization of the main components.
+The accelerator architecture is composed of independent hardware modules which are controlled by a DFS controller centralized. Figure~\ref{fig:accelerator_architecture} presents the organization of the components.
 
 \begin{figure}[h]
 \centering
@@ -500,7 +500,7 @@ thick
 \end{figure}
 
 
-The communication between software and hardware accelerator is modeled through a memory-mapped register interface using Transaction-Level Modeling (TLM). From the software perspective, the accelerator behaves as a conventional memory-mapped peripheral, while internally the SystemC model captures the interactions among the hardware modules.
+The communication between software and hardware accelerator is modeled through a memory-mapped register interface using Transaction-Level Modeling (TLM). From the software perspective, the accelerator behaves as a memory-mapped peripheral, while internally the SystemC model captures the interactions among the hardware modules.
 Since this communication scheme follows a structure similar to an AXI-Lite peripheral, the transition from the SystemC model to the FPGA implementation requires only minor architectural changes. This approach reduces the hardware integration process and allows the validated model to be reused during the synthesis and deployment stages.
 
 
