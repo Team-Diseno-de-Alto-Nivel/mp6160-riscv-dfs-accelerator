@@ -120,5 +120,18 @@ int sc_main(int argc, char* argv[]) {
 
     sc_start();
 
+    // Print hardware timing values collected by the accelerator's controller.
+    const auto& stats = accelerator.timing();
+    std::cout << "Hardware timing (cycles): total=" << stats.total_cycles
+              << " pop=" << stats.pop_cycles
+              << " visited=" << stats.visited_cycles
+              << " mark=" << stats.mark_cycles
+              << " neighbor=" << stats.neighbor_cycles
+              << " push=" << stats.push_cycles << std::endl;
+
+    // Approximate latency in nanoseconds using the simulation clock period (10 ns).
+    std::uint64_t latency_ns = stats.total_cycles * 10ULL;
+    std::cout << "Approx latency: " << latency_ns << " ns" << std::endl;
+
     return 0;
 }

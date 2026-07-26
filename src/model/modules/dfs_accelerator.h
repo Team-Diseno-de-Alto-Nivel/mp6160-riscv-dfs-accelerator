@@ -146,6 +146,10 @@ SC_MODULE(DfsAccelerator) {
         result_if.result_valid(result_valid_sig_);
     }
 
+    const DfsController::TimingStats& timing() const {
+        return controller.timing();
+    }
+
     void b_transport(tlm::tlm_generic_payload& trans, sc_time& delay) {
         delay += sc_time(10, SC_NS);
 

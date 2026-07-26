@@ -39,7 +39,6 @@
 #include <systemc.h>
 
 #include "utils/types.h"
-
 namespace dfs {
 
 SC_MODULE(DfsController) {
@@ -98,10 +97,23 @@ SC_MODULE(DfsController) {
         Done,
     };
 
+    struct TimingStats {
+        uint64_t total_cycles = 0;
+        uint64_t pop_cycles = 0;
+        uint64_t visited_cycles = 0;
+        uint64_t mark_cycles = 0;
+        uint64_t neighbor_cycles = 0;
+        uint64_t push_cycles = 0;
+    };
+
     SC_CTOR(DfsController) {
         SC_METHOD(run_fsm);
         sensitive << clk.pos();
         dont_initialize();
+    }
+    
+    const TimingStats& timing() const {
+    return timing_;
     }
 
     void run_fsm() {
@@ -132,6 +144,7 @@ SC_MODULE(DfsController) {
             visited_count_ = 0;
             island_count_ = 0;
             overflow_ = false;
+            timing_ = {};
             return;
         }
 
@@ -157,6 +170,7 @@ SC_MODULE(DfsController) {
                 busy.write(true);
                 scan_x_ = 0;
                 scan_y_ = 0;
+                ++timing_.total_cycles;
                 state_ = State::ScanNext;
                 break;
 
@@ -195,17 +209,23 @@ SC_MODULE(DfsController) {
                 cur_node_y_ = stk_top_y.read();
                 vis_addr.write(cell_index(cur_node_x_, cur_node_y_));
                 stk_pop.write(true);
+                ++timing_.pop_cycles;
+                ++timing_.total_cycles;
                 state_ = State::Visit;
                 break;
 
             case State::Visit:
                 busy.write(true);
+                ++timing_.visited_cycles;
+                ++timing_.total_cycles;
                 if (vis_is_visited.read() || grid_value.read() == 0) {
                     // already seen or impassable, skip it
                     state_ = State::Pop;
                     break;
                 }
                 vis_we.write(true);
+                ++timing_.mark_cycles;
+                ++timing_.total_cycles;
                 vis_addr.write(cell_index(cur_node_x_, cur_node_y_));
                 ++visited_count_;
                 if (is_new_island_start_) {
@@ -226,6 +246,12 @@ SC_MODULE(DfsController) {
                     // answer for one cycle — ignore it, see file comment.
                     ngen_wait_ = false;
                 } else if (ngen_valid_out.read()) {
+                    // Latch now: NeighborGenerator only guarantees nbr_x/
+                    // nbr_y are valid the cycle valid_out is observed, and
+                    // PushNeighbor's own re-request for the next candidate
+                    // would otherwise race the read.
+                    ++timing_.neighbor_cycles;
+                    ++timing_.total_cycles;
                     // latch now, PushNeighbor's re-request would race a
                     // delayed read of nbr_x/y
                     nbr_latch_x_ = ngen_x.read();
@@ -243,6 +269,8 @@ SC_MODULE(DfsController) {
                 } else {
                     stk_in_x.write(nbr_latch_x_);
                     stk_in_y.write(nbr_latch_y_);
+                    ++timing_.push_cycles;
+                    ++timing_.total_cycles;
                     stk_push.write(true);
                 }
                 ngen_valid_in.write(true);  // request the next candidate
@@ -288,6 +316,7 @@ SC_MODULE(DfsController) {
     std::uint32_t visited_count_ = 0;
     std::uint32_t island_count_ = 0;
     bool overflow_ = false;
+    TimingStats timing_;
 };
 
 }  // namespace dfs
