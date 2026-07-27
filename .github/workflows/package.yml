@@ -1,0 +1,133 @@
+name: Package Avance II
+
+# Bundles the Avance II TEC Digital deliverable in one manual run:
+#   * paper   -> compiles the IEEE PDF (same latex-action as paper.yml).
+#   * demo    -> records the reproducible demo and renders the MP4 (same
+#     pipeline as demo.yml).
+#   * package -> collects the PDF + video into a single ZIP artifact ready to
+#     upload to TEC Digital, with a LEEME.txt pointing to the public repo.
+# The enunciado (§5) asks for a compressed file with the updated article PDF,
+# the repo citation (already in the PDF), and the video.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compile paper PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          working_directory: docs/paper
+
+      - name: Upload paper PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-pdf
+          path: docs/paper/main.pdf
+
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build dev container
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: .devcontainer/Dockerfile
+          load: true
+          tags: dfs-riscv:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build project
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            dfs-riscv:ci \
+            make
+
+      - name: Install recording tools (asciinema, agg, ffmpeg)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y asciinema ffmpeg
+          curl -fL -o /tmp/agg \
+            https://github.com/asciinema/agg/releases/latest/download/agg-x86_64-unknown-linux-gnu
+          chmod +x /tmp/agg
+          sudo mv /tmp/agg /usr/local/bin/agg
+
+      - name: Record demo
+        run: |
+          asciinema rec --overwrite \
+            --command "docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace dfs-riscv:ci make demo" \
+            demo.cast
+
+      - name: Render MP4
+        run: |
+          agg --font-size 20 demo.cast demo.gif
+          ffmpeg -y -i demo.gif \
+            -movflags +faststart -pix_fmt yuv420p \
+            -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" \
+            demo.mp4
+
+      - name: Upload demo video
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-video
+          path: demo.mp4
+
+  package:
+    needs: [paper, demo]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download paper PDF
+        uses: actions/download-artifact@v4
+        with:
+          name: paper-pdf
+          path: bundle
+
+      - name: Download demo video
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-video
+          path: bundle
+
+      - name: Assemble TEC Digital bundle
+        run: |
+          cd bundle
+          mv main.pdf articulo-avance-ii.pdf
+          mv demo.mp4 demo-avance-ii.mp4
+          cat > LEEME.txt <<'EOF'
+          Entrega Avance II - MP6160 Diseno de Alto Nivel (ITCR)
+          Optimizacion de DFS sobre matrices 2D con un procesador RISC-V
+          con aceleracion por hardware.
+
+          Contenido:
+            - articulo-avance-ii.pdf : articulo IEEE (Propuesta de Solucion +
+                                       Results and Analysis preliminares).
+            - demo-avance-ii.mp4     : demostracion experimental reproducible
+                                       (emulacion RISC-V + co-simulacion SystemC).
+
+          Repositorio publico:
+            https://github.com/Team-Diseno-de-Alto-Nivel/mp6160-riscv-dfs-accelerator
+          EOF
+
+      - name: Upload TEC Digital ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: avance-ii-tecdigital
+          path: bundle/
