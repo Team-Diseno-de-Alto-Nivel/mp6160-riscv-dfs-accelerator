@@ -383,12 +383,11 @@ HLS and Vivado, targeting an AMD Kria KV260 FPGA.
 
 \section{From SystemC to RTL Design Proposed}
 
-The proposed DFS accelerator was developed following a design methodology of the hardware in which the functional validation was prioritized. The project starts from the description of the high-level software intead of implementing the architecture directly in RTL and then it is refined it into a hardware-oriented model. This development strategy reduces debugging effort from the beginning of the project.
-
+The proposed DFS accelerator was developed following a hardware design methodology in which the functional validation was prioritized. The project starts from the description of the high-level software intead of implementing the architecture directly in RTL and then it is refined it into a hardware-oriented model. This development strategy reduces debugging effort and allows architectural exploration at the early stage.
 
 \subsection{Overall Development Flow}
 
-The development process starts with a software reference model of the DFS algorithm and progressively refines it into a hardware implementation for FPGA deployment. This incremental approach allows the design to be verified at each stage before continuing with the next one. Figure~\ref{fig:development_flow} illustrates the main stages of this process.
+This kind of development follows a refinement methodology, in which the accelerator moves forward from a software reference into a complete FPGA-based hardware system. Figure~\ref{fig:development_flow} illustrates the stages of this process.
 
 
 \begin{figure}[h]
@@ -439,7 +438,7 @@ FPGA Integration};
 
 \end{figure}
 
-SystemC was adopted as the main modeling language during the early stages of the accelerator development. The goal was to validate the behavior of the DFS architecture before moving to an RTL implementation. Using SystemC/TLM made it possible to model the communication between the hardware modules and verify the functionality of the accelerator while keeping the design at a higher level of abstraction.
+SystemC was adopted as the modeling language during the early stages. The objetive of this was to verify the behavior of the DFS architecture before moving into an RTL implementation. Using SystemC/TLM made it possible to model the communication between the hardware modules and verify the functionality of the accelerator while keeping the design at a higher level of abstraction.
 
 Additionally, SystemC enables early evaluation of design by allowing latency analysis and architectural exploration before moving to the synthesis stage. This makes it possible to compare different approaches and refine the design while development time is reduced.
 
@@ -501,7 +500,7 @@ thick
 
 
 The communication between software and hardware accelerator is modeled through a memory-mapped register interface using Transaction-Level Modeling (TLM). From the software perspective, the accelerator behaves as a memory-mapped peripheral, while internally the SystemC model captures the interactions among the hardware modules.
-Since this communication scheme follows a structure similar to an AXI-Lite peripheral, the transition from the SystemC model to the FPGA implementation requires only minor architectural changes. This approach reduces the hardware integration process and allows the validated model to be reused during the synthesis and deployment stages.
+The communication scheme follows a structure similar to an AXI-Lite peripheral, the transition from the SystemC model to the FPGA implementation requires minor architectural changes. This approach reduces the hardware integration process and allows the validated model to be reused during the synthesis stages.
 
 
 \subsection{Hardware Generation Strategy}
@@ -513,7 +512,7 @@ Using HLS also allows the application of hardware-specific optimizations, such a
 \subsection{Target Platform Selection}
 The AMD Kria KV260 was selected as the target platform because it provides a suitable environment for hardware/software co-design and FPGA-based deployment.
 The combination of programmable logic, an embedded processing system, AXI-based communication infrastructure, and native support for the AMD Vitis toolchain makes the KV260 a suitable platform for integrating and evaluating custom hardware accelerators \cite{amd_kv260_user_guide, amd_vitis_hls_user_guide}. 
-Additionally, the communication architecture adopted throughout this project is compatible with the AXI-based infrastructure available on the KV260 platform \cite{arm_axi_protocol}. This compatibility simplifies the integration process and enables a more direct transition from the SystemC model to the final FPGA implementation.
+Additionally, the communication architecture adopted throughout this project is compatible with the AXI-based infrastructure available on the KV260 platform \cite{arm_axi_protocol}. This compatibility simplifies the integration process and enables a direct transition from the SystemC model to the final FPGA implementation.
 
 \subsection{Hardware/Software Integration}
 \begin{figure}[h]
