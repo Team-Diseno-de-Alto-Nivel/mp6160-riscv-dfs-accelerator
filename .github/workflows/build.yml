@@ -56,6 +56,14 @@ jobs:
             dfs-riscv:ci \
             make
 
+      - name: Run unit tests (src/model)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            dfs-riscv:ci \
+            ctest --test-dir src/model/build --output-on-failure
+
       - name: Run simulation
         run: |
           docker run --rm \
@@ -80,6 +88,14 @@ jobs:
             -w /workspace \
             dfs-riscv:ci \
             make -C src/program run-native
+
+      - name: Run unit tests (src/program native)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            dfs-riscv:ci \
+            ctest --test-dir src/program/build-native --output-on-failure
 
       - name: Run experiments (OFF/ON) and program<->model co-simulation
         run: |

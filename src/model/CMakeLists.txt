@@ -38,3 +38,27 @@ add_executable(sim
 )
 target_include_directories(sim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(sim ${SYSTEMC_LIB})
+
+# ── Unit testbenches (HW-TB, #55) ──────────────────────────────────────────────
+enable_testing()
+
+add_executable(control_result_interface_test
+    tests/control_result_interface_test.cpp
+)
+target_include_directories(control_result_interface_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(control_result_interface_test ${SYSTEMC_LIB})
+add_test(NAME control_result_interface_test COMMAND control_result_interface_test)
+
+add_executable(dfs_controller_engine_test
+    tests/dfs_controller_engine_test.cpp
+)
+target_include_directories(dfs_controller_engine_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(dfs_controller_engine_test ${SYSTEMC_LIB})
+add_test(NAME dfs_controller_engine_test COMMAND dfs_controller_engine_test)
+
+add_executable(neighbor_stack_memory_test
+    tests/neighbor_stack_memory_test.cpp
+)
+target_include_directories(neighbor_stack_memory_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(neighbor_stack_memory_test ${SYSTEMC_LIB})
+add_test(NAME neighbor_stack_memory_test COMMAND neighbor_stack_memory_test)
