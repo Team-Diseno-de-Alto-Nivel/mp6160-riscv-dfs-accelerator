@@ -240,8 +240,8 @@ High-performance, energy-efficient accelerator for graph analytics
  
 Large-scale graph processing on multi-FPGA architectures
 & \cite{dai2017foregraph}
-& Splits the graph so the work is shared across several FPGAs and performance does not stall on a single chip. Its load balancing and chip-to-chip communication hold up well.
-& Synchronizing multiple FPGAs unleashes a development nightmare. Leading to leave this out if you are working with embedded systems or low-cost boards.
+& Splits the graph so the work is shared across several FPGAs and performance does not stall on a single chip, this entails load balancing and managing inter-chip communication.
+& Synchronizing multiple FPGAs can be complex, often leading to the decision to forgo it when working with embedded systems or low-cost boards.
 & It is specific to a setup were there is a multi-FPGA hardware and the graph overflows any single chip on the market. \\
 \bottomrule
 \end{tabular}
@@ -249,8 +249,8 @@ Large-scale graph processing on multi-FPGA architectures
 
 \subsection{Observed Challenges}
 From the analysis in Section II and the summary in Table I, we can pull out the main problems that pushed us to do this work. 
-The first challenge is that DFS parallelism is limited by contention over the shared traversal state. 
-Second, traversal of 2D matrices exhibits irregular memory access patterns, which reduces cache utilization and increases latency in general-purpose architectures. 
+The first challenge focuses on the fact that DFS parallelism is limited by contention on the shared traversal state.
+Second, traversal of 2D matrices exhibits an irregular memory access patterns, which reduces cache utilization and increases latency in the architectures. 
 Third, state-of-the-art solutions focus primarily on sparse graphs, GPU acceleration, or specialized domains such as SAT or subgraph matching. 
 This limits their direct applicability to the problem of DFS on dense 2D matrices in a RISC-V-based embedded environment. 
 Taken together, these limitations highlight the absence of a specialized architecture that decouples DFS control from neighbor exploration computation, which defines the architectural gap that this work addresses in the following section.
@@ -387,7 +387,7 @@ The proposed DFS accelerator was developed following a hardware design methodolo
 
 \subsection{Overall Development Flow}
 
-This kind of development follows a refinement methodology, in which the accelerator moves forward from a software reference into a complete FPGA-based hardware system. Figure~\ref{fig:development_flow} illustrates the stages of this process.
+This development follows a refinement methodology, in which the accelerator moves forward from a software reference into a FPGA-based hardware system. Figure~\ref{fig:development_flow} illustrates the stages.
 
 
 \begin{figure}[h]
@@ -438,7 +438,7 @@ FPGA Integration};
 
 \end{figure}
 
-SystemC was adopted as the modeling language during the early stages. The objetive of this was to verify the behavior of the DFS architecture before moving into an RTL implementation. Using SystemC/TLM made it possible to model the communication between the hardware modules and verify the functionality of the accelerator while keeping the design at a higher level of abstraction.
+The modeling language used during the early stages was SystemC, the main objetive was to verify the behavior of the DFS architecture before moving into an RTL implementation. The use of SystemC/TLM enabled the communication model between the hardware modules and the verification of the accelerator while preserving a higher level of abstraction.
 
 Additionally, SystemC enables early evaluation of design by allowing latency analysis and architectural exploration before moving to the synthesis stage. This makes it possible to compare different approaches and refine the design while development time is reduced.
 
@@ -500,13 +500,12 @@ thick
 
 
 The communication between software and hardware accelerator is modeled through a memory-mapped register interface using Transaction-Level Modeling (TLM). From the software perspective, the accelerator behaves as a memory-mapped peripheral, while internally the SystemC model captures the interactions among the hardware modules.
-The communication scheme follows a structure similar to an AXI-Lite peripheral, the transition from the SystemC model to the FPGA implementation requires minor architectural changes. This approach reduces the hardware integration process and allows the validated model to be reused during the synthesis stages.
+The communication scheme follows a structure similar to an AXI-Lite peripheral, the transition from the SystemC model to the FPGA implementation requires minor architectural changes which reduces the hardware integration and, during the synthesis stages, the validated model can be reused.
 
 
 \subsection{Hardware Generation Strategy}
 
-AMD Vitis High-Level Synthesis (HLS) was selected as the hardware generation approach instead of manually developing the accelerator using the traditional RTL design. This decision reduces development complexity and allows the hardware implementation to be derived from a higher-level behavioral description.
-After the SystemC model has been functionally validated and its timing characteristics have been analyzed, the design can be further refined and synthesized into RTL using Vitis HLS. This enables a smoother transition from architectural modeling to hardware implementation while preserving the validated functionality.
+Instead of using the traditional RTL design, th AMD Vitis High-Level Synthesis (HLS) was selected as the hardware generation, this decision helps to reduce the development complexity and allows the hardware implementation from the higher-level behavioral. After the SystemC model has been functionally validated and its timing characteristics have been analyzed, the design can be further synthesized into RTL using Vitis HLS. This enables a smoother transition from architectural modeling to hardware implementation while preserving the validated functionality.
 Using HLS also allows the application of hardware-specific optimizations, such as loop pipelining, interface generation, and resource utilization improvements without compromising code  long-term maintainability and readability.
 
 \subsection{Target Platform Selection}
