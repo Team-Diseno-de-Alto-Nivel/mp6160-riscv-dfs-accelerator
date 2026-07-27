@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments demo clean paper paper-clean
 
 all: model program
 
@@ -25,6 +25,10 @@ integration:
 experiments:
 	bash scripts/run_experiments.sh
 	python3 scripts/plot_results.py
+
+# Reproducible one-shot demo (Avance II video): RISC-V emulation + SystemC co-simulation.
+demo:
+	bash scripts/demo.sh
 
 clean:
 	$(MAKE) -C src/model clean

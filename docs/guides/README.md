@@ -17,3 +17,11 @@ notes that complement the [README](../../README.md) and the paper
 - [setup.md](setup.md) — how to reproducibly stand up the toolchain (dev
   container / Docker / Codespaces / local build) and run `make model`,
   `make program`, `make run`.
+- [running-the-simulation.md](running-the-simulation.md) — correr la solución en
+  simulación (SystemC) y emulación (RISC-V bajo QEMU) y cómo leer la salida.
+- [running-experiments.md](running-experiments.md) — correr el runner de
+  experimentos (`make experiments`) y generar el CSV, las tablas y los gráficos.
+- [metrics-schema.md](metrics-schema.md) — esquema de columnas y unidades del CSV
+  consolidado de métricas.
+- [adding-a-dfs-algorithm.md](adding-a-dfs-algorithm.md) — cómo agregar un nuevo
+  problema DFS al baseline de software.

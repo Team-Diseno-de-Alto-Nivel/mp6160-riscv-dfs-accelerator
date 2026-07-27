@@ -1,13 +1,16 @@
 # CI/CD
 
-Two GitHub Actions workflows guard the repository. Each step runs to a non-zero
-exit code on failure, so a red check means a concrete gate failed.
+Three GitHub Actions workflows support the repository. The two guard workflows
+run each step to a non-zero exit code on failure, so a red check means a concrete
+gate failed; the third is a manually-triggered artifact generator.
 
 - **[build.yml](../../.github/workflows/build.yml)** — the code CI: builds the dev
   container, the SystemC model and the RISC-V program, then verifies the program
   **two ways** (RISC-V emulation and native build).
 - **[paper.yml](../../.github/workflows/paper.yml)** — the paper CI: compiles the
   IEEE PDF and, on pull requests, runs an AI-writing gate.
+- **[demo.yml](../../.github/workflows/demo.yml)** — the demo generator: on demand,
+  records `make demo` and renders the Avance II demo video (MP4) as an artifact.
 
 ## Code CI — `build.yml`
 
@@ -92,3 +95,28 @@ flowchart TB
 The AI check is a free, local proxy — no API key or secret. It computes per-paragraph
 scores, comments them on the PR with an annotated PDF, and blocks merge only when the
 average crosses the threshold.
+
+## Demo video — `demo.yml`
+
+Triggered manually (`workflow_dispatch`) from the **Actions** tab. It produces the
+reproducible Avance II demo video without any hand recording.
+
+```mermaid
+flowchart TB
+    DT["Trigger: workflow_dispatch (manual)"] --> D1
+    D1["Build dev container<br/>(GHA cache)"] --> D2
+    D2["make → build model + program"] --> D3
+    D3["Install asciinema + agg + ffmpeg (runner)"] --> D4
+    D4["asciinema rec → 'make demo'<br/>(scripts/demo.sh under QEMU + SystemC)"] --> D5
+    D5["agg → GIF → ffmpeg → MP4"] --> D6
+    D6["Upload artifact: demo-video (demo.mp4 + demo.cast)"]
+```
+
+### How it works
+
+| Step | What it does |
+|---|---|
+| Build container + `make` | Same reproducible environment as `build.yml`; pre-builds so the recording is short |
+| `asciinema rec` | Records `make demo` (`scripts/demo.sh`): RISC-V emulation under `qemu-system-riscv64` + the SystemC co-simulation, with on-screen captions |
+| `agg` + `ffmpeg` | Renders the terminal cast to an MP4 |
+| Upload artifact | Publishes `demo.mp4` (and the raw `demo.cast`) for download |

@@ -66,10 +66,17 @@ If SystemC is already installed, export `SYSTEMC_HOME` before `make` to skip the
 
 `make integration` specifically needs `SYSTEMC_HOME` pointing at an **installed** SystemC (headers under `$SYSTEMC_HOME/include`, library under `$SYSTEMC_HOME/lib`) — unlike `make model`, it does not auto-fetch one. The dev container already has this set up. Building locally without it: run `make model` once (which fetches and builds SystemC via CMake `FetchContent` under `src/model/build/_deps/systemc-build`), then `cmake --install src/model/build --prefix <some-dir>` and export `SYSTEMC_HOME=<some-dir>` before `make integration`.
 
+### Running & demo
+
+- **Run the solution** (simulation and RISC-V emulation) and read the output — [docs/guides/running-the-simulation.md](docs/guides/running-the-simulation.md).
+- **Run the experiments** (`make experiments`) to collect the metrics CSV, tables, and plots — [docs/guides/running-experiments.md](docs/guides/running-experiments.md).
+- **`make demo`** runs the reproducible one-command demo (RISC-V emulation + SystemC co-simulation). The [`demo.yml`](.github/workflows/demo.yml) workflow records it into an MP4 artifact.
+
 ### CI/CD
 
 - [`build.yml`](.github/workflows/build.yml): on every push/PR touching `src/`, `Makefile`, or `.devcontainer/`, builds the model and the program, runs the simulation, and verifies the program **both** under RISC-V emulation (qemu) and as a native build.
 - [`paper.yml`](.github/workflows/paper.yml): compiles the LaTeX paper (`docs/paper/`) on every push to `main` and every PR that modifies it (PDF uploaded as an artifact); on PRs it also runs an **AI-writing gate** (see below).
+- [`demo.yml`](.github/workflows/demo.yml): manually triggered (`workflow_dispatch`); records `make demo` and renders the reproducible demo video (MP4) as a downloadable artifact.
 
 See the [CI/CD guide](docs/guides/ci-cd.md) for flow diagrams and how each step verifies.
 

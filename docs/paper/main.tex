@@ -13,6 +13,7 @@
 \usepackage{tikz}
 \usepackage{array}
 \usepackage{booktabs}
+\usepackage{url}
 \usetikzlibrary{positioning, arrows.meta, shapes, fit}
 
 \newcommand{\pend}[1]{\textcolor{red}{[#1]}}
@@ -264,6 +265,9 @@ Taken together, these limitations highlight the absence of a specialized archite
 The proposed architecture implements a hardware accelerator for the execution of the Depth First Search (DFS)
 algorithm on 2D arrays. The system shifts the computational load from the processor to the FPGA unit,
 composed of 3 stages: control, exploration, and storage modules.
+
+The complete implementation is publicly available in the project
+repository.\footnote{\url{https://github.com/Team-Diseno-de-Alto-Nivel/mp6160-riscv-dfs-accelerator}}
 
 The search state is stored in the following stages:
 
