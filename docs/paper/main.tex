@@ -456,43 +456,32 @@ The accelerator architecture is composed of independent hardware modules which a
 \centering
 
 \begin{tikzpicture}[
-node distance=1cm,
 block/.style={
 rectangle,
 draw,
 rounded corners,
-minimum width=2.4cm,
-minimum height=0.8cm,
-align=center
+minimum width=2.5cm,
+minimum height=0.9cm,
+align=center,
+font=\footnotesize
 },
 arrow/.style={
--{Latex[length=3mm]},
+-{Latex[length=2mm]},
 thick
 }
 ]
 
-\node[block] (controller)
-{DFS\\Controller};
+\node[block] (neighbor) {Neighbor\\Generator};
+\node[block, below=0.3cm of neighbor] (stack) {Stack\\Manager};
+\node[block, below=0.3cm of stack] (visited) {Visited\\Memory};
+\node[block, below=0.3cm of visited] (grid) {Grid\\Memory};
+\node[block, below=0.3cm of grid] (result) {Result\\Interface};
 
-\node[block, below left=1.3cm and 4cm of controller] (stack)
-{Stack\\Manager};
+\node[block, left=1.5cm of visited] (controller) {DFS\\Controller};
 
-\node[block, below left=1.3cm and 2cm of controller] (neighbor)
-{Neighbor\\Generator};
-
-\node[block, below=1.8cm of controller] (visited)
-{Visited\\Memory};
-
-\node[block, below right=1.3cm and 2cm of controller] (grid)
-{Grid\\Memory};
-
-\node[block, below right=1.3cm and 4cm of controller] (result)
-{Result\\Interface};
-
-
-\foreach \x in {stack,neighbor,visited,grid,result}
+\foreach \x in {neighbor,stack,visited,grid,result}
 {
-\draw[arrow] (controller) -- (\x);
+\draw[arrow] (controller.east) -- (\x.west);
 }
 
 \end{tikzpicture}
