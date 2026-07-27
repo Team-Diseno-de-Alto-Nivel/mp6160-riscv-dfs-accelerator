@@ -59,6 +59,13 @@ $ python3 scripts/plot_results.py
 Toma `results/metrics.csv` por defecto, o podés pasarle otra ruta de CSV como
 argumento.
 
+## En CI
+
+El workflow [`build.yml`](../../.github/workflows/build.yml) corre este mismo
+runner en cada push/PR que toca `src/**` y publica el directorio `results/`
+(CSV, tablas y gráficos) como artefacto descargable. Ver
+[ci-cd.md](ci-cd.md).
+
 ## Ver también
 
 - [running-the-simulation.md](running-the-simulation.md) — correr una sola pasada
