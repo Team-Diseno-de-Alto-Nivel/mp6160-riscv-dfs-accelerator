@@ -316,61 +316,60 @@ and the run's result under-counts real coverage — see the scope note atop
 
 ## Results
 
-Numbers below come from `make experiments`
-(see [docs/guides/running-experiments.md](docs/guides/running-experiments.md)):
-21 dataset cases across the 5 problems and their 2 unoptimized variants, each run
-twice (accelerator OFF and ON) for **42 runs, all passing**. `latency_ns` is a
-*modelled* figure from the shared cost model (10 ns clock), not wall-clock time,
-so it is deterministic and reproducible across hosts, and speedup is
-`OFF.latency_ns / ON.latency_ns`. Column meanings are in
-[docs/guides/metrics-schema.md](docs/guides/metrics-schema.md).
+`make experiments`: 21 cases × OFF/ON = 42 runs, all passing. Latency is
+modelled (cost model, 10 ns clock), not wall-clock; speedup is `OFF / ON`.
+See [running-experiments.md](docs/guides/running-experiments.md) and
+[metrics-schema.md](docs/guides/metrics-schema.md).
 
-### Speedup per problem
+### Per problem
 
-| Problem (variant) | Cases | Speedup range | Geometric mean |
-|---|---:|---:|---:|
-| Number of Islands | 6 | 1.39×–1.97× | 1.65× |
-| Unique Paths III | 3 | 1.47×–1.50× | 1.48× |
-| Word Search II | 2 | 1.47×–1.60× | 1.54× |
-| Word Search II (no pruning) | 2 | 1.55×–1.67× | 1.61× |
-| Pacific Atlantic | 2 | 1.33×–1.50× | 1.41× |
-| Longest Increasing Path | 3 | 4.00× (constant) | 4.00× |
-| Longest Increasing Path (no memo) | 3 | 4.00× (constant) | 4.00× |
+| Problem (variant) | Cases | Latency OFF (ns) | Latency ON (ns) | Speedup range | Geometric mean |
+|---|---:|---:|---:|---:|---:|
+| Number of Islands | 6 | 4,420 | 2,650 | 1.39×–1.97× | 1.65× |
+| Unique Paths III | 3 | 22,180 | 15,040 | 1.47×–1.50× | 1.48× |
+| Word Search II | 2 | 1,400 | 920 | 1.47×–1.60× | 1.54× |
+| Word Search II (no pruning) | 2 | 1,190 | 740 | 1.55×–1.67× | 1.61× |
+| Pacific Atlantic | 2 | 4,030 | 3,010 | 1.33×–1.50× | 1.41× |
+| Longest Increasing Path | 3 | 760 | 190 | 4.00× | 4.00× |
+| Longest Increasing Path (no memo) | 3 | 1,880 | 470 | 4.00× | 4.00× |
+| **Total** | **21** | **35,860** | **23,020** | | **1.56×** (aggregate) |
 
-Aggregated over every case, total modelled latency drops from **35,860 ns** to
-**23,020 ns**, a **1.56×** overall speedup. The `noi_all_water` case does zero
-DFS work (0 ns in both modes) and is excluded from the ranges and means above.
+`noi_all_water` does zero DFS work (0 ns in both modes) and is excluded from the
+ranges and means.
 
-### Analysis
+### Per case
 
-- **Neighbor expansion is what the accelerator buys.** Longest Increasing Path is
-  driven entirely by neighbor generation and gets a flat 4.00× on every case, with
-  or without memoization. Memoization still matters in absolute terms (360 ns vs
-  920 ns OFF on `lip_desc`), it just does not change the ratio.
-- **More neighbors per node means more to amortize.** Number of Islands under
-  8-connectivity reaches 1.92×–1.97×, against 1.39×–1.60× for the same grids under
-  4-connectivity.
-- **Grid-scan-bound problems gain the least.** Unique Paths III and Pacific
-  Atlantic sit at 1.33×–1.50×: their runtime is dominated by work the accelerator
-  does not offload.
-- **Removing a software optimization slightly widens the gap.** Word Search II
-  without pruning gains 1.55×–1.67× versus 1.47×–1.60× with pruning, since the
-  extra expanded nodes land on the accelerated path.
-- **Results match across modes** on all 21 cases, and the program↔model
-  co-simulation over TLM (`integration_metrics.csv`) reproduces the same metrics
-  as the in-process run.
+Traversal counters are identical in both modes, so they are listed once.
+Longest Increasing Path does not track visited cells.
 
-### Reproducing
+| Problem (variant) | Case | Result | Expanded nodes | Visited cells | Peak stack | Latency OFF (ns) | Latency ON (ns) | Speedup | Match |
+|---|---|---:|---:|---:|---:|---:|---:|---:|:---:|
+| Number of Islands | `noi_classic_4c` | 3 | 7 | 7 | 2 | 660 | 450 | 1.47× | ✓ |
+|  | `noi_classic_8c` | 1 | 7 | 7 | 3 | 1,020 | 530 | 1.92× | ✓ |
+|  | `noi_checker_4c` | 8 | 8 | 8 | 1 | 640 | 400 | 1.60× | ✓ |
+|  | `noi_checker_8c` | 1 | 8 | 8 | 5 | 1,140 | 580 | 1.97× | ✓ |
+|  | `noi_all_water` | 0 | 0 | 0 | 0 | 0 | 0 | — | ✓ |
+|  | `noi_all_land_4c` | 1 | 9 | 9 | 3 | 960 | 690 | 1.39× | ✓ |
+| Unique Paths III | `up3_one_obstacle` | 2 | 95 | 95 | 11 | 7,160 | 4,820 | 1.49× | ✓ |
+|  | `up3_open` | 4 | 195 | 195 | 12 | 14,750 | 10,040 | 1.47× | ✓ |
+|  | `up3_no_path` | 0 | 5 | 5 | 3 | 270 | 180 | 1.50× | ✓ |
+| Word Search II | `ws2_classic` | 2 | 41 | 9 | 5 | 840 | 570 | 1.47× | ✓ |
+|  | `ws2_small` | 4 | 10 | 7 | 4 | 560 | 350 | 1.60× | ✓ |
+| Word Search II (no pruning) | `ws2_classic` | 2 | 57 | 7 | 4 | 590 | 380 | 1.55× | ✓ |
+|  | `ws2_small` | 4 | 18 | 8 | 4 | 600 | 360 | 1.67× | ✓ |
+| Longest Increasing Path | `lip_desc` | 4 | 18 | — | 2 | 360 | 90 | 4.00× | ✓ |
+|  | `lip_zigzag` | 4 | 18 | — | 4 | 360 | 90 | 4.00× | ✓ |
+|  | `lip_single` | 1 | 1 | — | 1 | 40 | 10 | 4.00× | ✓ |
+| Longest Increasing Path (no memo) | `lip_desc` | 4 | 23 | — | 4 | 920 | 230 | 4.00× | ✓ |
+|  | `lip_zigzag` | 4 | 23 | — | 4 | 920 | 230 | 4.00× | ✓ |
+|  | `lip_single` | 1 | 1 | — | 1 | 40 | 10 | 4.00× | ✓ |
+| Pacific Atlantic | `pa_classic` | 7 | 32 | 32 | 9 | 3,850 | 2,890 | 1.33× | ✓ |
+|  | `pa_single` | 1 | 2 | 2 | 1 | 180 | 120 | 1.50× | ✓ |
 
-```console
-$ make experiments
-```
-
-Writes the full per-case table to `results/tables/speedup.md` (plus a `booktabs`
-`.tex` for the paper), the raw CSV to `results/metrics.csv`, and bar charts to
-`results/plots/`. `results/` is gitignored; CI regenerates it on every push that
-touches `src/**` and publishes it as the `experiment-results` artifact
-(see [docs/guides/ci-cd.md](docs/guides/ci-cd.md)).
+`instruction_count` and `throughput_cells_per_s` are derived (latency is
+`ops × 10 ns`, throughput is `expanded_nodes / latency`) and live in
+`results/metrics.csv`, regenerated by CI as the `experiment-results` artifact.
+The program↔model co-simulation over TLM reports the same metrics.
 
 ---
 
