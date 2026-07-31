@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       src: ${{ steps.filter.outputs.src }}
+      hls: ${{ steps.filter.outputs.hls }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -25,6 +26,33 @@ jobs:
               - 'src/**'
               - 'Makefile'
               - '.devcontainer/**'
+            hls:
+              - 'src/hls/**'
+              - 'src/program/**'
+              - 'Makefile'
+              - '.github/workflows/build.yml'
+
+  # FPGA-1 (#62): guards the HLS kernel without needing a Vitis license. Runs on a
+  # bare runner instead of the dev container so it reports in well under a minute,
+  # independently of the (much slower) container build below.
+  hls-host:
+    needs: changes
+    if: needs.changes.outputs.hls == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Also enforces the kFootprintBudgetBytes static_assert in dfs_accel.cpp:
+      # bumping kMaxRows/kMaxCols or widening cell_t fails the compile, not review.
+      - name: Kernel vs software reference on the 21 golden cases
+        run: make hls-host
+
+      # Out-of-bounds on the explicit frame stack is the failure mode that passes
+      # functionally on the host and breaks in RTL, so it must be caught here.
+      - name: Same check under ASan/UBSan
+        run: make hls-host HLS_CXXFLAGS="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all"
 
   build:
     needs: changes

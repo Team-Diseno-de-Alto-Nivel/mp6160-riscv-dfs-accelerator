@@ -107,6 +107,14 @@ struct Engine {
     }
 };
 
+static_assert(sizeof(Engine) <= dfs_hls::kFootprintBudgetBytes,
+              "dfs_accel on-chip memory exceeds kFootprintBudgetBytes: raising kMaxRows, "
+              "kMaxCols or widening cell_t/Frame costs BRAM on the KV260. Re-check the "
+              "synthesis budget before raising it.");
+
+static_assert(kMaxRows <= 256 && kMaxCols <= 256,
+              "Coord packs row and col into 8 bits each");
+
 Coord make_coord(std::uint32_t r, std::uint32_t c) {
     Coord out;
     out.row = static_cast<std::uint8_t>(r);

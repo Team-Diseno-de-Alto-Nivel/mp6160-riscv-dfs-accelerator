@@ -45,9 +45,12 @@ HLS_TB_SOURCES := \
 	src/program/algorithms/longest_increasing_path/longest_increasing_path.cpp \
 	src/program/algorithms/pacific_atlantic/pacific_atlantic.cpp
 
+HLS_CXXFLAGS ?= -O2
+
 hls-host:
 	mkdir -p src/hls/build
-	$(CXX) -std=c++17 -O2 -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-label \
+	$(CXX) -std=c++17 $(HLS_CXXFLAGS) -Wall -Wextra -Werror \
+	    -Wno-unknown-pragmas -Wno-unused-label \
 	    -Isrc/hls -Isrc/program $(HLS_TB_SOURCES) -o src/hls/build/hls_host
 	./src/hls/build/hls_host
 

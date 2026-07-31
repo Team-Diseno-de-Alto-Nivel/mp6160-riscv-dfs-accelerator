@@ -12,6 +12,7 @@ constexpr std::uint32_t kMaxWords = 16;
 constexpr std::uint32_t kMaxWordLen = 16;
 constexpr std::uint32_t kMaxTrieNodes = kMaxWords * kMaxWordLen + 1;
 constexpr std::uint32_t kResultWords = 4;
+constexpr std::uint32_t kFootprintBudgetBytes = 128u * 1024u;
 
 using cell_t = std::int8_t;
 
