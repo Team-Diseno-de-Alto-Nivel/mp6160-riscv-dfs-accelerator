@@ -316,7 +316,61 @@ and the run's result under-counts real coverage — see the scope note atop
 
 ## Results
 
-_To be added once experiments are run._
+Numbers below come from `make experiments`
+(see [docs/guides/running-experiments.md](docs/guides/running-experiments.md)):
+21 dataset cases across the 5 problems and their 2 unoptimized variants, each run
+twice (accelerator OFF and ON) for **42 runs, all passing**. `latency_ns` is a
+*modelled* figure from the shared cost model (10 ns clock), not wall-clock time,
+so it is deterministic and reproducible across hosts, and speedup is
+`OFF.latency_ns / ON.latency_ns`. Column meanings are in
+[docs/guides/metrics-schema.md](docs/guides/metrics-schema.md).
+
+### Speedup per problem
+
+| Problem (variant) | Cases | Speedup range | Geometric mean |
+|---|---:|---:|---:|
+| Number of Islands | 6 | 1.39×–1.97× | 1.65× |
+| Unique Paths III | 3 | 1.47×–1.50× | 1.48× |
+| Word Search II | 2 | 1.47×–1.60× | 1.54× |
+| Word Search II (no pruning) | 2 | 1.55×–1.67× | 1.61× |
+| Pacific Atlantic | 2 | 1.33×–1.50× | 1.41× |
+| Longest Increasing Path | 3 | 4.00× (constant) | 4.00× |
+| Longest Increasing Path (no memo) | 3 | 4.00× (constant) | 4.00× |
+
+Aggregated over every case, total modelled latency drops from **35,860 ns** to
+**23,020 ns**, a **1.56×** overall speedup. The `noi_all_water` case does zero
+DFS work (0 ns in both modes) and is excluded from the ranges and means above.
+
+### Analysis
+
+- **Neighbor expansion is what the accelerator buys.** Longest Increasing Path is
+  driven entirely by neighbor generation and gets a flat 4.00× on every case, with
+  or without memoization. Memoization still matters in absolute terms (360 ns vs
+  920 ns OFF on `lip_desc`), it just does not change the ratio.
+- **More neighbors per node means more to amortize.** Number of Islands under
+  8-connectivity reaches 1.92×–1.97×, against 1.39×–1.60× for the same grids under
+  4-connectivity.
+- **Grid-scan-bound problems gain the least.** Unique Paths III and Pacific
+  Atlantic sit at 1.33×–1.50×: their runtime is dominated by work the accelerator
+  does not offload.
+- **Removing a software optimization slightly widens the gap.** Word Search II
+  without pruning gains 1.55×–1.67× versus 1.47×–1.60× with pruning, since the
+  extra expanded nodes land on the accelerated path.
+- **Results match across modes** on all 21 cases, and the program↔model
+  co-simulation over TLM (`integration_metrics.csv`) reproduces the same metrics
+  as the in-process run.
+
+### Reproducing
+
+```console
+$ make experiments
+```
+
+Writes the full per-case table to `results/tables/speedup.md` (plus a `booktabs`
+`.tex` for the paper), the raw CSV to `results/metrics.csv`, and bar charts to
+`results/plots/`. `results/` is gitignored; CI regenerates it on every push that
+touches `src/**` and publishes it as the `experiment-results` artifact
+(see [docs/guides/ci-cd.md](docs/guides/ci-cd.md)).
 
 ---
 
