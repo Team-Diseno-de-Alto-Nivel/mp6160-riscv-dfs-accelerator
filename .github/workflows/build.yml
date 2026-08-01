@@ -54,6 +54,18 @@ jobs:
       - name: Same check under ASan/UBSan
         run: make hls-host HLS_CXXFLAGS="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all"
 
+      # FPGA-2 (#63): guards run_hls.tcl without needing a Vitis license. Runs the
+      # real script under plain tclsh with stub procs standing in for the
+      # Vitis-only commands, so a broken path/part/clock is caught here instead of
+      # the next time someone with Vitis actually runs it.
+      # tclsh isn't in the ubuntu-latest image manifest, so install it explicitly
+      # rather than assume it happens to be dragged in by something else.
+      - name: Validate run_hls.tcl (no Vitis license needed)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tcl
+          tclsh src/hls/scripts/validate_run_hls.tcl
+
   build:
     needs: changes
     if: needs.changes.outputs.src == 'true'
