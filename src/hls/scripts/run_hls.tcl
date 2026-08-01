@@ -50,7 +50,11 @@ csim_design
 # Generates the RTL and the csynth.rpt that issue #90 reads.
 csynth_design
 
-# No cosim_design / export_design on purpose: cosim is #95. Exporting
-# the IP before that would make unverified RTL look final.
+# Runs the RTL (not the g++-compiled C++) against the same 21-case
+# testbench used by csim, to catch divergences csim can't see
+# (uninitialized BRAM, loop bounds, memory aliasing). Issue #95.
+# No export_design on purpose: exporting before this would make
+# unverified RTL look final.
+cosim_design
 
 exit

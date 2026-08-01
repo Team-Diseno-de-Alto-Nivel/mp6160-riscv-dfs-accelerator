@@ -1,4 +1,4 @@
-# Cheap CI guard for run_hls.tcl (issue #63). No Vitis license needed:
+# Cheap CI guard for run_hls.tcl (issues #63, #95). No Vitis license needed:
 # runs the real script under plain tclsh, with stub procs standing in for
 # the Vitis-only commands. The stubs assert what Vitis would actually care
 # about (paths, part, clock) without touching Vitis itself.
@@ -77,8 +77,8 @@ source $script
 if {!$::saw_csynth} {
     fail "run_hls.tcl never calls csynth_design"
 }
-if {$::saw_cosim} {
-    fail "run_hls.tcl calls cosim_design -- that's #95, out of scope here"
+if {!$::saw_cosim} {
+    fail "run_hls.tcl never calls cosim_design -- required by #95"
 }
 if {$::saw_export} {
     fail "run_hls.tcl calls export_design -- premature before cosim (#95)"
@@ -90,5 +90,5 @@ if {[llength $::errors] > 0} {
     _real_exit 1
 }
 
-puts "run_hls.tcl OK: paths resolve, part/clock match, csynth_design present, no cosim/export"
+puts "run_hls.tcl OK: paths resolve, part/clock match, csynth_design and cosim_design present, no export"
 _real_exit 0

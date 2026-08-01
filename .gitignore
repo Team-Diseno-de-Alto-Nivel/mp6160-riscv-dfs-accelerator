@@ -21,6 +21,12 @@ cmake_install.cmake
 Makefile.cmake
 _deps/
 
+# Vitis HLS generated project (issues #63, #95) — only vitis_hls.log is
+# versioned, so the team can see results without installing Vitis.
+dfs_accel_prj/
+.Xil/
+*.jou
+
 # macOS
 .DS_Store
 .AppleDouble
