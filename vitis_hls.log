@@ -3,18 +3,18 @@
   **** SW Build 5069499 on May 21 2024
   **** IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
   **** SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
-  **** Start of session at: Sat Aug  1 17:15:22 2026
+  **** Start of session at: Sat Aug  1 14:44:58 2026
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 
 source /tools/Xilinx/Vitis_HLS/2024.1/scripts/vitis_hls/hls.tcl -notrace
-INFO: [HLS 200-10] For user 'fabio' on host 'fabio-HP-Notebook' (Linux_x86_64 version 7.0.0-28-generic) on Sat Aug 01 17:15:30 CST 2026
+INFO: [HLS 200-10] For user 'fabio' on host 'fabio-HP-Notebook' (Linux_x86_64 version 7.0.0-28-generic) on Sat Aug 01 14:45:01 CST 2026
 INFO: [HLS 200-10] On os Ubuntu 26.04 LTS
 INFO: [HLS 200-10] In directory '/home/fabio/AltoNivel/DFS'
 WARNING: [HLS 200-2053] The vitis_hls executable is deprecated. Consider using vitis-run --mode hls --tcl
 Sourcing Tcl script 'src/hls/scripts/run_hls.tcl'
 INFO: [HLS 200-1510] Running: open_project -reset dfs_accel_prj 
-INFO: [HLS 200-10] Creating and opening project '/home/fabio/AltoNivel/DFS/dfs_accel_prj'.
+INFO: [HLS 200-10] Opening and resetting project '/home/fabio/AltoNivel/DFS/dfs_accel_prj'.
 INFO: [HLS 200-1510] Running: set_top dfs_accel 
 INFO: [HLS 200-1510] Running: add_files /home/fabio/AltoNivel/DFS/src/hls/dfs_accel.cpp -cflags -std=c++14 -I/home/fabio/AltoNivel/DFS/src/hls 
 INFO: [HLS 200-10] Adding design file '/home/fabio/AltoNivel/DFS/src/hls/dfs_accel.cpp' to the project
@@ -89,11 +89,11 @@ pacific_atlantic                 pa_single                 1        1        1  
 21/21 cases match the golden result
 INFO: [SIM 211-1] CSim done with 0 errors.
 INFO: [SIM 211-3] *************** CSIM finish ***************
-INFO: [HLS 200-2161] Finished Command csim_design Elapsed time: 00:00:04; Allocated memory: 0.098 MB.
+INFO: [HLS 200-2161] Finished Command csim_design Elapsed time: 00:00:04; Allocated memory: 0.031 MB.
 INFO: [HLS 200-1510] Running: csynth_design 
-INFO: [HLS 200-111] Finished File checks and directory preparation: CPU user time: 0.1 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.1 seconds; current allocated memory: 257.926 MB.
+INFO: [HLS 200-111] Finished File checks and directory preparation: CPU user time: 0.23 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.25 seconds; current allocated memory: 257.883 MB.
 INFO: [HLS 200-10] Analyzing design file 'src/hls/dfs_accel.cpp' ... 
-INFO: [HLS 200-111] Finished Source Code Analysis and Preprocessing: CPU user time: 0.67 seconds. CPU system time: 0.42 seconds. Elapsed time: 1.09 seconds; current allocated memory: 260.430 MB.
+INFO: [HLS 200-111] Finished Source Code Analysis and Preprocessing: CPU user time: 1.09 seconds. CPU system time: 0.48 seconds. Elapsed time: 1.6 seconds; current allocated memory: 260.375 MB.
 INFO: [HLS 200-777] Using interface defaults for 'Vivado' flow target.
 INFO: [HLS 200-1995] There were 3,402 instructions in the design after the 'Compile/Link' phase of compilation. See the Design Size Report for more details: /home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/syn/report/csynth_design_size.rpt
 INFO: [HLS 200-1995] There were 2,661 instructions in the design after the 'Unroll/Inline (step 1)' phase of compilation. See the Design Size Report for more details: /home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/syn/report/csynth_design_size.rpt
@@ -207,12 +207,12 @@ INFO: [HLS 214-115] Multiple burst writes of length 4 and bit width 32 has been 
 INFO: [HLS 214-115] Multiple burst reads of variable length and bit width 8 in loop 'VITIS_LOOP_458_1'(src/hls/dfs_accel.cpp:458:23) has been inferred on bundle 'gmem0'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (src/hls/dfs_accel.cpp:458:23)
 INFO: [HLS 214-115] Multiple burst reads of variable length and bit width 8 in loop 'VITIS_LOOP_465_4'(src/hls/dfs_accel.cpp:465:23) has been inferred on bundle 'gmem1'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (src/hls/dfs_accel.cpp:465:23)
 INFO: [HLS 214-115] Multiple burst writes of length 4 and bit width 32 has been inferred on bundle 'gmem2'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (src/hls/dfs_accel.cpp:502:1)
-INFO: [HLS 200-111] Finished Compiling Optimization and Transform: CPU user time: 7.38 seconds. CPU system time: 0.74 seconds. Elapsed time: 10.99 seconds; current allocated memory: 272.020 MB.
-INFO: [HLS 200-111] Finished Checking Pragmas: CPU user time: 0.01 seconds. CPU system time: 0 seconds. Elapsed time: 0 seconds; current allocated memory: 272.020 MB.
+INFO: [HLS 200-111] Finished Compiling Optimization and Transform: CPU user time: 5.08 seconds. CPU system time: 0.68 seconds. Elapsed time: 8.99 seconds; current allocated memory: 271.855 MB.
+INFO: [HLS 200-111] Finished Checking Pragmas: CPU user time: 0 seconds. CPU system time: 0 seconds. Elapsed time: 0 seconds; current allocated memory: 271.855 MB.
 INFO: [HLS 200-10] Starting code transformations ...
-INFO: [HLS 200-111] Finished Standard Transforms: CPU user time: 0.46 seconds. CPU system time: 0 seconds. Elapsed time: 0.46 seconds; current allocated memory: 275.484 MB.
+INFO: [HLS 200-111] Finished Standard Transforms: CPU user time: 0.17 seconds. CPU system time: 0 seconds. Elapsed time: 0.18 seconds; current allocated memory: 275.555 MB.
 INFO: [HLS 200-10] Checking synthesizability ...
-INFO: [HLS 200-111] Finished Checking Synthesizability: CPU user time: 0.44 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.45 seconds; current allocated memory: 280.984 MB.
+INFO: [HLS 200-111] Finished Checking Synthesizability: CPU user time: 0.16 seconds. CPU system time: 0 seconds. Elapsed time: 0.16 seconds; current allocated memory: 281.141 MB.
 INFO: [XFORM 203-401] Performing if-conversion on hyperblock from (src/hls/dfs_accel.cpp:186:19) to (src/hls/dfs_accel.cpp:187:23) in function 'dfs_accel'... converting 3 basic blocks.
 INFO: [XFORM 203-11] Balancing expressions in function '(anonymous namespace)::run_word_search_trie' (src/hls/dfs_accel.cpp:56:21)...3 expression(s) balanced.
 INFO: [XFORM 203-11] Balancing expressions in function '(anonymous namespace)::run_word_search_no_pruning' (src/hls/dfs_accel.cpp:56:13)...3 expression(s) balanced.
@@ -220,14 +220,14 @@ INFO: [XFORM 203-11] Balancing expressions in function '(anonymous namespace)::r
 INFO: [XFORM 203-11] Balancing expressions in function '(anonymous namespace)::run_number_of_islands' (src/hls/dfs_accel.cpp:56:21)...3 expression(s) balanced.
 INFO: [XFORM 203-11] Balancing expressions in function '(anonymous namespace)::run_longest_increasing_path' (src/hls/dfs_accel.cpp:56:34)...3 expression(s) balanced.
 INFO: [XFORM 203-11] Balancing expressions in function '(anonymous namespace)::flood' (src/hls/dfs_accel.cpp:56:13)...3 expression(s) balanced.
-INFO: [HLS 200-111] Finished Loop, function and other optimizations: CPU user time: 1.9 seconds. CPU system time: 0.02 seconds. Elapsed time: 1.92 seconds; current allocated memory: 310.082 MB.
+INFO: [HLS 200-111] Finished Loop, function and other optimizations: CPU user time: 0.71 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.73 seconds; current allocated memory: 310.117 MB.
 INFO: [HLS 200-2061] Successfully converted nested loops 'VITIS_LOOP_196_1'(src/hls/dfs_accel.cpp:196:23) and 'VITIS_LOOP_197_2'(src/hls/dfs_accel.cpp:197:27) in function '(anonymous namespace)::run_unique_paths_iii' into perfectly nested loops.
 INFO: [HLS 200-2061] Successfully converted nested loops 'VITIS_LOOP_156_1'(src/hls/dfs_accel.cpp:156:23) and 'VITIS_LOOP_157_2'(src/hls/dfs_accel.cpp:157:27) in function '(anonymous namespace)::flood' into perfectly nested loops.
 WARNING: [HLS 200-960] Cannot flatten loop 'VITIS_LOOP_293_3' (src/hls/dfs_accel.cpp:293:23) in function '(anonymous namespace)::run_word_search_trie' the outer loop is not a perfect loop because there is nontrivial logic in the loop latch.
 Resolution: For help on HLS 200-960 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-960.html
 INFO: [XFORM 203-541] Flattening a loop nest 'VITIS_LOOP_196_1' (src/hls/dfs_accel.cpp:196:23) in function '(anonymous namespace)::run_unique_paths_iii'.
 INFO: [XFORM 203-541] Flattening a loop nest 'VITIS_LOOP_156_1' (src/hls/dfs_accel.cpp:156:23) in function '(anonymous namespace)::flood'.
-INFO: [HLS 200-111] Finished Architecture Synthesis: CPU user time: 1.86 seconds. CPU system time: 0.14 seconds. Elapsed time: 2.17 seconds; current allocated memory: 597.969 MB.
+INFO: [HLS 200-111] Finished Architecture Synthesis: CPU user time: 0.72 seconds. CPU system time: 0.08 seconds. Elapsed time: 0.79 seconds; current allocated memory: 598.000 MB.
 INFO: [HLS 200-10] Starting hardware synthesis ...
 INFO: [HLS 200-10] Synthesizing 'dfs_accel' ...
 WARNING: [SYN 201-103] Legalizing function name '(anonymous namespace)flood_Pipeline_VITIS_LOOP_71_1' to 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_71_1'.
@@ -262,13 +262,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_458_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 3, loop 'VITIS_LOOP_458_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.26 seconds. CPU system time: 0.05 seconds. Elapsed time: 0.35 seconds; current allocated memory: 600.180 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.17 seconds. CPU system time: 0.04 seconds. Elapsed time: 0.2 seconds; current allocated memory: 600.125 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.02 seconds. CPU system time: 0 seconds. Elapsed time: 0.03 seconds; current allocated memory: 600.180 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.02 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.02 seconds; current allocated memory: 600.125 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'dfs_accel_Pipeline_VITIS_LOOP_461_2' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -276,13 +276,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_461_2'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 1, loop 'VITIS_LOOP_461_2'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.07 seconds; current allocated memory: 600.477 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 600.527 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.02 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.03 seconds; current allocated memory: 600.477 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 600.527 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'dfs_accel_Pipeline_VITIS_LOOP_465_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -302,13 +302,13 @@ WARNING: [HLS 200-880] The II Violation in module 'dfs_accel_Pipeline_VITIS_LOOP
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 16, Depth = 18, loop 'VITIS_LOOP_465_4'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.29 seconds. CPU system time: 0 seconds. Elapsed time: 0.3 seconds; current allocated memory: 601.902 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.21 seconds. CPU system time: 0 seconds. Elapsed time: 0.25 seconds; current allocated memory: 602.008 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.06 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.06 seconds; current allocated memory: 601.902 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.03 seconds; current allocated memory: 602.008 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -316,13 +316,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_71_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 1, loop 'VITIS_LOOP_71_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.07 seconds. CPU system time: 0 seconds. Elapsed time: 0.08 seconds; current allocated memory: 602.156 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 602.180 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.03 seconds; current allocated memory: 602.156 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.02 seconds. CPU system time: 0 seconds. Elapsed time: 0.02 seconds; current allocated memory: 602.180 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_156_1_VITIS_LOOP_157_2' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -332,13 +332,13 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_flood_P
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 2, Depth = 5, loop 'VITIS_LOOP_156_1_VITIS_LOOP_157_2'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.16 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.16 seconds; current allocated memory: 602.652 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.08 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.08 seconds; current allocated memory: 602.742 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 602.652 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.02 seconds. CPU system time: 0 seconds. Elapsed time: 0.03 seconds; current allocated memory: 602.742 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -351,26 +351,26 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_flood_P
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 3, Depth = 7, loop 'VITIS_LOOP_171_4'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.14 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.14 seconds; current allocated memory: 603.352 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.08 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 603.246 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 603.352 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 603.246 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_flood' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [HLS 200-486] Changing DSP latency (root=add_i_i34) to 3 in order to utilize available DSP registers.
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.07 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.08 seconds; current allocated memory: 603.473 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.07 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.09 seconds; current allocated memory: 603.496 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 603.473 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 603.496 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'dfs_accel_Pipeline_VITIS_LOOP_184_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -378,13 +378,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_184_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 2, loop 'VITIS_LOOP_184_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.07 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 603.473 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 603.496 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.07 seconds; current allocated memory: 603.473 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.03 seconds; current allocated memory: 603.496 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'dfs_accel_Pipeline_VITIS_LOOP_187_2' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -392,13 +392,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_187_2'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 2, loop 'VITIS_LOOP_187_2'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.07 seconds. CPU system time: 0 seconds. Elapsed time: 0.08 seconds; current allocated memory: 604.434 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.05 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.05 seconds; current allocated memory: 604.457 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.03 seconds; current allocated memory: 604.434 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.02 seconds; current allocated memory: 604.457 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_244_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -406,13 +406,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_244_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 1, loop 'VITIS_LOOP_244_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 604.719 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 604.750 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.03 seconds; current allocated memory: 604.719 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.03 seconds; current allocated memory: 604.750 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -434,25 +434,25 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_run_lon
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 12, Depth = 12, loop 'VITIS_LOOP_253_4'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.21 seconds. CPU system time: 0 seconds. Elapsed time: 0.23 seconds; current allocated memory: 606.133 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.29 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.32 seconds; current allocated memory: 606.227 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.06 seconds; current allocated memory: 606.133 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.08 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 606.227 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_longest_increasing_path' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.08 seconds. CPU system time: 0 seconds. Elapsed time: 0.08 seconds; current allocated memory: 606.398 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.1 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.11 seconds; current allocated memory: 606.582 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.04 seconds; current allocated memory: 606.398 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 606.582 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -460,13 +460,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_71_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 1, loop 'VITIS_LOOP_71_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.05 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 606.898 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.08 seconds. CPU system time: 0 seconds. Elapsed time: 0.08 seconds; current allocated memory: 606.914 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.02 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 606.898 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 606.914 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_enter_match' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -477,13 +477,13 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_enter_m
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 2, Depth = 7, function '(anonymous namespace)enter_match'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.11 seconds. CPU system time: 0 seconds. Elapsed time: 0.12 seconds; current allocated memory: 607.555 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.18 seconds. CPU system time: 0 seconds. Elapsed time: 0.19 seconds; current allocated memory: 607.570 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 607.555 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.09 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 607.570 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -507,25 +507,25 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_run_wor
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 15, Depth = 15, loop 'VITIS_LOOP_383_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.18 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.19 seconds; current allocated memory: 608.379 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.32 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.37 seconds; current allocated memory: 608.562 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 608.379 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.1 seconds. CPU system time: 0 seconds. Elapsed time: 0.1 seconds; current allocated memory: 608.562 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_word_search_no_pruning' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.1 seconds. CPU system time: 0 seconds. Elapsed time: 0.1 seconds; current allocated memory: 609.270 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.18 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.19 seconds; current allocated memory: 609.117 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.05 seconds; current allocated memory: 609.270 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.09 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 609.117 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -533,13 +533,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_71_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 1, loop 'VITIS_LOOP_71_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.07 seconds. CPU system time: 0 seconds. Elapsed time: 0.07 seconds; current allocated memory: 609.977 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.14 seconds. CPU system time: 0 seconds. Elapsed time: 0.27 seconds; current allocated memory: 609.836 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 609.977 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.07 seconds; current allocated memory: 609.836 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_288_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -547,13 +547,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_288_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 1, loop 'VITIS_LOOP_288_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.11 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 610.105 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.14 seconds. CPU system time: 0 seconds. Elapsed time: 0.15 seconds; current allocated memory: 610.047 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 610.105 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 610.047 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_295_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -567,13 +567,13 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_run_wor
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 4, Depth = 5, loop 'VITIS_LOOP_295_4'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.35 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.36 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.4 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.41 seconds; current allocated memory: 618.957 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.07 seconds. CPU system time: 0 seconds. Elapsed time: 0.07 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 618.957 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_331_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -581,13 +581,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_331_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 1, loop 'VITIS_LOOP_331_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.08 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.08 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.07 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.08 seconds; current allocated memory: 618.957 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 618.957 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_enter_trie' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -598,13 +598,13 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_enter_t
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 2, Depth = 8, function '(anonymous namespace)enter_trie'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.33 seconds. CPU system time: 0 seconds. Elapsed time: 0.37 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.14 seconds. CPU system time: 0 seconds. Elapsed time: 0.15 seconds; current allocated memory: 618.957 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.11 seconds. CPU system time: 0 seconds. Elapsed time: 0.12 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.07 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.07 seconds; current allocated memory: 618.957 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -630,25 +630,25 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_run_wor
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 16, Depth = 16, loop 'VITIS_LOOP_338_4'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.38 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.4 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.19 seconds. CPU system time: 0 seconds. Elapsed time: 0.2 seconds; current allocated memory: 618.957 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.07 seconds. CPU system time: 0 seconds. Elapsed time: 0.07 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.06 seconds; current allocated memory: 618.957 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_word_search_trie' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.2 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.33 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.09 seconds. CPU system time: 0 seconds. Elapsed time: 0.11 seconds; current allocated memory: 618.957 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0 seconds. Elapsed time: 0.07 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.06 seconds; current allocated memory: 618.957 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -656,13 +656,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_71_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 1, loop 'VITIS_LOOP_71_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.1 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.11 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.07 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.08 seconds; current allocated memory: 618.957 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 618.957 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_196_1_VITIS_LOOP_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -671,13 +671,13 @@ INFO: [HLS 200-486] Changing DSP latency (root=add_ln56) to 3 in order to utiliz
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_196_1_VITIS_LOOP_197_2'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 6, loop 'VITIS_LOOP_196_1_VITIS_LOOP_197_2'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.14 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.09 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.1 seconds; current allocated memory: 618.957 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.07 seconds. CPU system time: 0 seconds. Elapsed time: 0.07 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 618.957 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_209_3' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -699,26 +699,26 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_run_uni
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 13, Depth = 14, loop 'VITIS_LOOP_209_3'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.34 seconds. CPU system time: 0 seconds. Elapsed time: 0.34 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.2 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.22 seconds; current allocated memory: 618.957 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.09 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.1 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.07 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.08 seconds; current allocated memory: 618.957 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_unique_paths_iii' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [HLS 200-486] Changing DSP latency (root=i) to 3 in order to utilize available DSP registers.
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.16 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.17 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.1 seconds. CPU system time: 0 seconds. Elapsed time: 0.1 seconds; current allocated memory: 618.957 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.07 seconds. CPU system time: 0 seconds. Elapsed time: 0.07 seconds; current allocated memory: 618.973 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 618.957 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -726,13 +726,13 @@ INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_71_1'.
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 1, Depth = 1, loop 'VITIS_LOOP_71_1'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.1 seconds. CPU system time: 0 seconds. Elapsed time: 0.11 seconds; current allocated memory: 619.332 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.09 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.27 seconds; current allocated memory: 619.344 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 619.332 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 619.344 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_139_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -743,37 +743,37 @@ WARNING: [HLS 200-880] The II Violation in module 'p_anonymous_namespace_run_num
 Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=200-880.html
 INFO: [HLS 200-1470] Pipelining result : Target II = NA, Final II = 2, Depth = 7, loop 'VITIS_LOOP_139_4'
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.14 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.21 seconds; current allocated memory: 619.680 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.13 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.16 seconds; current allocated memory: 619.652 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 619.680 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.08 seconds; current allocated memory: 619.652 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'p_anonymous_namespace_run_number_of_islands' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.09 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 620.203 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.11 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.13 seconds; current allocated memory: 620.355 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.05 seconds; current allocated memory: 620.203 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 620.355 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-42] -- Implementing module 'dfs_accel' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [SCHED 204-11] Starting scheduling ...
 INFO: [SCHED 204-11] Finished scheduling.
-INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.14 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.14 seconds; current allocated memory: 621.383 MB.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.13 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.14 seconds; current allocated memory: 621.445 MB.
 INFO: [BIND 205-100] Starting micro-architecture generation ...
 INFO: [BIND 205-101] Performing variable lifetime analysis.
 INFO: [BIND 205-101] Exploring resource sharing.
 INFO: [BIND 205-101] Binding ...
 INFO: [BIND 205-100] Finished micro-architecture generation.
-INFO: [HLS 200-111] Finished Binding: CPU user time: 0.09 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 621.695 MB.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.09 seconds. CPU system time: 0 seconds. Elapsed time: 0.1 seconds; current allocated memory: 621.715 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'dfs_accel_Pipeline_VITIS_LOOP_458_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -791,12 +791,12 @@ WARNING: [RTGEN 206-101] Setting dangling out port 'dfs_accel_Pipeline_VITIS_LOO
 WARNING: [RTGEN 206-101] Setting dangling out port 'dfs_accel_Pipeline_VITIS_LOOP_458_1/m_axi_gmem0_ARREGION' to 0.
 WARNING: [RTGEN 206-101] Setting dangling out port 'dfs_accel_Pipeline_VITIS_LOOP_458_1/m_axi_gmem0_ARUSER' to 0.
 INFO: [RTGEN 206-100] Finished creating RTL model for 'dfs_accel_Pipeline_VITIS_LOOP_458_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.2 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.23 seconds; current allocated memory: 622.238 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.22 seconds. CPU system time: 0 seconds. Elapsed time: 0.24 seconds; current allocated memory: 622.258 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'dfs_accel_Pipeline_VITIS_LOOP_461_2' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Finished creating RTL model for 'dfs_accel_Pipeline_VITIS_LOOP_461_2'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.08 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.09 seconds; current allocated memory: 623.258 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.13 seconds. CPU system time: 0 seconds. Elapsed time: 0.14 seconds; current allocated memory: 623.273 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'dfs_accel_Pipeline_VITIS_LOOP_465_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -814,19 +814,19 @@ WARNING: [RTGEN 206-101] Setting dangling out port 'dfs_accel_Pipeline_VITIS_LOO
 WARNING: [RTGEN 206-101] Setting dangling out port 'dfs_accel_Pipeline_VITIS_LOOP_465_4/m_axi_gmem1_ARREGION' to 0.
 WARNING: [RTGEN 206-101] Setting dangling out port 'dfs_accel_Pipeline_VITIS_LOOP_465_4/m_axi_gmem1_ARUSER' to 0.
 INFO: [RTGEN 206-100] Finished creating RTL model for 'dfs_accel_Pipeline_VITIS_LOOP_465_4'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.2 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.23 seconds; current allocated memory: 625.766 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.33 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.35 seconds; current allocated memory: 625.797 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_71_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.14 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 628.125 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.22 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.23 seconds; current allocated memory: 628.145 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_156_1_VITIS_LOOP_157_2' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_156_1_VITIS_LOOP_157_2' pipeline 'VITIS_LOOP_156_1_VITIS_LOOP_157_2' pipeline type 'loop pipeline'
 INFO: [RTGEN 206-100] Generating core module 'mul_12s_8ns_12_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_156_1_VITIS_LOOP_157_2'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.1 seconds. CPU system time: 0 seconds. Elapsed time: 0.12 seconds; current allocated memory: 629.059 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.14 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.16 seconds; current allocated memory: 629.090 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -837,7 +837,7 @@ INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 1 
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4'.
 INFO: [RTMG 210-279] Implementing memory 'dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4_p_anonymous_namespace_kbkb' using auto ROMs.
 INFO: [RTMG 210-279] Implementing memory 'dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4_p_anonymous_namespace_kcud' using auto ROMs.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.25 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.28 seconds; current allocated memory: 631.219 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.24 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.29 seconds; current allocated memory: 631.262 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_flood' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -845,24 +845,24 @@ INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 1 
 INFO: [RTGEN 206-100] Generating core module 'mul_32ns_32ns_64_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Generating core module 'mul_32s_32s_32_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_flood'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.17 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.21 seconds; current allocated memory: 633.457 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.13 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 633.477 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'dfs_accel_Pipeline_VITIS_LOOP_184_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'dfs_accel_Pipeline_VITIS_LOOP_184_1' pipeline 'VITIS_LOOP_184_1' pipeline type 'loop pipeline'
 INFO: [RTGEN 206-100] Finished creating RTL model for 'dfs_accel_Pipeline_VITIS_LOOP_184_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.2 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.22 seconds; current allocated memory: 634.645 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.1 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.12 seconds; current allocated memory: 634.664 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'dfs_accel_Pipeline_VITIS_LOOP_187_2' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'dfs_accel_Pipeline_VITIS_LOOP_187_2' pipeline 'VITIS_LOOP_187_2' pipeline type 'loop pipeline'
 INFO: [RTGEN 206-100] Finished creating RTL model for 'dfs_accel_Pipeline_VITIS_LOOP_187_2'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.16 seconds. CPU system time: 0 seconds. Elapsed time: 0.17 seconds; current allocated memory: 635.398 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.17 seconds. CPU system time: 0 seconds. Elapsed time: 0.2 seconds; current allocated memory: 635.422 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_244_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_244_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.14 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 636.215 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.1 seconds. CPU system time: 0 seconds. Elapsed time: 0.12 seconds; current allocated memory: 636.234 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -870,7 +870,7 @@ INFO: [SYN 201-210] Renamed object name 'p_anonymous_namespace_run_longest_incre
 INFO: [SYN 201-210] Renamed object name 'p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4_p_anonymous_namespace_kDeltaCol_ROM_AUTO_1R' to 'p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4_peOg' due to the length limit 80
 INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 4 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.28 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.29 seconds; current allocated memory: 637.957 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.12 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.13 seconds; current allocated memory: 638.004 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_longest_increasing_path' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -878,12 +878,12 @@ INFO: [SYN 201-210] Renamed object name 'p_anonymous_namespace_run_longest_incre
 INFO: [RTGEN 206-100] Generating core module 'mul_32s_32s_32_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_longest_increasing_path'.
 INFO: [RTMG 210-278] Implementing memory 'dfs_accel_p_anonymous_namespace_run_longest_increasing_path_p_anonymous_namespace_enginfYi' using auto RAMs.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.16 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.18 seconds; current allocated memory: 641.715 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.21 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.21 seconds; current allocated memory: 641.762 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_71_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.12 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.18 seconds; current allocated memory: 643.238 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.1 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.11 seconds; current allocated memory: 643.258 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_enter_match' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -891,7 +891,7 @@ INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'p_anonymous_names
 INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 1 instance(s).
 INFO: [RTGEN 206-100] Generating core module 'sparsemux_33_4_8_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_enter_match'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.12 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.13 seconds; current allocated memory: 644.703 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.11 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.12 seconds; current allocated memory: 644.730 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -899,23 +899,23 @@ INFO: [SYN 201-210] Renamed object name 'p_anonymous_namespace_run_word_search_n
 INFO: [SYN 201-210] Renamed object name 'p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1_p_anonymous_namespace_kDeltaCol_ROM_AUTO_1R' to 'p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1_p_hbi' due to the length limit 80
 INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 2 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.17 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.2 seconds; current allocated memory: 648.109 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.19 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.21 seconds; current allocated memory: 648.141 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_word_search_no_pruning' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Generating core module 'mul_32s_32s_32_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_word_search_no_pruning'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.15 seconds. CPU system time: 0 seconds. Elapsed time: 0.16 seconds; current allocated memory: 651.684 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.19 seconds. CPU system time: 0 seconds. Elapsed time: 0.21 seconds; current allocated memory: 651.715 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_71_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.11 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.14 seconds; current allocated memory: 653.660 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.1 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.11 seconds; current allocated memory: 653.680 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_288_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_288_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.1 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 654.836 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.08 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.08 seconds; current allocated memory: 654.867 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_295_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -923,12 +923,12 @@ INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'p_anonymous_names
 INFO: [RTGEN 206-100] Generating core module 'sparsemux_33_4_8_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Generating core module 'sparsemux_53_6_16_1_1': 2 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_295_4'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.17 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.18 seconds; current allocated memory: 658.176 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.16 seconds. CPU system time: 0 seconds. Elapsed time: 0.17 seconds; current allocated memory: 658.203 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_331_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_331_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.14 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 662.285 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.15 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 662.281 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_enter_trie' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -936,7 +936,7 @@ INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'p_anonymous_names
 INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 1 instance(s).
 INFO: [RTGEN 206-100] Generating core module 'sparsemux_53_6_16_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_enter_trie'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.11 seconds. CPU system time: 0 seconds. Elapsed time: 0.12 seconds; current allocated memory: 664.031 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.11 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.12 seconds; current allocated memory: 664.020 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -944,7 +944,7 @@ INFO: [SYN 201-210] Renamed object name 'p_anonymous_namespace_run_word_search_t
 INFO: [SYN 201-210] Renamed object name 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4_p_anonymous_namespace_kDeltaCol_ROM_AUTO_1R' to 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4_p_anonymjbC' due to the length limit 80
 INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 2 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.2 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.22 seconds; current allocated memory: 668.230 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.24 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.25 seconds; current allocated memory: 668.234 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_word_search_trie' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -982,19 +982,19 @@ INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run
 INFO: [RTMG 210-278] Implementing memory 'dfs_accel_p_anonymous_namespace_run_word_search_trie_p_anonymous_namespace_engine_trie_kbM' using auto RAMs.
 INFO: [RTMG 210-278] Implementing memory 'dfs_accel_p_anonymous_namespace_run_word_search_trie_p_anonymous_namespace_engine_trie_KfY' using auto RAMs.
 INFO: [RTMG 210-278] Implementing memory 'dfs_accel_p_anonymous_namespace_run_word_search_trie_p_anonymous_namespace_engine_word_Lf8' using auto RAMs.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.47 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.51 seconds; current allocated memory: 674.180 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.66 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.7 seconds; current allocated memory: 674.184 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_71_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.19 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.21 seconds; current allocated memory: 677.395 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.39 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.4 seconds; current allocated memory: 677.398 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_196_1_VITIS_LOOP_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_196_1_VITIS_LOOP_1' pipeline 'VITIS_LOOP_196_1_VITIS_LOOP_197_2' pipeline type 'loop pipeline'
 INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_196_1_VITIS_LOOP_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.1 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.1 seconds; current allocated memory: 678.328 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.21 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.22 seconds; current allocated memory: 678.332 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_209_3' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -1003,7 +1003,7 @@ INFO: [SYN 201-210] Renamed object name 'p_anonymous_namespace_run_unique_paths_
 INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_209_3' pipeline 'VITIS_LOOP_209_3' pipeline type 'loop pipeline'
 INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 2 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_209_3'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.19 seconds. CPU system time: 0 seconds. Elapsed time: 0.21 seconds; current allocated memory: 680.801 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.36 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.38 seconds; current allocated memory: 680.785 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_unique_paths_iii' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -1011,12 +1011,12 @@ INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 1 
 INFO: [RTGEN 206-100] Generating core module 'mul_32ns_32ns_64_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Generating core module 'mul_32s_32s_32_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_unique_paths_iii'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.4 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.43 seconds; current allocated memory: 684.289 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.41 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.42 seconds; current allocated memory: 684.273 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_71_1' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_71_1'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.24 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.25 seconds; current allocated memory: 685.762 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.24 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.24 seconds; current allocated memory: 685.770 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_139_4' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -1025,14 +1025,14 @@ INFO: [SYN 201-210] Renamed object name 'p_anonymous_namespace_run_number_of_isl
 INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_139_4' pipeline 'VITIS_LOOP_139_4' pipeline type 'loop pipeline'
 INFO: [RTGEN 206-100] Generating core module 'mac_muladd_12s_8ns_8ns_12_4_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_139_4'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.28 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.28 seconds; current allocated memory: 686.922 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.26 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.28 seconds; current allocated memory: 686.930 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'p_anonymous_namespace_run_number_of_islands' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [RTGEN 206-100] Generating core module 'mul_12s_8ns_12_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Generating core module 'mul_32s_32s_32_1_1': 1 instance(s).
 INFO: [RTGEN 206-100] Finished creating RTL model for 'p_anonymous_namespace_run_number_of_islands'.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.33 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.34 seconds; current allocated memory: 689.203 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.32 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.34 seconds; current allocated memory: 689.207 MB.
 INFO: [HLS 200-10] ----------------------------------------------------------------
 INFO: [HLS 200-10] -- Generating RTL for module 'dfs_accel' 
 INFO: [HLS 200-10] ----------------------------------------------------------------
@@ -1068,13 +1068,475 @@ INFO: [RTMG 210-278] Implementing memory 'dfs_accel_p_anonymous_namespace_engine
 INFO: [RTMG 210-278] Implementing memory 'dfs_accel_p_anonymous_namespace_engine_frames_walked_RAM_AUTO_1R1W' using auto RAMs.
 INFO: [RTMG 210-278] Implementing memory 'dfs_accel_p_anonymous_namespace_engine_frames_node_RAM_AUTO_1R1W' using auto RAMs.
 INFO: [RTMG 210-278] Implementing memory 'dfs_accel_p_anonymous_namespace_engine_frames_best_RAM_AUTO_1R1W' using auto RAMs.
-INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 1.14 seconds. CPU system time: 0.03 seconds. Elapsed time: 1.18 seconds; current allocated memory: 696.328 MB.
-INFO: [HLS 200-111] Finished Generating all RTL models: CPU user time: 1.19 seconds. CPU system time: 0.08 seconds. Elapsed time: 1.28 seconds; current allocated memory: 700.207 MB.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.65 seconds. CPU system time: 0.03 seconds. Elapsed time: 0.78 seconds; current allocated memory: 696.336 MB.
+INFO: [HLS 200-111] Finished Generating all RTL models: CPU user time: 0.56 seconds. CPU system time: 0.06 seconds. Elapsed time: 0.71 seconds; current allocated memory: 700.312 MB.
 INFO: [HLS 200-1603] Design has inferred MAXI bursts and missed bursts, see Vitis HLS GUI synthesis summary report for detailed information.
-INFO: [HLS 200-111] Finished Updating report files: CPU user time: 7.6 seconds. CPU system time: 0.04 seconds. Elapsed time: 7.68 seconds; current allocated memory: 721.469 MB.
+INFO: [HLS 200-111] Finished Updating report files: CPU user time: 7.76 seconds. CPU system time: 0.04 seconds. Elapsed time: 7.81 seconds; current allocated memory: 721.477 MB.
 INFO: [VHDL 208-304] Generating VHDL RTL for dfs_accel.
 INFO: [VLOG 209-307] Generating Verilog RTL for dfs_accel.
 INFO: [HLS 200-790] **** Loop Constraint Status: All loop constraints were NOT satisfied.
 INFO: [HLS 200-789] **** Estimated Fmax: 285.71 MHz
-INFO: [HLS 200-2161] Finished Command csynth_design Elapsed time: 00:00:41; Allocated memory: 464.230 MB.
-INFO: [HLS 200-112] Total CPU user time: 48.42 seconds. Total CPU system time: 2.93 seconds. Total elapsed time: 55.17 seconds; peak allocated memory: 721.633 MB.
+INFO: [HLS 200-2161] Finished Command csynth_design Elapsed time: 00:00:36; Allocated memory: 464.277 MB.
+INFO: [HLS 200-1510] Running: cosim_design 
+INFO: [COSIM 212-47] Using XSIM for RTL simulation.
+INFO: [COSIM 212-14] Instrumenting C test bench ...
+   Build using "/tools/Xilinx/Vitis_HLS/2024.1/vcxx/libexec//clang++"
+   Compiling accelerator.cpp_pre.cpp.tb.cpp
+   Compiling apatb_dfs_accel.cpp
+   Compiling datasets.cpp_pre.cpp.tb.cpp
+   Compiling dfs_accel.cpp_pre.cpp.tb.cpp
+   Compiling dfs_accel_tb.cpp_pre.cpp.tb.cpp
+   Compiling dfs_algorithm.cpp_pre.cpp.tb.cpp
+   Compiling longest_increasing_path.cpp_pre.cpp.tb.cpp
+   Compiling number_of_islands.cpp_pre.cpp.tb.cpp
+   Compiling pacific_atlantic.cpp_pre.cpp.tb.cpp
+   Compiling unique_paths_iii.cpp_pre.cpp.tb.cpp
+   Compiling word_search_ii.cpp_pre.cpp.tb.cpp
+   Compiling apatb_dfs_accel_ir.ll
+   Generating cosim.tv.exe
+INFO: [COSIM 212-302] Starting C TB testing ... 
+algorithm                        case                 expect       sw      hls   nodes_sw  nodes_hls  peak_sw peak_hls  status
+number_of_islands                noi_classic_4c            3        3        3          7          7        2        2  ok
+number_of_islands                noi_classic_8c            1        1        1          7          7        3        3  ok
+number_of_islands                noi_checker_4c            8        8        8          8          8        1        1  ok
+number_of_islands                noi_checker_8c            1        1        1          8          8        5        5  ok
+number_of_islands                noi_all_water             0        0        0          0          0        0        0  ok
+number_of_islands                noi_all_land_4c           1        1        1          9          9        3        3  ok
+unique_paths_iii                 up3_one_obstacle          2        2        2         95         95       11       11  ok
+unique_paths_iii                 up3_open                  4        4        4        195        195       12       12  ok
+unique_paths_iii                 up3_no_path               0        0        0          5          5        3        3  ok
+word_search_ii                   ws2_classic               2        2        2         41         41        5        5  ok
+word_search_ii                   ws2_small                 4        4        4         10         10        4        4  ok
+word_search_ii_nopruning         ws2_classic               2        2        2         57         57        4        4  ok
+word_search_ii_nopruning         ws2_small                 4        4        4         18         18        4        4  ok
+longest_increasing_path          lip_desc                  4        4        4         18         18        2        2  ok
+longest_increasing_path          lip_zigzag                4        4        4         18         18        4        4  ok
+longest_increasing_path          lip_single                1        1        1          1          1        1        1  ok
+longest_increasing_path_nomemo   lip_desc                  4        4        4         23         23        4        4  ok
+longest_increasing_path_nomemo   lip_zigzag                4        4        4         23         23        4        4  ok
+longest_increasing_path_nomemo   lip_single                1        1        1          1          1        1        1  ok
+pacific_atlantic                 pa_classic                7        7        7         32         32        9        9  ok
+pacific_atlantic                 pa_single                 1        1        1          2          2        1        1  ok
+
+21/21 cases match the golden result
+INFO: [COSIM 212-333] Generating C post check test bench ...
+INFO: [COSIM 212-12] Generating RTL test bench ...
+INFO: [COSIM 212-1] *** C/RTL co-simulation file generation completed. ***
+INFO: [COSIM 212-323] Starting verilog simulation. 
+INFO: [COSIM 212-15] Starting XSIM ...
+Vivado Simulator v2024.1
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /tools/Xilinx/Vivado/2024.1/bin/unwrapped/lnx64.o/xelab xil_defaultlib.apatb_dfs_accel_top glbl -Oenable_linking_all_libraries -prj dfs_accel.prj -L smartconnect_v1_0 -L axi_protocol_checker_v1_1_12 -L axi_protocol_checker_v1_1_13 -L axis_protocol_checker_v1_1_11 -L axis_protocol_checker_v1_1_12 -L xil_defaultlib -L unisims_ver -L xpm -L floating_point_v7_0_23 -L floating_point_v7_1_18 --lib ieee_proposed=./ieee_proposed -s dfs_accel 
+Multi-threading is on. Using 2 slave threads.
+WARNING: [XSIM 43-3431] One or more environment variables have been detected which affect the operation of the C compiler. These are typically not set in standard installations and are not tested by AMD, however they may be appropriate for your system, so the flow will attempt to continue.  If errors occur, try running xelab with the "-mt off -v 1" switches to see more information from the C compiler. The following environment variables have been detected:
+    LIBRARY_PATH
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/glbl.v" into library work
+INFO: [VRFC 10-311] analyzing module glbl
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_control_s_axi.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_control_s_axi
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_gmem0_m_axi.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_load
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_store
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_read
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_write
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_burst_converter
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_throttle
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_reg_slice
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_fifo
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_srl
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem0_m_axi_mem
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_number_of_islands.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_number_of_islands
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_196_1_VITIS_LOOP_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_196_1_VITIS_LOOP_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_enter_trie.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_enter_trie
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_trie_p_anonymous_namespace_engine_trie_kbM.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_trie_p_anonymous_namespace_engine_trie_kbM
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_465_4.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_465_4
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_longest_increasing_path_p_anonymous_namespace_enginfYi.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_longest_increasing_path_p_anonymous_namespace_enginfYi
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_unique_paths_iii.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_unique_paths_iii
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_mac_muladd_12s_8ns_8ns_12_4_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_mac_muladd_12s_8ns_8ns_12_4_1_DSP48_0
+INFO: [VRFC 10-311] analyzing module dfs_accel_mac_muladd_12s_8ns_8ns_12_4_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_longest_increasing_path.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_longest_increasing_path
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_enter_match.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_enter_match
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_gmem2_m_axi.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_load
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_store
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_read
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_write
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_burst_converter
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_throttle
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_reg_slice
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_fifo
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_srl
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem2_m_axi_mem
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_engine_frames_walked_RAM_AUTO_1R1W.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_engine_frames_walked_RAM_AUTO_1R1W
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_engine_frames_node_RAM_AUTO_1R1W.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_engine_frames_node_RAM_AUTO_1R1W
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_mul_12s_8ns_12_1_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_mul_12s_8ns_12_1_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_engine_frames_best_RAM_AUTO_1R1W.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_engine_frames_best_RAM_AUTO_1R1W
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_288_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_288_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_engine_visited_RAM_AUTO_1R1W.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_engine_visited_RAM_AUTO_1R1W
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_71_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_71_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_71_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_71_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_flow_control_loop_pipe_sequential_init.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_flow_control_loop_pipe_sequential_init
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_458_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_458_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_209_3.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_209_3
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_184_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_184_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/AESL_axi_master_gmem2.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module AESL_axi_master_gmem2
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/AESL_axi_master_gmem1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module AESL_axi_master_gmem1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_mul_32s_32s_32_1_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_mul_32s_32s_32_1_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_sparsemux_33_4_8_1_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_sparsemux_33_4_8_1_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_mul_32ns_32ns_64_1_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_mul_32ns_32ns_64_1_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_no_pruning.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_no_pruning
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_engine_word_len_RAM_AUTO_1R1W.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_engine_word_len_RAM_AUTO_1R1W
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_295_4.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_295_4
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_71_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_71_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_gmem1_m_axi.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_load
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_store
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_read
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_write
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_burst_converter
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_throttle
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_reg_slice
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_fifo
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_srl
+INFO: [VRFC 10-311] analyzing module dfs_accel_gmem1_m_axi_mem
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_sparsemux_53_6_16_1_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_sparsemux_53_6_16_1_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_trie_p_anonymous_namespace_engine_trie_KfY.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_trie_p_anonymous_namespace_engine_trie_KfY
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_244_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_244_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_156_1_VITIS_LOOP_157_2.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_156_1_VITIS_LOOP_157_2
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/AESL_axi_slave_control.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module AESL_axi_slave_control
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_trie_p_anonymous_namespace_engine_word_Lf8.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_trie_p_anonymous_namespace_engine_word_Lf8
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel.autotb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module apatb_dfs_accel_top
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_trie.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_trie
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_139_4.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_139_4
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4_p_anonymous_namespace_kcud.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4_p_anonymous_namespace_kcud
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_engine_grid_RAM_AUTO_1R1W.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_engine_grid_RAM_AUTO_1R1W
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_187_2.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_187_2
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/AESL_axi_master_gmem0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module AESL_axi_master_gmem0
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_71_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_71_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_flood.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_flood
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_461_2.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_dfs_accel_Pipeline_VITIS_LOOP_461_2
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_engine_stack_row_RAM_AUTO_1R1W.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_engine_stack_row_RAM_AUTO_1R1W
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_engine_words_0_RAM_AUTO_1R1W.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_engine_words_0_RAM_AUTO_1R1W
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_331_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_331_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4_p_anonymous_namespace_kbkb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4_p_anonymous_namespace_kbkb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_71_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dfs_accel_p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_71_1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dataflow_monitor.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dataflow_monitor
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package xil_defaultlib.$unit_dataflow_monitor_sv
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_flow_control_loop_pipe...
+Compiling module xil_defaultlib.dfs_accel_dfs_accel_Pipeline_VIT...
+Compiling module xil_defaultlib.dfs_accel_dfs_accel_Pipeline_VIT...
+Compiling module xil_defaultlib.dfs_accel_dfs_accel_Pipeline_VIT...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_mul_12s_8ns_12_1_1(NUM...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_mac_muladd_12s_8ns_8ns...
+Compiling module xil_defaultlib.dfs_accel_mac_muladd_12s_8ns_8ns...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_mul_32ns_32ns_64_1_1(N...
+Compiling module xil_defaultlib.dfs_accel_mul_32s_32s_32_1_1(NUM...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_dfs_accel_Pipeline_VIT...
+Compiling module xil_defaultlib.dfs_accel_dfs_accel_Pipeline_VIT...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_sparsemux_33_4_8_1_1(d...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_sparsemux_53_6_16_1_1(...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_p_anonymous_namespace_...
+Compiling module xil_defaultlib.dfs_accel_control_s_axi
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_mem(MEM_ST...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(MEM_S...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_store(NUM_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_mem(MEM_ST...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(MEM_S...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_load(NUM_R...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_burst_conv...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_throttle(C...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_write(CONS...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi_read(C_USE...
+Compiling module xil_defaultlib.dfs_accel_gmem0_m_axi(CONSERVATI...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_mem(MEM_ST...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(MEM_S...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_store(NUM_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_mem(MEM_ST...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(MEM_S...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_load(NUM_R...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_burst_conv...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_throttle(C...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_write(CONS...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi_read(C_USE...
+Compiling module xil_defaultlib.dfs_accel_gmem1_m_axi(CONSERVATI...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_mem(MEM_ST...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_fifo(MEM_S...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_store(NUM_...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_mem(MEM_ST...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_fifo(MEM_S...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_load(NUM_R...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_burst_conv...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_throttle(C...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_write(CONS...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_reg_slice(...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_srl(DATA_W...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_fifo(DATA_...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi_read(C_USE...
+Compiling module xil_defaultlib.dfs_accel_gmem2_m_axi(CONSERVATI...
+Compiling module xil_defaultlib.dfs_accel
+Compiling module xil_defaultlib.AESL_axi_master_gmem0
+Compiling module xil_defaultlib.AESL_axi_master_gmem1
+Compiling module xil_defaultlib.AESL_axi_master_gmem2
+Compiling module xil_defaultlib.AESL_axi_slave_control
+Compiling module xil_defaultlib.nodf_module_intf_default
+Compiling module xil_defaultlib.seq_loop_intf(FSM_WIDTH=13)
+Compiling module xil_defaultlib.seq_loop_intf(FSM_WIDTH=8)
+Compiling module xil_defaultlib.seq_loop_intf(FSM_WIDTH=17)
+Compiling module xil_defaultlib.seq_loop_intf(FSM_WIDTH=20)
+Compiling module xil_defaultlib.seq_loop_intf(FSM_WIDTH=11)
+Compiling module xil_defaultlib.upc_loop_intf(FSM_WIDTH=1)
+Compiling module xil_defaultlib.upc_loop_intf(FSM_WIDTH=16)
+Compiling module xil_defaultlib.upc_loop_intf_default
+Compiling module xil_defaultlib.upc_loop_intf(FSM_WIDTH=3)
+Compiling module xil_defaultlib.upc_loop_intf(FSM_WIDTH=12)
+Compiling module xil_defaultlib.upc_loop_intf(FSM_WIDTH=15)
+Compiling module xil_defaultlib.upc_loop_intf(FSM_WIDTH=4)
+Compiling module xil_defaultlib.upc_loop_intf(FSM_WIDTH=13)
+Compiling module xil_defaultlib.dataflow_monitor_1
+Compiling module xil_defaultlib.apatb_dfs_accel_top
+Compiling module work.glbl
+Built simulation snapshot dfs_accel
+
+****** xsim v2024.1 (64-bit)
+  **** SW Build 5076996 on Wed May 22 18:36:09 MDT 2024
+  **** IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
+  **** SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
+  **** Start of session at: Sat Aug  1 14:47:54 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/dfs_accel/xsim_script.tcl
+# xsim {dfs_accel} -autoloadwcfg -tclbatch {dfs_accel.tcl}
+Time resolution is 1 ps
+source dfs_accel.tcl
+## run all
+////////////////////////////////////////////////////////////////////////////////////
+// Inter-Transaction Progress: Completed Transaction / Total Transaction
+// Intra-Transaction Progress: Measured Latency / Latency Estimation * 100%
+//
+// RTL Simulation : "Inter-Transaction Progress" ["Intra-Transaction Progress"] @ "Simulation Time"
+////////////////////////////////////////////////////////////////////////////////////
+// RTL Simulation : 0 / 21 [n/a] @ "110000"
+// RTL Simulation : 1 / 21 [n/a] @ "1566000"
+// RTL Simulation : 2 / 21 [n/a] @ "3094000"
+// RTL Simulation : 3 / 21 [n/a] @ "4402000"
+// RTL Simulation : 4 / 21 [n/a] @ "5930000"
+// RTL Simulation : 5 / 21 [n/a] @ "6442000"
+// RTL Simulation : 6 / 21 [n/a] @ "7630000"
+// RTL Simulation : 7 / 21 [n/a] @ "29314000"
+// RTL Simulation : 8 / 21 [n/a] @ "72558000"
+// RTL Simulation : 9 / 21 [n/a] @ "73890000"
+// RTL Simulation : 10 / 21 [n/a] @ "79554000"
+// RTL Simulation : 11 / 21 [n/a] @ "84122000"
+// RTL Simulation : 12 / 21 [n/a] @ "88230000"
+// RTL Simulation : 13 / 21 [n/a] @ "91190000"
+// RTL Simulation : 14 / 21 [n/a] @ "94478000"
+// RTL Simulation : 15 / 21 [n/a] @ "97642000"
+// RTL Simulation : 16 / 21 [n/a] @ "98302000"
+// RTL Simulation : 17 / 21 [n/a] @ "104478000"
+// RTL Simulation : 18 / 21 [n/a] @ "110570000"
+// RTL Simulation : 19 / 21 [n/a] @ "111230000"
+// RTL Simulation : 20 / 21 [n/a] @ "115534000"
+// RTL Simulation : 21 / 21 [n/a] @ "116194000"
+////////////////////////////////////////////////////////////////////////////////////
+$finish called at time : 116218 ns : File "/home/fabio/AltoNivel/DFS/dfs_accel_prj/solution1/sim/verilog/dfs_accel.autotb.v" Line 758
+## quit
+INFO: [Common 17-206] Exiting xsim at Sat Aug  1 14:48:03 2026...
+INFO: [COSIM 212-316] Starting C post checking ...
+algorithm                        case                 expect       sw      hls   nodes_sw  nodes_hls  peak_sw peak_hls  status
+number_of_islands                noi_classic_4c            3        3        3          7          7        2        2  ok
+number_of_islands                noi_classic_8c            1        1        1          7          7        3        3  ok
+number_of_islands                noi_checker_4c            8        8        8          8          8        1        1  ok
+number_of_islands                noi_checker_8c            1        1        1          8          8        5        5  ok
+number_of_islands                noi_all_water             0        0        0          0          0        0        0  ok
+number_of_islands                noi_all_land_4c           1        1        1          9          9        3        3  ok
+unique_paths_iii                 up3_one_obstacle          2        2        2         95         95       11       11  ok
+unique_paths_iii                 up3_open                  4        4        4        195        195       12       12  ok
+unique_paths_iii                 up3_no_path               0        0        0          5          5        3        3  ok
+word_search_ii                   ws2_classic               2        2        2         41         41        5        5  ok
+word_search_ii                   ws2_small                 4        4        4         10         10        4        4  ok
+word_search_ii_nopruning         ws2_classic               2        2        2         57         57        4        4  ok
+word_search_ii_nopruning         ws2_small                 4        4        4         18         18        4        4  ok
+longest_increasing_path          lip_desc                  4        4        4         18         18        2        2  ok
+longest_increasing_path          lip_zigzag                4        4        4         18         18        4        4  ok
+longest_increasing_path          lip_single                1        1        1          1          1        1        1  ok
+longest_increasing_path_nomemo   lip_desc                  4        4        4         23         23        4        4  ok
+longest_increasing_path_nomemo   lip_zigzag                4        4        4         23         23        4        4  ok
+longest_increasing_path_nomemo   lip_single                1        1        1          1          1        1        1  ok
+pacific_atlantic                 pa_classic                7        7        7         32         32        9        9  ok
+pacific_atlantic                 pa_single                 1        1        1          2          2        1        1  ok
+
+21/21 cases match the golden result
+INFO: [COSIM 212-1000] *** C/RTL co-simulation finished: PASS ***
+INFO: [HLS 200-2161] Finished Command cosim_design Elapsed time: 00:02:20; Allocated memory: 3.914 MB.
+INFO: [HLS 200-112] Total CPU user time: 205.76 seconds. Total CPU system time: 8.45 seconds. Total elapsed time: 186.92 seconds; peak allocated memory: 725.555 MB.

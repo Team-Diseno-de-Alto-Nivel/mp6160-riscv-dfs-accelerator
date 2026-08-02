@@ -29,6 +29,7 @@ jobs:
             hls:
               - 'src/hls/**'
               - 'src/program/**'
+              - 'src/vivado/**'
               - 'Makefile'
               - '.github/workflows/build.yml'
 
@@ -65,6 +66,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y tcl
           tclsh src/hls/scripts/validate_run_hls.tcl
+
+      # FPGA-3 (#64): guards build_bd.tcl the same way -- stub procs instead of
+      # a real Vivado, so a broken part/board_part/PS port/clock or a dropped
+      # AXI connection is caught here instead of the next time someone with
+      # Vivado opens the block design.
+      - name: Validate build_bd.tcl (no Vivado license needed)
+        run: tclsh src/vivado/scripts/validate_build_bd.tcl
 
   build:
     needs: changes
