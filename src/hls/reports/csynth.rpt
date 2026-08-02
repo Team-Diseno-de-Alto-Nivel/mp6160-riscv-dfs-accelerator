@@ -1,0 +1,747 @@
+
+
+================================================================
+== Synthesis Summary Report of 'dfs_accel'
+================================================================
++ General Information: 
+    * Date:           Sat Aug  1 20:01:30 2026
+    * Version:        2024.1 (Build 5069499 on May 21 2024)
+    * Project:        dfs_accel_prj
+    * Solution:       solution1 (Vivado IP Flow Target)
+    * Product family: zynquplus
+    * Target device:  xck26-sfvc784-2LV-c
+    
+
++ Performance & Resource Estimates: 
+    
+    PS: '+' for module; 'o' for loop; '*' for dataflow
+    +---------------------------------------------------------------------------------------+------+------+---------+-----------+----------+---------+------+----------+----------+----------+------------+-------------+-----+
+    |                                        Modules                                        | Issue|      | Latency |  Latency  | Iteration|         | Trip |          |          |          |            |             |     |
+    |                                        & Loops                                        | Type | Slack| (cycles)|    (ns)   |  Latency | Interval| Count| Pipelined|   BRAM   |    DSP   |     FF     |     LUT     | URAM|
+    +---------------------------------------------------------------------------------------+------+------+---------+-----------+----------+---------+------+----------+----------+----------+------------+-------------+-----+
+    |+ dfs_accel                                                                            |     -|  0.00|        -|          -|         -|        -|     -|        no|  66 (22%)|   50 (4%)|   8601 (3%)|  23473 (20%)|    -|
+    | + dfs_accel_Pipeline_VITIS_LOOP_461_2                                                 |     -|  1.61|       18|     72.000|         -|       18|     -|        no|         -|         -|     7 (~0%)|     52 (~0%)|    -|
+    |  o VITIS_LOOP_461_2                                                                   |     -|  3.50|       16|     64.000|         1|        1|    16|       yes|         -|         -|           -|            -|    -|
+    | + dfs_accel_Pipeline_VITIS_LOOP_458_1                                                 |     -|  0.00|        -|          -|         -|        -|     -|        no|         -|         -|    69 (~0%)|    127 (~0%)|    -|
+    |  o VITIS_LOOP_458_1                                                                   |     -|  3.50|        -|          -|         3|        1|     -|       yes|         -|         -|           -|            -|    -|
+    | + dfs_accel_Pipeline_VITIS_LOOP_465_4                                                 |     -|  0.00|      259|  1.036e+03|         -|      259|     -|        no|         -|         -|    84 (~0%)|    432 (~0%)|    -|
+    |  o VITIS_LOOP_465_4                                                                   |    II|  3.50|      257|  1.028e+03|        18|       16|    16|       yes|         -|         -|           -|            -|    -|
+    | + p_anonymous_namespace_flood                                                         |     -|  0.08|        -|          -|         -|        -|     -|        no|         -|  10 (~0%)|   494 (~0%)|    1917 (1%)|    -|
+    |  + p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_71_1                               |     -|  0.82|        -|          -|         -|        -|     -|        no|         -|         -|    34 (~0%)|    105 (~0%)|    -|
+    |   o VITIS_LOOP_71_1                                                                   |     -|  3.50|        -|          -|         1|        1|     -|       yes|         -|         -|           -|            -|    -|
+    |  + p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_156_1_VITIS_LOOP_157_2             |     -|  0.59|        -|          -|         -|        -|     -|        no|         -|   1 (~0%)|   220 (~0%)|    863 (~0%)|    -|
+    |   o VITIS_LOOP_156_1_VITIS_LOOP_157_2                                                 |    II|  3.50|        -|          -|         4|        2|     -|       yes|         -|         -|           -|            -|    -|
+    |  o VITIS_LOOP_168_3                                                                   |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |   + p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4                             |     -|  0.26|        -|          -|         -|        -|     -|        no|         -|   1 (~0%)|    92 (~0%)|    406 (~0%)|    -|
+    |    o VITIS_LOOP_171_4                                                                 |    II|  3.50|        -|          -|         7|        3|     -|       yes|         -|         -|           -|            -|    -|
+    | + dfs_accel_Pipeline_VITIS_LOOP_184_1                                                 |     -|  1.03|        -|          -|         -|        -|     -|        no|         -|         -|    47 (~0%)|    116 (~0%)|    -|
+    |  o VITIS_LOOP_184_1                                                                   |     -|  3.50|        -|          -|         2|        1|     -|       yes|         -|         -|           -|            -|    -|
+    | + dfs_accel_Pipeline_VITIS_LOOP_187_2                                                 |     -|  0.94|        -|          -|         -|        -|     -|        no|         -|         -|    67 (~0%)|    228 (~0%)|    -|
+    |  o VITIS_LOOP_187_2                                                                   |     -|  3.50|        -|          -|         2|        1|     -|       yes|         -|         -|           -|            -|    -|
+    | + p_anonymous_namespace_run_longest_increasing_path                                   |     -|  0.08|        -|          -|         -|        -|     -|        no|    4 (1%)|   7 (~0%)|   514 (~0%)|    1759 (1%)|    -|
+    |  + p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_244_1        |     -|  0.82|        -|          -|         -|        -|     -|        no|         -|         -|    34 (~0%)|    105 (~0%)|    -|
+    |   o VITIS_LOOP_244_1                                                                  |     -|  3.50|        -|          -|         1|        1|     -|       yes|         -|         -|           -|            -|    -|
+    |  o VITIS_LOOP_247_2                                                                   |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |   o VITIS_LOOP_248_3                                                                  |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |    + p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4      |     -|  0.17|        -|          -|         -|        -|     -|        no|         -|   4 (~0%)|   258 (~0%)|    825 (~0%)|    -|
+    |     o VITIS_LOOP_253_4                                                                |    II|  3.50|        -|          -|        12|       12|     -|       yes|         -|         -|           -|            -|    -|
+    | + p_anonymous_namespace_run_word_search_no_pruning                                    |     -|  0.08|        -|          -|         -|        -|     -|        no|         -|   7 (~0%)|   755 (~0%)|    2937 (2%)|    -|
+    |  + p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_71_1          |     -|  0.82|        -|          -|         -|        -|     -|        no|         -|         -|    34 (~0%)|    105 (~0%)|    -|
+    |   o VITIS_LOOP_71_1                                                                   |     -|  3.50|        -|          -|         1|        1|     -|       yes|         -|         -|           -|            -|    -|
+    |  o VITIS_LOOP_403_1                                                                   |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |   o VITIS_LOOP_406_2                                                                  |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |    o VITIS_LOOP_407_3                                                                 |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |     + p_anonymous_namespace_enter_match                                               |    II|  0.72|        6|     24.000|         -|        2|     -|       yes|         -|   1 (~0%)|   178 (~0%)|    432 (~0%)|    -|
+    |     + p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1      |     -|  0.26|        -|          -|         -|        -|     -|        no|         -|   3 (~0%)|   295 (~0%)|   1014 (~0%)|    -|
+    |      o VITIS_LOOP_383_1                                                               |    II|  3.50|        -|          -|        15|       15|     -|       yes|         -|         -|           -|            -|    -|
+    |       + p_anonymous_namespace_enter_match                                             |    II|  0.72|        6|     24.000|         -|        2|     -|       yes|         -|   1 (~0%)|   178 (~0%)|    432 (~0%)|    -|
+    | + p_anonymous_namespace_run_word_search_trie                                          |     -|  0.08|        -|          -|         -|        -|     -|        no|   27 (9%)|   7 (~0%)|  1977 (~0%)|    5886 (5%)|    -|
+    |  + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_71_1                |     -|  0.82|        -|          -|         -|        -|     -|        no|         -|         -|    34 (~0%)|    105 (~0%)|    -|
+    |   o VITIS_LOOP_71_1                                                                   |     -|  3.50|        -|          -|         1|        1|     -|       yes|         -|         -|           -|            -|    -|
+    |  + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_288_1               |     -|  1.06|      259|  1.036e+03|         -|      259|     -|        no|         -|         -|    11 (~0%)|     59 (~0%)|    -|
+    |   o VITIS_LOOP_288_1                                                                  |     -|  3.50|      257|  1.028e+03|         1|        1|   257|       yes|         -|         -|           -|            -|    -|
+    |  + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_331_1               |     -|  1.61|       18|     72.000|         -|       18|     -|        no|         -|         -|     7 (~0%)|     52 (~0%)|    -|
+    |   o VITIS_LOOP_331_1                                                                  |     -|  3.50|       16|     64.000|         1|        1|    16|       yes|         -|         -|           -|            -|    -|
+    |  o VITIS_LOOP_293_3                                                                   |     -|  3.50|    16416|  6.566e+04|      1026|        -|    16|        no|         -|         -|           -|            -|    -|
+    |   + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_295_4              |     -|  0.12|     1022|  4.088e+03|         -|     1022|     -|        no|         -|         -|   331 (~0%)|    877 (~0%)|    -|
+    |    o VITIS_LOOP_295_4                                                                 |    II|  3.50|     1020|  4.080e+03|         4|        4|   255|       yes|         -|         -|           -|            -|    -|
+    |  o VITIS_LOOP_334_2                                                                   |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |   o VITIS_LOOP_335_3                                                                  |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |    + p_anonymous_namespace_enter_trie                                                 |    II|  0.12|        7|     28.000|         -|        2|     -|       yes|         -|   1 (~0%)|   490 (~0%)|    591 (~0%)|    -|
+    |    + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4             |     -|  0.12|        -|          -|         -|        -|     -|        no|         -|   3 (~0%)|   653 (~0%)|   1167 (~0%)|    -|
+    |     o VITIS_LOOP_338_4                                                                |    II|  3.50|        -|          -|        16|       16|     -|       yes|         -|         -|           -|            -|    -|
+    |      + p_anonymous_namespace_enter_trie                                               |    II|  0.12|        7|     28.000|         -|        2|     -|       yes|         -|   1 (~0%)|   490 (~0%)|    591 (~0%)|    -|
+    | + p_anonymous_namespace_run_unique_paths_iii                                          |     -|  0.01|        -|          -|         -|        -|     -|        no|         -|  11 (~0%)|   781 (~0%)|    2341 (1%)|    -|
+    |  + p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_71_1                |     -|  0.82|        -|          -|         -|        -|     -|        no|         -|         -|    34 (~0%)|    105 (~0%)|    -|
+    |   o VITIS_LOOP_71_1                                                                   |     -|  3.50|        -|          -|         1|        1|     -|       yes|         -|         -|           -|            -|    -|
+    |  + p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_196_1_VITIS_LOOP_1  |     -|  0.59|        -|          -|         -|        -|     -|        no|         -|   1 (~0%)|   395 (~0%)|    619 (~0%)|    -|
+    |   o VITIS_LOOP_196_1_VITIS_LOOP_197_2                                                 |     -|  3.50|        -|          -|         5|        1|     -|       yes|         -|         -|           -|            -|    -|
+    |  + p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_209_3               |     -|  0.01|        -|          -|         -|        -|     -|        no|         -|   2 (~0%)|   218 (~0%)|    895 (~0%)|    -|
+    |   o VITIS_LOOP_209_3                                                                  |    II|  3.50|        -|          -|        14|       13|     -|       yes|         -|         -|           -|            -|    -|
+    | + p_anonymous_namespace_run_number_of_islands                                         |     -|  0.08|        -|          -|         -|        -|     -|        no|         -|   5 (~0%)|   590 (~0%)|    1438 (1%)|    -|
+    |  + p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_71_1               |     -|  0.82|        -|          -|         -|        -|     -|        no|         -|         -|    34 (~0%)|    105 (~0%)|    -|
+    |   o VITIS_LOOP_71_1                                                                   |     -|  3.50|        -|          -|         1|        1|     -|       yes|         -|         -|           -|            -|    -|
+    |  o VITIS_LOOP_128_1                                                                   |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |   o VITIS_LOOP_129_2                                                                  |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |    o VITIS_LOOP_136_3                                                                 |     -|  3.50|        -|          -|         -|        -|     -|        no|         -|         -|           -|            -|    -|
+    |     + p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_139_4           |     -|  0.75|        -|          -|         -|        -|     -|        no|         -|   1 (~0%)|   269 (~0%)|    505 (~0%)|    -|
+    |      o VITIS_LOOP_139_4                                                               |    II|  3.50|        -|          -|         7|        2|     -|       yes|         -|         -|           -|            -|    -|
+    +---------------------------------------------------------------------------------------+------+------+---------+-----------+----------+---------+------+----------+----------+----------+------------+-------------+-----+
+
+
+================================================================
+== HW Interfaces
+================================================================
+* M_AXI
++-------------+------------+------------+---------------+---------+--------+----------+-----------+--------------+--------------+-------------+-------------+-------------------+
+| Interface   | Read/Write | Data Width | Address Width | Latency | Offset | Register | Max Widen | Max Read     | Max Write    | Num Read    | Num Write   | Resource Estimate |
+|             |            | (SW->HW)   |               |         |        |          | Bitwidth  | Burst Length | Burst Length | Outstanding | Outstanding |                   |
++-------------+------------+------------+---------------+---------+--------+----------+-----------+--------------+--------------+-------------+-------------+-------------------+
+| m_axi_gmem0 | READ_ONLY  | 8 -> 8     | 32            | 0       | slave  | 0        | 0         | 16           | 16           | 16          | 16          | BRAM=1            |
+| m_axi_gmem1 | READ_ONLY  | 8 -> 8     | 32            | 0       | slave  | 0        | 0         | 16           | 16           | 16          | 16          | BRAM=1            |
+| m_axi_gmem2 | WRITE_ONLY | 32 -> 32   | 32            | 0       | slave  | 0        | 0         | 16           | 16           | 16          | 16          | BRAM=2            |
++-------------+------------+------------+---------------+---------+--------+----------+-----------+--------------+--------------+-------------+-------------+-------------------+
+
+* S_AXILITE Interfaces
++---------------+------------+---------------+--------+----------+
+| Interface     | Data Width | Address Width | Offset | Register |
++---------------+------------+---------------+--------+----------+
+| s_axi_control | 32         | 7             | 16     | 0        |
++---------------+------------+---------------+--------+----------+
+
+* S_AXILITE Registers
++---------------+------------+--------+-------+--------+----------------------------------+----------------------------------------------------------------------+
+| Interface     | Register   | Offset | Width | Access | Description                      | Bit Fields                                                           |
++---------------+------------+--------+-------+--------+----------------------------------+----------------------------------------------------------------------+
+| s_axi_control | CTRL       | 0x00   | 32    | RW     | Control signals                  | 0=AP_START 1=AP_DONE 2=AP_IDLE 3=AP_READY 7=AUTO_RESTART 9=INTERRUPT |
+| s_axi_control | GIER       | 0x04   | 32    | RW     | Global Interrupt Enable Register | 0=Enable                                                             |
+| s_axi_control | IP_IER     | 0x08   | 32    | RW     | IP Interrupt Enable Register     | 0=CHAN0_INT_EN 1=CHAN1_INT_EN                                        |
+| s_axi_control | IP_ISR     | 0x0c   | 32    | RW     | IP Interrupt Status Register     | 0=CHAN0_INT_ST 1=CHAN1_INT_ST                                        |
+| s_axi_control | grid_in    | 0x10   | 32    | W      | Data signal of grid_in           |                                                                      |
+| s_axi_control | words_in   | 0x18   | 32    | W      | Data signal of words_in          |                                                                      |
+| s_axi_control | result_out | 0x20   | 32    | W      | Data signal of result_out        |                                                                      |
+| s_axi_control | rows       | 0x28   | 32    | W      | Data signal of rows              |                                                                      |
+| s_axi_control | cols       | 0x30   | 32    | W      | Data signal of cols              |                                                                      |
+| s_axi_control | mode       | 0x38   | 32    | W      | Data signal of mode              |                                                                      |
+| s_axi_control | flags      | 0x40   | 32    | W      | Data signal of flags             |                                                                      |
+| s_axi_control | num_words  | 0x48   | 32    | W      | Data signal of num_words         |                                                                      |
++---------------+------------+--------+-------+--------+----------------------------------+----------------------------------------------------------------------+
+
+* TOP LEVEL CONTROL
++-----------+------------+-----------+
+| Interface | Type       | Ports     |
++-----------+------------+-----------+
+| ap_clk    | clock      | ap_clk    |
+| ap_rst_n  | reset      | ap_rst_n  |
+| interrupt | interrupt  | interrupt |
+| ap_ctrl   | ap_ctrl_hs |           |
++-----------+------------+-----------+
+
+
+================================================================
+== SW I/O Information
+================================================================
+* Top Function Arguments
++------------+-----------+-----------------------+
+| Argument   | Direction | Datatype              |
++------------+-----------+-----------------------+
+| grid_in    | in        | signed char const *   |
+| words_in   | in        | unsigned char const * |
+| result_out | out       | unsigned int*         |
+| rows       | in        | unsigned int          |
+| cols       | in        | unsigned int          |
+| mode       | in        | unsigned int          |
+| flags      | in        | unsigned int          |
+| num_words  | in        | unsigned int          |
++------------+-----------+-----------------------+
+
+* SW-to-HW Mapping
++------------+---------------+-----------+----------+--------------------------------------+
+| Argument   | HW Interface  | HW Type   | HW Usage | HW Info                              |
++------------+---------------+-----------+----------+--------------------------------------+
+| grid_in    | m_axi_gmem0   | interface |          | channel=0                            |
+| grid_in    | s_axi_control | register  | offset   | name=grid_in offset=0x10 range=32    |
+| words_in   | m_axi_gmem1   | interface |          | channel=0                            |
+| words_in   | s_axi_control | register  | offset   | name=words_in offset=0x18 range=32   |
+| result_out | m_axi_gmem2   | interface |          | channel=0                            |
+| result_out | s_axi_control | register  | offset   | name=result_out offset=0x20 range=32 |
+| rows       | s_axi_control | register  |          | name=rows offset=0x28 range=32       |
+| cols       | s_axi_control | register  |          | name=cols offset=0x30 range=32       |
+| mode       | s_axi_control | register  |          | name=mode offset=0x38 range=32       |
+| flags      | s_axi_control | register  |          | name=flags offset=0x40 range=32      |
+| num_words  | s_axi_control | register  |          | name=num_words offset=0x48 range=32  |
++------------+---------------+-----------+----------+--------------------------------------+
+
+
+================================================================
+== M_AXI Burst Information
+================================================================
+ Note: All burst requests might be further partitioned into multiple requests during RTL generation based on max_read_burst_length or max_write_burst_length settings.
+
+* Inferred Burst Summary
++--------------+-----------+----------+-------+------------------+------------------------------+
+| HW Interface | Direction | Length   | Width | Loop             | Loop Location                |
++--------------+-----------+----------+-------+------------------+------------------------------+
+| m_axi_gmem0  | read      | variable | 8     | VITIS_LOOP_458_1 | src/hls/dfs_accel.cpp:458:23 |
+| m_axi_gmem1  | read      | variable | 8     | VITIS_LOOP_465_4 | src/hls/dfs_accel.cpp:465:23 |
+| m_axi_gmem2  | write     | 4        | 32    |                  |                              |
++--------------+-----------+----------+-------+------------------+------------------------------+
+
+* All M_AXI Variable Accesses
++--------------+------------+------------------------------+-----------+--------------+----------+------------------+------------------------------+------------+-------------------------------------------------------------------------------------------------------+
+| HW Interface | Variable   | Access Location              | Direction | Burst Status | Length   | Loop             | Loop Location                | Resolution | Problem                                                                                               |
++--------------+------------+------------------------------+-----------+--------------+----------+------------------+------------------------------+------------+-------------------------------------------------------------------------------------------------------+
+| m_axi_gmem0  | grid_in    | src/hls/dfs_accel.cpp:458:83 | read      | Widen Fail   |          | VITIS_LOOP_458_1 | src/hls/dfs_accel.cpp:458:23 | 214-353    | Could not widen since type i8 size is greater than or equal to the max_widen_bitwidth threshold of 0  |
+| m_axi_gmem0  | grid_in    | src/hls/dfs_accel.cpp:458:83 | read      | Inferred     | variable | VITIS_LOOP_458_1 | src/hls/dfs_accel.cpp:458:23 |            |                                                                                                       |
+| m_axi_gmem1  | words_in   | src/hls/dfs_accel.cpp:468:37 | read      | Widen Fail   |          | VITIS_LOOP_467_5 | src/hls/dfs_accel.cpp:467:27 | 214-353    | Could not widen since type i8 size is greater than or equal to the max_widen_bitwidth threshold of 0  |
+| m_axi_gmem1  | words_in   | src/hls/dfs_accel.cpp:468:37 | read      | Inferred     | variable | VITIS_LOOP_465_4 | src/hls/dfs_accel.cpp:465:23 |            |                                                                                                       |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:447:41 | write     | Widen Fail   |          |                  |                              | 214-353    | Could not widen since type i32 size is greater than or equal to the max_widen_bitwidth threshold of 0 |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:447:41 | write     | Inferred     | 4        |                  |                              |            |                                                                                                       |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:448:49 | write     | Widen Fail   |          |                  |                              | 214-353    | Could not widen since type i32 size is greater than or equal to the max_widen_bitwidth threshold of 0 |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:448:49 | write     | Inferred     | 4        |                  |                              |            |                                                                                                       |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:449:48 | write     | Widen Fail   |          |                  |                              | 214-353    | Could not widen since type i32 size is greater than or equal to the max_widen_bitwidth threshold of 0 |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:449:48 | write     | Inferred     | 4        |                  |                              |            |                                                                                                       |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:450:50 | write     | Widen Fail   |          |                  |                              | 214-353    | Could not widen since type i32 size is greater than or equal to the max_widen_bitwidth threshold of 0 |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:450:50 | write     | Inferred     | 4        |                  |                              |            |                                                                                                       |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:498:37 | write     | Widen Fail   |          |                  |                              | 214-353    | Could not widen since type i32 size is greater than or equal to the max_widen_bitwidth threshold of 0 |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:498:37 | write     | Inferred     | 4        |                  |                              |            |                                                                                                       |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:499:45 | write     | Widen Fail   |          |                  |                              | 214-353    | Could not widen since type i32 size is greater than or equal to the max_widen_bitwidth threshold of 0 |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:499:45 | write     | Inferred     | 4        |                  |                              |            |                                                                                                       |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:500:44 | write     | Widen Fail   |          |                  |                              | 214-353    | Could not widen since type i32 size is greater than or equal to the max_widen_bitwidth threshold of 0 |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:500:44 | write     | Inferred     | 4        |                  |                              |            |                                                                                                       |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:501:46 | write     | Widen Fail   |          |                  |                              | 214-353    | Could not widen since type i32 size is greater than or equal to the max_widen_bitwidth threshold of 0 |
+| m_axi_gmem2  | result_out | src/hls/dfs_accel.cpp:501:46 | write     | Inferred     | 4        |                  |                              |            |                                                                                                       |
++--------------+------------+------------------------------+-----------+--------------+----------+------------------+------------------------------+------------+-------------------------------------------------------------------------------------------------------+
+
+    * Resolution URL: docs.xilinx.com/access/sources/dita/topic?Doc_Version=2024.1%20English&url=ug1448-hls-guidance&resourceid=XXX-YYY.html (replace XXX-YYY with column value)
+
+================================================================
+== Bind Op Report
+================================================================
++---------------------------------------------------------------------------------------+-----+--------+-----------------+-----------+-----------+---------+
+| Name                                                                                  | DSP | Pragma | Variable        | Op        | Impl      | Latency |
++---------------------------------------------------------------------------------------+-----+--------+-----------------+-----------+-----------+---------+
+| + dfs_accel                                                                           | 50  |        |                 |           |           |         |
+|   add_ln446_fu_968_p2                                                                 |     |        | add_ln446       | add       | fabric    | 0       |
+|   add_ln446_1_fu_984_p2                                                               |     |        | add_ln446_1     | add       | fabric    | 0       |
+|   or_ln446_fu_1000_p2                                                                 |     |        | or_ln446        | or        | auto      | 0       |
+|   icmp_ln446_fu_1006_p2                                                               |     |        | icmp_ln446      | seteq     | auto      | 0       |
+|   select_ln456_fu_1024_p3                                                             |     |        | select_ln456    | select    | auto_sel  | 0       |
+|   mul_32s_32s_32_1_1_U531                                                             | 3   |        | mul             | mul       | auto      | 0       |
+|   icmp_ln460_fu_1038_p2                                                               |     |        | icmp_ln460      | setgt     | auto      | 0       |
+|   words_fu_1071_p3                                                                    |     |        | words           | select    | auto_sel  | 0       |
+|   icmp_ln465_fu_1077_p2                                                               |     |        | icmp_ln465      | setne     | auto      | 0       |
+|   xor_ln465_fu_1083_p2                                                                |     |        | xor_ln465       | xor       | auto      | 0       |
+|   icmp_ln465_1_fu_1054_p2                                                             |     |        | icmp_ln465_1    | seteq     | auto      | 0       |
+|   select_ln465_fu_1088_p3                                                             |     |        | select_ln465    | select    | auto_sel  | 0       |
+|   sub_ln465_fu_1103_p2                                                                |     |        | sub_ln465       | sub       | fabric    | 0       |
+|   empty_54_fu_1109_p3                                                                 |     |        | empty_54        | select    | auto_sel  | 0       |
+|   select_ln465_1_fu_1117_p3                                                           |     |        | select_ln465_1  | select    | auto_sel  | 0       |
+|   mul_32s_32s_32_1_1_U531                                                             | 3   |        | mul_i_i         | mul       | auto      | 0       |
+|   mul_32s_32s_32_1_1_U531                                                             | 3   |        | mul_ln55        | mul       | auto      | 0       |
+|   icmp_ln187_fu_1149_p2                                                               |     |        | icmp_ln187      | seteq     | auto      | 0       |
+|  + dfs_accel_Pipeline_VITIS_LOOP_461_2                                                | 0   |        |                 |           |           |         |
+|    icmp_ln461_fu_310_p2                                                               |     |        | icmp_ln461      | seteq     | auto      | 0       |
+|    add_ln461_fu_316_p2                                                                |     |        | add_ln461       | add       | fabric    | 0       |
+|  + dfs_accel_Pipeline_VITIS_LOOP_458_1                                                | 0   |        |                 |           |           |         |
+|    icmp_ln458_fu_82_p2                                                                |     |        | icmp_ln458      | seteq     | auto      | 0       |
+|    add_ln458_fu_88_p2                                                                 |     |        | add_ln458       | add       | fabric    | 0       |
+|  + dfs_accel_Pipeline_VITIS_LOOP_465_4                                                | 0   |        |                 |           |           |         |
+|    icmp_ln465_fu_372_p2                                                               |     |        | icmp_ln465      | seteq     | auto      | 0       |
+|    add_ln465_fu_378_p2                                                                |     |        | add_ln465       | add       | fabric    | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470      | setne     | auto      | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_1    | setne     | auto      | 0       |
+|    select_ln470_fu_403_p3                                                             |     |        | select_ln470    | select    | auto_sel  | 0       |
+|    select_ln470_1_fu_413_p3                                                           |     |        | select_ln470_1  | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_2    | setne     | auto      | 0       |
+|    add_ln470_fu_420_p2                                                                |     |        | add_ln470       | add       | fabric    | 0       |
+|    select_ln470_2_fu_426_p3                                                           |     |        | select_ln470_2  | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_3    | setne     | auto      | 0       |
+|    add_ln470_1_fu_437_p2                                                              |     |        | add_ln470_1     | add       | fabric    | 0       |
+|    select_ln470_3_fu_443_p3                                                           |     |        | select_ln470_3  | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_4    | setne     | auto      | 0       |
+|    add_ln470_2_fu_450_p2                                                              |     |        | add_ln470_2     | add       | fabric    | 0       |
+|    select_ln470_4_fu_456_p3                                                           |     |        | select_ln470_4  | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_5    | setne     | auto      | 0       |
+|    add_ln470_3_fu_464_p2                                                              |     |        | add_ln470_3     | add       | fabric    | 0       |
+|    select_ln470_5_fu_469_p3                                                           |     |        | select_ln470_5  | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_6    | setne     | auto      | 0       |
+|    add_ln470_4_fu_476_p2                                                              |     |        | add_ln470_4     | add       | fabric    | 0       |
+|    select_ln470_6_fu_481_p3                                                           |     |        | select_ln470_6  | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_7    | setne     | auto      | 0       |
+|    add_ln470_5_fu_491_p2                                                              |     |        | add_ln470_5     | add       | fabric    | 0       |
+|    select_ln470_7_fu_497_p3                                                           |     |        | select_ln470_7  | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_8    | setne     | auto      | 0       |
+|    add_ln470_6_fu_504_p2                                                              |     |        | add_ln470_6     | add       | fabric    | 0       |
+|    select_ln470_8_fu_510_p3                                                           |     |        | select_ln470_8  | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_9    | setne     | auto      | 0       |
+|    add_ln470_7_fu_518_p2                                                              |     |        | add_ln470_7     | add       | fabric    | 0       |
+|    select_ln470_9_fu_523_p3                                                           |     |        | select_ln470_9  | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_10   | setne     | auto      | 0       |
+|    add_ln470_8_fu_530_p2                                                              |     |        | add_ln470_8     | add       | fabric    | 0       |
+|    select_ln470_10_fu_535_p3                                                          |     |        | select_ln470_10 | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_11   | setne     | auto      | 0       |
+|    add_ln470_9_fu_542_p2                                                              |     |        | add_ln470_9     | add       | fabric    | 0       |
+|    select_ln470_11_fu_547_p3                                                          |     |        | select_ln470_11 | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_12   | setne     | auto      | 0       |
+|    add_ln470_10_fu_554_p2                                                             |     |        | add_ln470_10    | add       | fabric    | 0       |
+|    select_ln470_12_fu_559_p3                                                          |     |        | select_ln470_12 | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_13   | setne     | auto      | 0       |
+|    add_ln470_11_fu_566_p2                                                             |     |        | add_ln470_11    | add       | fabric    | 0       |
+|    select_ln470_13_fu_571_p3                                                          |     |        | select_ln470_13 | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_14   | setne     | auto      | 0       |
+|    add_ln470_12_fu_578_p2                                                             |     |        | add_ln470_12    | add       | fabric    | 0       |
+|    select_ln470_14_fu_583_p3                                                          |     |        | select_ln470_14 | select    | auto_sel  | 0       |
+|    grp_fu_358_p2                                                                      |     |        | icmp_ln470_15   | setne     | auto      | 0       |
+|    add_ln470_13_fu_593_p2                                                             |     |        | add_ln470_13    | add       | fabric    | 0       |
+|    select_ln470_15_fu_599_p3                                                          |     |        | select_ln470_15 | select    | auto_sel  | 0       |
+|  + p_anonymous_namespace_flood                                                        | 10  |        |                 |           |           |         |
+|    mul_32s_32s_32_1_1_U76                                                             | 3   |        | mul_i_i         | mul       | auto      | 0       |
+|    mul_32ns_32ns_64_1_1_U75                                                           | 4   |        | mul_ln155       | mul       | auto      | 0       |
+|    icmp_ln168_fu_193_p2                                                               |     |        | icmp_ln168      | seteq     | auto      | 0       |
+|    add_ln93_fu_199_p2                                                                 |     |        | add_ln93        | add       | fabric    | 0       |
+|    add_ln170_fu_217_p2                                                                |     |        | add_ln170       | add       | fabric    | 0       |
+|    mac_muladd_12s_8ns_8ns_12_4_1_U77                                                  | 1   |        | mul_i_i32       | mul       | dsp_slice | 3       |
+|    mac_muladd_12s_8ns_8ns_12_4_1_U77                                                  | 1   |        | add_i_i34       | add       | dsp_slice | 3       |
+|   + p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_71_1                              | 0   |        |                 |           |           |         |
+|     icmp_ln71_fu_54_p2                                                                |     |        | icmp_ln71       | seteq     | auto      | 0       |
+|     add_ln71_fu_60_p2                                                                 |     |        | add_ln71        | add       | fabric    | 0       |
+|   + p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_156_1_VITIS_LOOP_157_2            | 1   |        |                 |           |           |         |
+|     icmp_ln156_fu_152_p2                                                              |     |        | icmp_ln156      | seteq     | auto      | 0       |
+|     add_ln156_fu_157_p2                                                               |     |        | add_ln156       | add       | fabric    | 0       |
+|     icmp_ln157_fu_169_p2                                                              |     |        | icmp_ln157      | seteq     | auto      | 0       |
+|     select_ln156_fu_174_p3                                                            |     |        | select_ln156    | select    | auto_sel  | 0       |
+|     r_11_mid1_fu_182_p2                                                               |     |        | r_11_mid1       | add       | fabric    | 0       |
+|     r_113_fu_188_p2                                                                   |     |        | r_113           | add       | fabric    | 0       |
+|     select_ln156_1_fu_194_p3                                                          |     |        | select_ln156_1  | select    | auto_sel  | 0       |
+|     select_ln156_2_fu_202_p3                                                          |     |        | select_ln156_2  | select    | auto_sel  | 0       |
+|     first_iter_0_fu_210_p2                                                            |     |        | first_iter_0    | seteq     | auto      | 0       |
+|     cmp5_fu_216_p2                                                                    |     |        | cmp5            | seteq     | auto      | 0       |
+|     mul_12s_8ns_12_1_1_U44                                                            | 1   |        | mul_i_i3        | mul       | auto      | 0       |
+|     cmp8_fu_226_p2                                                                    |     |        | cmp8            | seteq     | auto      | 0       |
+|     add_ln159_fu_266_p2                                                               |     |        | add_ln159       | add       | fabric    | 0       |
+|     icmp_ln159_fu_271_p2                                                              |     |        | icmp_ln159      | seteq     | auto      | 0       |
+|     or_ln159_fu_276_p2                                                                |     |        | or_ln159        | or        | auto      | 0       |
+|     or_ln158_fu_231_p2                                                                |     |        | or_ln158        | or        | auto      | 0       |
+|     i_fu_287_p2                                                                       |     |        | i               | add       | fabric    | 0       |
+|     add_ln64_fu_301_p2                                                                |     |        | add_ln64        | add       | fabric    | 0       |
+|     depth_fu_319_p2                                                                   |     |        | depth           | add       | fabric    | 0       |
+|     icmp_ln85_fu_335_p2                                                               |     |        | icmp_ln85       | setgt     | auto      | 0       |
+|     c_6_fu_237_p2                                                                     |     |        | c_6             | add       | fabric    | 0       |
+|   + p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4                             | 1   |        |                 |           |           |         |
+|     icmp_ln171_fu_205_p2                                                              |     |        | icmp_ln171      | seteq     | auto      | 0       |
+|     add_ln171_fu_211_p2                                                               |     |        | add_ln171       | add       | fabric    | 0       |
+|     r_fu_236_p2                                                                       |     |        | r               | add       | fabric    | 0       |
+|     col_fu_249_p2                                                                     |     |        | col             | add       | fabric    | 0       |
+|     icmp_ln77_fu_274_p2                                                               |     |        | icmp_ln77       | setlt     | auto      | 0       |
+|     xor_ln77_fu_279_p2                                                                |     |        | xor_ln77        | xor       | auto      | 0       |
+|     icmp_ln77_6_fu_285_p2                                                             |     |        | icmp_ln77_6     | setlt     | auto      | 0       |
+|     xor_ln77_6_fu_290_p2                                                              |     |        | xor_ln77_6      | xor       | auto      | 0       |
+|     or_ln77_fu_296_p2                                                                 |     |        | or_ln77         | or        | auto      | 0       |
+|     or_ln77_11_fu_302_p2                                                              |     |        | or_ln77_11      | or        | auto      | 0       |
+|     or_ln77_12_fu_308_p2                                                              |     |        | or_ln77_12      | or        | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U57                                                 | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U57                                                 | 1   |        | i_13            | add       | dsp_slice | 3       |
+|     icmp_ln174_fu_333_p2                                                              |     |        | icmp_ln174      | setlt     | auto      | 0       |
+|     add_ln64_fu_342_p2                                                                |     |        | add_ln64        | add       | fabric    | 0       |
+|     depth_fu_360_p2                                                                   |     |        | depth           | add       | fabric    | 0       |
+|     icmp_ln85_fu_376_p2                                                               |     |        | icmp_ln85       | setgt     | auto      | 0       |
+|  + dfs_accel_Pipeline_VITIS_LOOP_184_1                                                | 0   |        |                 |           |           |         |
+|    icmp_ln184_fu_67_p2                                                                |     |        | icmp_ln184      | seteq     | auto      | 0       |
+|    add_ln184_fu_73_p2                                                                 |     |        | add_ln184       | add       | fabric    | 0       |
+|  + dfs_accel_Pipeline_VITIS_LOOP_187_2                                                | 0   |        |                 |           |           |         |
+|    icmp_ln187_fu_86_p2                                                                |     |        | icmp_ln187      | seteq     | auto      | 0       |
+|    add_ln187_fu_92_p2                                                                 |     |        | add_ln187       | add       | fabric    | 0       |
+|    add_ln188_fu_116_p2                                                                |     |        | add_ln188       | add       | fabric    | 0       |
+|    select_ln188_fu_122_p3                                                             |     |        | select_ln188    | select    | auto_sel  | 0       |
+|    count_1_fu_130_p3                                                                  |     |        | count_1         | select    | auto_sel  | 0       |
+|  + p_anonymous_namespace_run_longest_increasing_path                                  | 7   |        |                 |           |           |         |
+|    mul_32s_32s_32_1_1_U124                                                            | 3   |        | mul_i           | mul       | auto      | 0       |
+|    icmp_ln247_fu_246_p2                                                               |     |        | icmp_ln247      | seteq     | auto      | 0       |
+|    r_7_fu_251_p2                                                                      |     |        | r_7             | add       | fabric    | 0       |
+|    icmp_ln248_fu_261_p2                                                               |     |        | icmp_ln248      | seteq     | auto      | 0       |
+|    c_5_fu_266_p2                                                                      |     |        | c_5             | add       | fabric    | 0       |
+|    add_ln104_fu_287_p2                                                                |     |        | add_ln104       | add       | fabric    | 0       |
+|    icmp_ln85_fu_303_p2                                                                |     |        | icmp_ln85       | seteq     | auto      | 0       |
+|    icmp_ln281_fu_322_p2                                                               |     |        | icmp_ln281      | setgt     | auto      | 0       |
+|    longest_1_fu_328_p3                                                                |     |        | longest_1       | select    | auto_sel  | 0       |
+|   + p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_244_1       | 0   |        |                 |           |           |         |
+|     icmp_ln244_fu_54_p2                                                               |     |        | icmp_ln244      | seteq     | auto      | 0       |
+|     add_ln244_fu_60_p2                                                                |     |        | add_ln244       | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4       | 4   |        |                 |           |           |         |
+|     icmp_ln253_fu_393_p2                                                              |     |        | icmp_ln253      | seteq     | auto      | 0       |
+|     add_ln254_fu_399_p2                                                               |     |        | add_ln254       | add       | fabric    | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U101                                                | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U101                                                | 1   |        | add_ln56        | add       | dsp_slice | 3       |
+|     icmp_ln259_fu_422_p2                                                              |     |        | icmp_ln259      | seteq     | auto      | 0       |
+|     grp_fu_370_p2                                                                     |     |        | icmp_ln238      | seteq     | auto      | 0       |
+|     grp_fu_375_p2                                                                     |     |        | add_ln239       | add       | fabric    | 0       |
+|     icmp_ln240_fu_442_p2                                                              |     |        | icmp_ln240      | setlt     | auto      | 0       |
+|     add_ln240_fu_447_p2                                                               |     |        | add_ln240       | add       | fabric    | 0       |
+|     icmp_ln267_fu_463_p2                                                              |     |        | icmp_ln267      | setgt     | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U102                                                | 1   |        | mul_ln56_6      | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U102                                                | 1   |        | add_ln56_6      | add       | dsp_slice | 3       |
+|     grp_fu_370_p2                                                                     |     |        | icmp_ln238_1    | seteq     | auto      | 0       |
+|     grp_fu_375_p2                                                                     |     |        | add_ln239_1     | add       | fabric    | 0       |
+|     icmp_ln240_1_fu_492_p2                                                            |     |        | icmp_ln240_1    | setlt     | auto      | 0       |
+|     add_ln240_1_fu_498_p2                                                             |     |        | add_ln240_1     | add       | fabric    | 0       |
+|     add_ln268_fu_481_p2                                                               |     |        | add_ln268       | add       | fabric    | 0       |
+|     r_fu_520_p2                                                                       |     |        | r               | add       | fabric    | 0       |
+|     col_fu_540_p2                                                                     |     |        | col             | add       | fabric    | 0       |
+|     icmp_ln77_fu_566_p2                                                               |     |        | icmp_ln77       | setlt     | auto      | 0       |
+|     xor_ln77_fu_571_p2                                                                |     |        | xor_ln77        | xor       | auto      | 0       |
+|     icmp_ln77_5_fu_577_p2                                                             |     |        | icmp_ln77_5     | setlt     | auto      | 0       |
+|     xor_ln77_5_fu_582_p2                                                              |     |        | xor_ln77_5      | xor       | auto      | 0       |
+|     or_ln77_fu_588_p2                                                                 |     |        | or_ln77         | or        | auto      | 0       |
+|     or_ln77_9_fu_594_p2                                                               |     |        | or_ln77_9       | or        | auto      | 0       |
+|     or_ln77_10_fu_600_p2                                                              |     |        | or_ln77_10      | or        | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U103                                                | 1   |        | mul_ln56_4      | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U103                                                | 1   |        | add_ln56_4      | add       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U104                                                | 1   |        | mul_ln56_5      | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U104                                                | 1   |        | add_ln56_5      | add       | dsp_slice | 3       |
+|     icmp_ln271_fu_636_p2                                                              |     |        | icmp_ln271      | setgt     | auto      | 0       |
+|     depth_fu_642_p2                                                                   |     |        | depth           | add       | fabric    | 0       |
+|     add_ln104_fu_657_p2                                                               |     |        | add_ln104       | add       | fabric    | 0       |
+|     icmp_ln85_fu_673_p2                                                               |     |        | icmp_ln85       | setgt     | auto      | 0       |
+|  + p_anonymous_namespace_run_word_search_no_pruning                                   | 7   |        |                 |           |           |         |
+|    mul_32s_32s_32_1_1_U214                                                            | 3   |        | mul_i_i         | mul       | auto      | 0       |
+|    icmp_ln403_fu_360_p2                                                               |     |        | icmp_ln403      | seteq     | auto      | 0       |
+|    add_ln403_fu_365_p2                                                                |     |        | add_ln403       | add       | fabric    | 0       |
+|    icmp_ln404_fu_380_p2                                                               |     |        | icmp_ln404      | seteq     | auto      | 0       |
+|    icmp_ln406_fu_386_p2                                                               |     |        | icmp_ln406      | setlt     | auto      | 0       |
+|    xor_ln406_fu_391_p2                                                                |     |        | xor_ln406       | xor       | auto      | 0       |
+|    and_ln406_fu_397_p2                                                                |     |        | and_ln406       | and       | auto      | 0       |
+|    r_3_fu_403_p2                                                                      |     |        | r_3             | add       | fabric    | 0       |
+|    icmp_ln407_fu_436_p2                                                               |     |        | icmp_ln407      | setlt     | auto      | 0       |
+|    xor_ln407_fu_442_p2                                                                |     |        | xor_ln407       | xor       | auto      | 0       |
+|    and_ln407_fu_448_p2                                                                |     |        | and_ln407       | and       | auto      | 0       |
+|    c_2_fu_454_p2                                                                      |     |        | c_2             | add       | fabric    | 0       |
+|    found_2_fu_482_p2                                                                  |     |        | found_2         | or        | auto      | 0       |
+|    add_ln409_fu_413_p2                                                                |     |        | add_ln409       | add       | fabric    | 0       |
+|    count_3_fu_419_p3                                                                  |     |        | count_3         | select    | auto_sel  | 0       |
+|   + p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_71_1         | 0   |        |                 |           |           |         |
+|     icmp_ln71_fu_54_p2                                                                |     |        | icmp_ln71       | seteq     | auto      | 0       |
+|     add_ln71_fu_60_p2                                                                 |     |        | add_ln71        | add       | fabric    | 0       |
+|   + p_anonymous_namespace_enter_match (grp_p_anonymous_namespace_enter_match_fu_195)  | 1   |        |                 |           |           |         |
+|     add_ln359_fu_479_p2                                                               |     |        | add_ln359       | add       | fabric    | 0       |
+|     depth_fu_617_p2                                                                   |     |        | depth           | add       | fabric    | 0       |
+|     icmp_ln85_fu_627_p2                                                               |     |        | icmp_ln85       | setgt     | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U145                                                | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U145                                                | 1   |        | i               | add       | dsp_slice | 3       |
+|     sparsemux_33_4_8_1_1_U144                                                         |     |        | tmp             | sparsemux | auto      | 0       |
+|     icmp_ln361_fu_604_p2                                                              |     |        | icmp_ln361      | seteq     | auto      | 0       |
+|     add_ln365_fu_642_p2                                                               |     |        | add_ln365       | add       | fabric    | 0       |
+|     icmp_ln365_fu_652_p2                                                              |     |        | icmp_ln365      | seteq     | auto      | 0       |
+|     add_ln64_fu_668_p2                                                                |     |        | add_ln64        | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1        | 3   |        |                 |           |           |         |
+|     icmp_ln383_fu_310_p2                                                              |     |        | icmp_ln383      | seteq     | auto      | 0       |
+|     add_ln384_fu_319_p2                                                               |     |        | add_ln384       | add       | fabric    | 0       |
+|     icmp_ln386_fu_342_p2                                                              |     |        | icmp_ln386      | setgt     | auto      | 0       |
+|     add_ln387_fu_348_p2                                                               |     |        | add_ln387       | add       | fabric    | 0       |
+|     r_fu_375_p2                                                                       |     |        | r               | add       | fabric    | 0       |
+|     col_fu_392_p2                                                                     |     |        | col             | add       | fabric    | 0       |
+|     icmp_ln77_fu_418_p2                                                               |     |        | icmp_ln77       | setlt     | auto      | 0       |
+|     xor_ln77_fu_423_p2                                                                |     |        | xor_ln77        | xor       | auto      | 0       |
+|     icmp_ln77_2_fu_433_p2                                                             |     |        | icmp_ln77_2     | setlt     | auto      | 0       |
+|     xor_ln77_2_fu_439_p2                                                              |     |        | xor_ln77_2      | xor       | auto      | 0       |
+|     or_ln77_fu_445_p2                                                                 |     |        | or_ln77         | or        | auto      | 0       |
+|     or_ln77_3_fu_451_p2                                                               |     |        | or_ln77_3       | or        | auto      | 0       |
+|     or_ln77_4_fu_457_p2                                                               |     |        | or_ln77_4       | or        | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U180                                                | 1   |        | mul_ln56_2      | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U180                                                | 1   |        | add_ln56_2      | add       | dsp_slice | 3       |
+|     grp_p_anonymous_namespace_enter_match_fu_233_char_index                           |     |        | add_ln391       | add       | fabric    | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U179                                                | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U179                                                | 1   |        | add_ln56        | add       | dsp_slice | 3       |
+|    + p_anonymous_namespace_enter_match (grp_p_anonymous_namespace_enter_match_fu_233) | 1   |        |                 |           |           |         |
+|      add_ln359_fu_479_p2                                                              |     |        | add_ln359       | add       | fabric    | 0       |
+|      depth_fu_617_p2                                                                  |     |        | depth           | add       | fabric    | 0       |
+|      icmp_ln85_fu_627_p2                                                              |     |        | icmp_ln85       | setgt     | auto      | 0       |
+|      mac_muladd_12s_8ns_8ns_12_4_1_U145                                               | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|      mac_muladd_12s_8ns_8ns_12_4_1_U145                                               | 1   |        | i               | add       | dsp_slice | 3       |
+|      sparsemux_33_4_8_1_1_U144                                                        |     |        | tmp             | sparsemux | auto      | 0       |
+|      icmp_ln361_fu_604_p2                                                             |     |        | icmp_ln361      | seteq     | auto      | 0       |
+|      add_ln365_fu_642_p2                                                              |     |        | add_ln365       | add       | fabric    | 0       |
+|      icmp_ln365_fu_652_p2                                                             |     |        | icmp_ln365      | seteq     | auto      | 0       |
+|      add_ln64_fu_668_p2                                                               |     |        | add_ln64        | add       | fabric    | 0       |
+|  + p_anonymous_namespace_run_word_search_trie                                         | 7   |        |                 |           |           |         |
+|    mul_32s_32s_32_1_1_U415                                                            | 3   |        | mul_i_i         | mul       | auto      | 0       |
+|    icmp_ln293_fu_803_p2                                                               |     |        | icmp_ln293      | seteq     | auto      | 0       |
+|    add_ln293_fu_808_p2                                                                |     |        | add_ln293       | add       | fabric    | 0       |
+|    icmp_ln334_fu_869_p2                                                               |     |        | icmp_ln334      | seteq     | auto      | 0       |
+|    r_2_fu_874_p2                                                                      |     |        | r_2             | add       | fabric    | 0       |
+|    icmp_ln335_fu_884_p2                                                               |     |        | icmp_ln335      | setlt     | auto      | 0       |
+|    c_1_fu_890_p2                                                                      |     |        | c_1             | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_71_1               | 0   |        |                 |           |           |         |
+|     icmp_ln71_fu_54_p2                                                                |     |        | icmp_ln71       | seteq     | auto      | 0       |
+|     add_ln71_fu_60_p2                                                                 |     |        | add_ln71        | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_288_1              | 0   |        |                 |           |           |         |
+|     icmp_ln288_fu_472_p2                                                              |     |        | icmp_ln288      | seteq     | auto      | 0       |
+|     add_ln288_fu_478_p2                                                               |     |        | add_ln288       | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_331_1              | 0   |        |                 |           |           |         |
+|     icmp_ln331_fu_54_p2                                                               |     |        | icmp_ln331      | seteq     | auto      | 0       |
+|     add_ln331_fu_60_p2                                                                |     |        | add_ln331       | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_295_4              | 0   |        |                 |           |           |         |
+|     icmp_ln295_fu_774_p2                                                              |     |        | icmp_ln295      | seteq     | auto      | 0       |
+|     add_ln295_fu_779_p2                                                               |     |        | add_ln295       | add       | fabric    | 0       |
+|     sparsemux_33_4_8_1_1_U275                                                         |     |        | tmp             | sparsemux | auto      | 0       |
+|     li_fu_857_p2                                                                      |     |        | li              | add       | fabric    | 0       |
+|     icmp_ln297_fu_863_p2                                                              |     |        | icmp_ln297      | setgt     | auto      | 0       |
+|     sparsemux_53_6_16_1_1_U276                                                        |     |        | tmp_2           | sparsemux | auto      | 0       |
+|     add_ln300_fu_1022_p2                                                              |     |        | add_ln300       | add       | fabric    | 0       |
+|     sparsemux_53_6_16_1_1_U277                                                        |     |        | node_1          | sparsemux | auto      | 0       |
+|   + p_anonymous_namespace_enter_trie (grp_p_anonymous_namespace_enter_trie_fu_593)    | 1   |        |                 |           |           |         |
+|     add_ln309_fu_683_p2                                                               |     |        | add_ln309       | add       | fabric    | 0       |
+|     depth_fu_771_p2                                                                   |     |        | depth           | add       | fabric    | 0       |
+|     icmp_ln85_fu_781_p2                                                               |     |        | icmp_ln85       | setgt     | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U326                                                | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U326                                                | 1   |        | i               | add       | dsp_slice | 3       |
+|     li_fu_722_p2                                                                      |     |        | li              | add       | fabric    | 0       |
+|     icmp_ln312_fu_728_p2                                                              |     |        | icmp_ln312      | setgt     | auto      | 0       |
+|     sparsemux_53_6_16_1_1_U325                                                        |     |        | nxt             | sparsemux | auto      | 0       |
+|     add_ln318_fu_961_p2                                                               |     |        | add_ln318       | add       | fabric    | 0       |
+|     add_ln64_fu_949_p2                                                                |     |        | add_ln64        | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4              | 3   |        |                 |           |           |         |
+|     icmp_ln338_fu_324_p2                                                              |     |        | icmp_ln338      | seteq     | auto      | 0       |
+|     add_ln339_fu_330_p2                                                               |     |        | add_ln339       | add       | fabric    | 0       |
+|     icmp_ln341_fu_353_p2                                                              |     |        | icmp_ln341      | setgt     | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U370                                                | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U370                                                | 1   |        | add_ln56        | add       | dsp_slice | 3       |
+|     add_ln342_fu_388_p2                                                               |     |        | add_ln342       | add       | fabric    | 0       |
+|     r_fu_399_p2                                                                       |     |        | r               | add       | fabric    | 0       |
+|     col_fu_412_p2                                                                     |     |        | col             | add       | fabric    | 0       |
+|     icmp_ln77_fu_437_p2                                                               |     |        | icmp_ln77       | setlt     | auto      | 0       |
+|     xor_ln77_fu_442_p2                                                                |     |        | xor_ln77        | xor       | auto      | 0       |
+|     icmp_ln77_1_fu_448_p2                                                             |     |        | icmp_ln77_1     | setlt     | auto      | 0       |
+|     xor_ln77_1_fu_453_p2                                                              |     |        | xor_ln77_1      | xor       | auto      | 0       |
+|     or_ln77_fu_459_p2                                                                 |     |        | or_ln77         | or        | auto      | 0       |
+|     or_ln77_1_fu_465_p2                                                               |     |        | or_ln77_1       | or        | auto      | 0       |
+|     or_ln77_2_fu_471_p2                                                               |     |        | or_ln77_2       | or        | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U371                                                | 1   |        | mul_ln56_1      | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U371                                                | 1   |        | add_ln56_1      | add       | dsp_slice | 3       |
+|    + p_anonymous_namespace_enter_trie (grp_p_anonymous_namespace_enter_trie_fu_228)   | 1   |        |                 |           |           |         |
+|      add_ln309_fu_683_p2                                                              |     |        | add_ln309       | add       | fabric    | 0       |
+|      depth_fu_771_p2                                                                  |     |        | depth           | add       | fabric    | 0       |
+|      icmp_ln85_fu_781_p2                                                              |     |        | icmp_ln85       | setgt     | auto      | 0       |
+|      mac_muladd_12s_8ns_8ns_12_4_1_U326                                               | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|      mac_muladd_12s_8ns_8ns_12_4_1_U326                                               | 1   |        | i               | add       | dsp_slice | 3       |
+|      li_fu_722_p2                                                                     |     |        | li              | add       | fabric    | 0       |
+|      icmp_ln312_fu_728_p2                                                             |     |        | icmp_ln312      | setgt     | auto      | 0       |
+|      sparsemux_53_6_16_1_1_U325                                                       |     |        | nxt             | sparsemux | auto      | 0       |
+|      add_ln318_fu_961_p2                                                              |     |        | add_ln318       | add       | fabric    | 0       |
+|      add_ln64_fu_949_p2                                                               |     |        | add_ln64        | add       | fabric    | 0       |
+|  + p_anonymous_namespace_run_unique_paths_iii                                         | 11  |        |                 |           |           |         |
+|    mul_32s_32s_32_1_1_U483                                                            | 3   |        | mul_i_i         | mul       | auto      | 0       |
+|    mul_32ns_32ns_64_1_1_U482                                                          | 4   |        | mul_ln196       | mul       | auto      | 0       |
+|    mac_muladd_12s_8ns_8ns_12_4_1_U484                                                 | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|    mac_muladd_12s_8ns_8ns_12_4_1_U484                                                 | 1   |        | i               | add       | dsp_slice | 3       |
+|    add_ln64_fu_276_p2                                                                 |     |        | add_ln64        | add       | fabric    | 0       |
+|    add_ln104_fu_298_p2                                                                |     |        | add_ln104       | add       | fabric    | 0       |
+|    icmp_ln85_fu_314_p2                                                                |     |        | icmp_ln85       | seteq     | auto      | 0       |
+|   + p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_71_1               | 0   |        |                 |           |           |         |
+|     icmp_ln71_fu_54_p2                                                                |     |        | icmp_ln71       | seteq     | auto      | 0       |
+|     add_ln71_fu_60_p2                                                                 |     |        | add_ln71        | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_196_1_VITIS_LOOP_1 | 1   |        |                 |           |           |         |
+|     icmp_ln196_fu_157_p2                                                              |     |        | icmp_ln196      | seteq     | auto      | 0       |
+|     add_ln196_fu_162_p2                                                               |     |        | add_ln196       | add       | fabric    | 0       |
+|     icmp_ln197_fu_174_p2                                                              |     |        | icmp_ln197      | seteq     | auto      | 0       |
+|     select_ln196_fu_179_p3                                                            |     |        | select_ln196    | select    | auto_sel  | 0       |
+|     add_ln196_1_fu_187_p2                                                             |     |        | add_ln196_1     | add       | fabric    | 0       |
+|     select_ln196_1_fu_193_p3                                                          |     |        | select_ln196_1  | select    | auto_sel  | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U452                                                | 1   |        | mul_ln197       | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U452                                                | 1   |        | add_ln56        | add       | dsp_slice | 3       |
+|     icmp_ln199_fu_250_p2                                                              |     |        | icmp_ln199      | setne     | auto      | 0       |
+|     add_ln199_fu_256_p2                                                               |     |        | add_ln199       | add       | fabric    | 0       |
+|     walkable_1_fu_262_p3                                                              |     |        | walkable_1      | select    | auto_sel  | 0       |
+|     icmp_ln200_fu_270_p2                                                              |     |        | icmp_ln200      | seteq     | auto      | 0       |
+|     select_ln200_fu_276_p3                                                            |     |        | select_ln200    | select    | auto_sel  | 0       |
+|     select_ln200_1_fu_283_p3                                                          |     |        | select_ln200_1  | select    | auto_sel  | 0       |
+|     c_3_fu_213_p2                                                                     |     |        | c_3             | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_209_3              | 2   |        |                 |           |           |         |
+|     icmp_ln209_fu_371_p2                                                              |     |        | icmp_ln209      | seteq     | auto      | 0       |
+|     add_ln210_fu_377_p2                                                               |     |        | add_ln210       | add       | fabric    | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U460                                                | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U460                                                | 1   |        | add_ln56        | add       | dsp_slice | 3       |
+|     icmp_ln213_fu_396_p2                                                              |     |        | icmp_ln213      | seteq     | auto      | 0       |
+|     icmp_ln220_fu_413_p2                                                              |     |        | icmp_ln220      | setgt     | auto      | 0       |
+|     grp_fu_353_p2                                                                     |     |        | icmp_ln232      | seteq     | auto      | 0       |
+|     add_ln221_fu_423_p2                                                               |     |        | add_ln221       | add       | fabric    | 0       |
+|     r_fu_467_p2                                                                       |     |        | r               | add       | fabric    | 0       |
+|     col_fu_481_p2                                                                     |     |        | col             | add       | fabric    | 0       |
+|     icmp_ln77_fu_507_p2                                                               |     |        | icmp_ln77       | setlt     | auto      | 0       |
+|     xor_ln77_fu_512_p2                                                                |     |        | xor_ln77        | xor       | auto      | 0       |
+|     icmp_ln77_3_fu_518_p2                                                             |     |        | icmp_ln77_3     | setlt     | auto      | 0       |
+|     xor_ln77_3_fu_523_p2                                                              |     |        | xor_ln77_3      | xor       | auto      | 0       |
+|     or_ln77_fu_529_p2                                                                 |     |        | or_ln77         | or        | auto      | 0       |
+|     or_ln77_5_fu_535_p2                                                               |     |        | or_ln77_5       | or        | auto      | 0       |
+|     or_ln77_6_fu_541_p2                                                               |     |        | or_ln77_6       | or        | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U461                                                | 1   |        | mul_ln56_3      | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U461                                                | 1   |        | i_6             | add       | dsp_slice | 3       |
+|     icmp_ln224_fu_566_p2                                                              |     |        | icmp_ln224      | seteq     | auto      | 0       |
+|     add_ln64_fu_576_p2                                                                |     |        | add_ln64        | add       | fabric    | 0       |
+|     add_ln227_fu_631_p2                                                               |     |        | add_ln227       | add       | fabric    | 0       |
+|     depth_fu_588_p2                                                                   |     |        | depth           | add       | fabric    | 0       |
+|     add_ln104_fu_603_p2                                                               |     |        | add_ln104       | add       | fabric    | 0       |
+|     icmp_ln85_fu_619_p2                                                               |     |        | icmp_ln85       | setgt     | auto      | 0       |
+|     icmp_ln214_fu_433_p2                                                              |     |        | icmp_ln214      | seteq     | auto      | 0       |
+|     add_ln214_fu_438_p2                                                               |     |        | add_ln214       | add       | fabric    | 0       |
+|     paths_1_fu_444_p3                                                                 |     |        | paths_1         | select    | auto_sel  | 0       |
+|     grp_fu_353_p2                                                                     |     |        | icmp_ln216      | seteq     | auto      | 0       |
+|  + p_anonymous_namespace_run_number_of_islands                                        | 5   |        |                 |           |           |         |
+|    mul_32s_32s_32_1_1_U518                                                            | 3   |        | mul_i_i         | mul       | auto      | 0       |
+|    icmp_ln128_fu_199_p2                                                               |     |        | icmp_ln128      | seteq     | auto      | 0       |
+|    r_5_fu_204_p2                                                                      |     |        | r_5             | add       | fabric    | 0       |
+|    mul_12s_8ns_12_1_1_U519                                                            | 1   |        | mul_ln129       | mul       | auto      | 0       |
+|    icmp_ln129_fu_223_p2                                                               |     |        | icmp_ln129      | seteq     | auto      | 0       |
+|    c_4_fu_228_p2                                                                      |     |        | c_4             | add       | fabric    | 0       |
+|    i_fu_242_p2                                                                        |     |        | i               | add       | fabric    | 0       |
+|    icmp_ln131_fu_256_p2                                                               |     |        | icmp_ln131      | seteq     | auto      | 0       |
+|    icmp_ln85_fu_272_p2                                                                |     |        | icmp_ln85       | seteq     | auto      | 0       |
+|    add_ln64_fu_288_p2                                                                 |     |        | add_ln64        | add       | fabric    | 0       |
+|    icmp_ln136_fu_304_p2                                                               |     |        | icmp_ln136      | seteq     | auto      | 0       |
+|    add_ln93_fu_310_p2                                                                 |     |        | add_ln93        | add       | fabric    | 0       |
+|    add_ln138_fu_328_p2                                                                |     |        | add_ln138       | add       | fabric    | 0       |
+|    islands_2_fu_340_p2                                                                |     |        | islands_2       | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_71_1              | 0   |        |                 |           |           |         |
+|     icmp_ln71_fu_54_p2                                                                |     |        | icmp_ln71       | seteq     | auto      | 0       |
+|     add_ln71_fu_60_p2                                                                 |     |        | add_ln71        | add       | fabric    | 0       |
+|   + p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_139_4             | 1   |        |                 |           |           |         |
+|     icmp_ln139_fu_199_p2                                                              |     |        | icmp_ln139      | seteq     | auto      | 0       |
+|     add_ln139_fu_205_p2                                                               |     |        | add_ln139       | add       | fabric    | 0       |
+|     r_fu_230_p2                                                                       |     |        | r               | add       | fabric    | 0       |
+|     col_fu_243_p2                                                                     |     |        | col             | add       | fabric    | 0       |
+|     icmp_ln77_fu_268_p2                                                               |     |        | icmp_ln77       | setlt     | auto      | 0       |
+|     xor_ln77_fu_273_p2                                                                |     |        | xor_ln77        | xor       | auto      | 0       |
+|     icmp_ln77_4_fu_279_p2                                                             |     |        | icmp_ln77_4     | setlt     | auto      | 0       |
+|     xor_ln77_4_fu_284_p2                                                              |     |        | xor_ln77_4      | xor       | auto      | 0       |
+|     or_ln77_fu_290_p2                                                                 |     |        | or_ln77         | or        | auto      | 0       |
+|     or_ln77_7_fu_296_p2                                                               |     |        | or_ln77_7       | or        | auto      | 0       |
+|     or_ln77_8_fu_302_p2                                                               |     |        | or_ln77_8       | or        | auto      | 0       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U504                                                | 1   |        | mul_ln56        | mul       | dsp_slice | 3       |
+|     mac_muladd_12s_8ns_8ns_12_4_1_U504                                                | 1   |        | i_9             | add       | dsp_slice | 3       |
+|     icmp_ln142_fu_327_p2                                                              |     |        | icmp_ln142      | seteq     | auto      | 0       |
+|     add_ln64_fu_337_p2                                                                |     |        | add_ln64        | add       | fabric    | 0       |
+|     depth_fu_355_p2                                                                   |     |        | depth           | add       | fabric    | 0       |
+|     icmp_ln85_fu_371_p2                                                               |     |        | icmp_ln85       | setgt     | auto      | 0       |
++---------------------------------------------------------------------------------------+-----+--------+-----------------+-----------+-----------+---------+
+
+
+================================================================
+== Storage Report
+================================================================
++---------------------------------------------------------------------------------+-----------+-----------+------+------+--------+------------------------------------------------+------+---------+------------------+
+| Name                                                                            | Usage     | Type      | BRAM | URAM | Pragma | Variable                                       | Impl | Latency | Bitwidth, Depth, |
+|                                                                                 |           |           |      |      |        |                                                |      |         | Banks            |
++---------------------------------------------------------------------------------+-----------+-----------+------+------+--------+------------------------------------------------+------+---------+------------------+
+| + dfs_accel                                                                     |           |           | 66   | 0    |        |                                                |      |         |                  |
+|   control_s_axi_U                                                               | interface | s_axilite |      |      |        |                                                |      |         |                  |
+|   gmem0_m_axi_U                                                                 | interface | m_axi     | 1    |      |        |                                                |      |         |                  |
+|   gmem1_m_axi_U                                                                 | interface | m_axi     | 1    |      |        |                                                |      |         |                  |
+|   gmem2_m_axi_U                                                                 | interface | m_axi     | 2    |      |        |                                                |      |         |                  |
+|   p_anonymous_namespace_engine_grid_U                                           | ram_s2p   |           | 2    |      |        | p_anonymous_namespace_engine_grid              | auto | 1       | 8, 4096, 1       |
+|   p_anonymous_namespace_engine_word_len_U                                       | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_word_len          | auto | 1       | 5, 16, 1         |
+|   p_anonymous_namespace_engine_words_0_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_0           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_1_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_1           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_2_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_2           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_3_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_3           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_4_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_4           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_5_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_5           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_6_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_6           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_7_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_7           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_8_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_8           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_9_U                                        | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_9           | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_10_U                                       | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_10          | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_11_U                                       | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_11          | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_12_U                                       | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_12          | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_13_U                                       | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_13          | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_14_U                                       | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_14          | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_words_15_U                                       | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_words_15          | auto | 1       | 8, 16, 1         |
+|   p_anonymous_namespace_engine_visited_U                                        | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_visited           | auto | 1       | 1, 4096, 1       |
+|   p_anonymous_namespace_engine_stack_row_U                                      | ram_1p    |           | 2    |      |        | p_anonymous_namespace_engine_stack_row         | auto | 1       | 8, 4096, 1       |
+|   p_anonymous_namespace_engine_stack_col_U                                      | ram_1p    |           | 2    |      |        | p_anonymous_namespace_engine_stack_col         | auto | 1       | 8, 4096, 1       |
+|   p_anonymous_namespace_engine_frames_walked_U                                  | ram_1p    |           | 8    |      |        | p_anonymous_namespace_engine_frames_walked     | auto | 1       | 32, 4096, 1      |
+|   p_anonymous_namespace_engine_frames_cur_row_U                                 | ram_1p    |           | 2    |      |        | p_anonymous_namespace_engine_frames_cur_row    | auto | 1       | 8, 4096, 1       |
+|   p_anonymous_namespace_engine_frames_cur_col_U                                 | ram_1p    |           | 2    |      |        | p_anonymous_namespace_engine_frames_cur_col    | auto | 1       | 8, 4096, 1       |
+|   p_anonymous_namespace_engine_frames_next_U                                    | ram_1p    |           | 2    |      |        | p_anonymous_namespace_engine_frames_next       | auto | 1       | 8, 4096, 1       |
+|   p_anonymous_namespace_engine_frames_char_index_U                              | ram_1p    |           | 2    |      |        | p_anonymous_namespace_engine_frames_char_index | auto | 1       | 8, 4096, 1       |
+|   p_anonymous_namespace_engine_frames_node_U                                    | ram_1p    |           | 2    |      |        | p_anonymous_namespace_engine_frames_node       | auto | 1       | 9, 4096, 1       |
+|   p_anonymous_namespace_engine_frames_best_U                                    | ram_t2p   |           | 4    |      |        | p_anonymous_namespace_engine_frames_best       | auto | 1       | 16, 4096, 1      |
+|   p_anonymous_namespace_engine_frames_checked_U                                 | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_frames_checked    | auto | 1       | 1, 4096, 1       |
+|   p_anonymous_namespace_engine_reachable_U                                      | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_reachable         | auto | 1       | 1, 4096, 1       |
+|  + p_anonymous_namespace_flood                                                  |           |           | 0    | 0    |        |                                                |      |         |                  |
+|   + p_anonymous_namespace_flood_Pipeline_VITIS_LOOP_171_4                       |           |           | 0    | 0    |        |                                                |      |         |                  |
+|     p_anonymous_namespace_kDeltaRow_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaRow                | auto | 1       | 2, 8, 1          |
+|     p_anonymous_namespace_kDeltaCol_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaCol                | auto | 1       | 2, 8, 1          |
+|  + p_anonymous_namespace_run_longest_increasing_path                            |           |           | 4    | 0    |        |                                                |      |         |                  |
+|    p_anonymous_namespace_engine_memo_U                                          | ram_1p    |           | 4    |      |        | p_anonymous_namespace_engine_memo              | auto | 1       | 16, 4096, 1      |
+|   + p_anonymous_namespace_run_longest_increasing_path_Pipeline_VITIS_LOOP_253_4 |           |           | 0    | 0    |        |                                                |      |         |                  |
+|     p_anonymous_namespace_kDeltaRow_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaRow                | auto | 1       | 2, 8, 1          |
+|     p_anonymous_namespace_kDeltaCol_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaCol                | auto | 1       | 2, 8, 1          |
+|  + p_anonymous_namespace_run_word_search_no_pruning                             |           |           | 0    | 0    |        |                                                |      |         |                  |
+|   + p_anonymous_namespace_run_word_search_no_pruning_Pipeline_VITIS_LOOP_383_1  |           |           | 0    | 0    |        |                                                |      |         |                  |
+|     p_anonymous_namespace_kDeltaRow_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaRow                | auto | 1       | 2, 8, 1          |
+|     p_anonymous_namespace_kDeltaCol_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaCol                | auto | 1       | 2, 8, 1          |
+|  + p_anonymous_namespace_run_word_search_trie                                   |           |           | 27   | 0    |        |                                                |      |         |                  |
+|    p_anonymous_namespace_engine_trie_next_0_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_0       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_1_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_1       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_2_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_2       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_3_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_3       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_4_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_4       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_5_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_5       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_6_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_6       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_7_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_7       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_8_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_8       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_9_U                                   | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_9       | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_10_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_10      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_11_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_11      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_12_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_12      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_13_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_13      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_14_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_14      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_15_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_15      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_16_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_16      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_17_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_17      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_18_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_18      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_19_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_19      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_20_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_20      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_21_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_21      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_22_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_22      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_23_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_23      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_24_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_24      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_next_25_U                                  | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_next_25      | auto | 1       | 16, 257, 1       |
+|    p_anonymous_namespace_engine_trie_word_U                                     | ram_1p    |           | 1    |      |        | p_anonymous_namespace_engine_trie_word         | auto | 1       | 5, 257, 1        |
+|    p_anonymous_namespace_engine_word_found_U                                    | ram_1p    |           |      |      |        | p_anonymous_namespace_engine_word_found        | auto | 1       | 1, 16, 1         |
+|   + p_anonymous_namespace_run_word_search_trie_Pipeline_VITIS_LOOP_338_4        |           |           | 0    | 0    |        |                                                |      |         |                  |
+|     p_anonymous_namespace_kDeltaRow_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaRow                | auto | 1       | 2, 8, 1          |
+|     p_anonymous_namespace_kDeltaCol_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaCol                | auto | 1       | 2, 8, 1          |
+|  + p_anonymous_namespace_run_unique_paths_iii                                   |           |           | 0    | 0    |        |                                                |      |         |                  |
+|   + p_anonymous_namespace_run_unique_paths_iii_Pipeline_VITIS_LOOP_209_3        |           |           | 0    | 0    |        |                                                |      |         |                  |
+|     p_anonymous_namespace_kDeltaRow_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaRow                | auto | 1       | 2, 8, 1          |
+|     p_anonymous_namespace_kDeltaCol_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaCol                | auto | 1       | 2, 8, 1          |
+|  + p_anonymous_namespace_run_number_of_islands                                  |           |           | 0    | 0    |        |                                                |      |         |                  |
+|   + p_anonymous_namespace_run_number_of_islands_Pipeline_VITIS_LOOP_139_4       |           |           | 0    | 0    |        |                                                |      |         |                  |
+|     p_anonymous_namespace_kDeltaRow_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaRow                | auto | 1       | 2, 8, 1          |
+|     p_anonymous_namespace_kDeltaCol_U                                           | rom_1p    |           |      |      |        | p_anonymous_namespace_kDeltaCol                | auto | 1       | 2, 8, 1          |
++---------------------------------------------------------------------------------+-----------+-----------+------+------+--------+------------------------------------------------+------+---------+------------------+
+
+
+================================================================
+== Pragma Report
+================================================================
+* Valid Pragma Syntax
++-----------+-----------------------------------------------------------------+----------------------------------------+
+| Type      | Options                                                         | Location                               |
++-----------+-----------------------------------------------------------------+----------------------------------------+
+| interface | m_axi port = grid_in offset = slave bundle = gmem0 depth = 4096 | src/hls/dfs_accel.cpp:426 in dfs_accel |
+| interface | m_axi port = words_in offset = slave bundle = gmem1 depth = 256 | src/hls/dfs_accel.cpp:427 in dfs_accel |
+| interface | m_axi port = result_out offset = slave bundle = gmem2 depth = 4 | src/hls/dfs_accel.cpp:428 in dfs_accel |
+| interface | s_axilite port = grid_in bundle = control                       | src/hls/dfs_accel.cpp:429 in dfs_accel |
+| interface | s_axilite port = words_in bundle = control                      | src/hls/dfs_accel.cpp:430 in dfs_accel |
+| interface | s_axilite port = result_out bundle = control                    | src/hls/dfs_accel.cpp:431 in dfs_accel |
+| interface | s_axilite port = rows bundle = control                          | src/hls/dfs_accel.cpp:432 in dfs_accel |
+| interface | s_axilite port = cols bundle = control                          | src/hls/dfs_accel.cpp:433 in dfs_accel |
+| interface | s_axilite port = mode bundle = control                          | src/hls/dfs_accel.cpp:434 in dfs_accel |
+| interface | s_axilite port = flags bundle = control                         | src/hls/dfs_accel.cpp:435 in dfs_accel |
+| interface | s_axilite port = num_words bundle = control                     | src/hls/dfs_accel.cpp:436 in dfs_accel |
+| interface | s_axilite port = return bundle = control                        | src/hls/dfs_accel.cpp:437 in dfs_accel |
++-----------+-----------------------------------------------------------------+----------------------------------------+
+
+

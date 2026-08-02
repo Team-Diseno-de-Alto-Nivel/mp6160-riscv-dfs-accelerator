@@ -373,18 +373,27 @@ The program↔model co-simulation over TLM reports the same metrics.
 
 ### Hardware (Vitis HLS → Vivado, Kria KV260)
 
-Not yet measured. The FPGA track is scheduled for the final delivery.
+First HLS synthesis numbers available ([#90](../../issues/90)); Vivado
+implementation, timing closure, and on-board measurement are still pending.
 
 | Metric | Source | Value | Issue |
 |---|---|---:|---|
-| Latency (cycles, min/max) | Vitis HLS `csynth.rpt` | _pending_ | [#90](../../issues/90) |
-| Initiation interval (II) | Vitis HLS `csynth.rpt` | _pending_ | [#90](../../issues/90) |
+| Latency (cycles, min/avg/max) | Vitis HLS cosim (`dfs_accel_cosim.rpt`) | 128 / 1,381 / 10,811 | [#90](../../issues/90) |
+| Initiation interval (II, worst case) | Vitis HLS `csynth.rpt` | 16 (`VITIS_LOOP_465_4`) | [#90](../../issues/90) |
 | LUT | Vivado utilization | _pending_ | [#65](../../issues/65) |
 | FF | Vivado utilization | _pending_ | [#65](../../issues/65) |
 | BRAM | Vivado utilization | _pending_ | [#65](../../issues/65) |
 | DSP | Vivado utilization | _pending_ | [#65](../../issues/65) |
 | Fmax (MHz) | Vivado timing closure | _pending_ | [#66](../../issues/66) |
 | Sustained throughput (OP/s) | on-board (PYNQ) | _pending_ | [#91](../../issues/91) |
+
+> HLS-estimated resources (pre-Vivado): BRAM 66 (22%), DSP 50 (4%), FF 8,601
+> (3%), LUT 23,473 (20%); estimated Fmax 285.71 MHz. Not all loop-level II
+> targets were met during synthesis (`VITIS_LOOP_465_4` and `VITIS_LOOP_338_4`
+> both settle at II=16 instead of the target II=1, due to a memory dependency
+> on the burst-read loop). Full detail in
+> [`src/hls/reports/csynth.rpt`](src/hls/reports/csynth.rpt) and
+> [`src/hls/reports/dfs_accel_cosim.rpt`](src/hls/reports/dfs_accel_cosim.rpt).
 
 ### Model vs hardware
 
