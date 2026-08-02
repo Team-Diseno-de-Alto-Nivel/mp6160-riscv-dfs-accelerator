@@ -27,6 +27,11 @@ dfs_accel_prj/
 .Xil/
 *.jou
 
+# Vivado generated project (issue #64) — only the scripts under
+# src/vivado/scripts/ are versioned, so the team can see the design without
+# installing Vivado.
+src/vivado/dfs_system/
+
 # macOS
 .DS_Store
 .AppleDouble

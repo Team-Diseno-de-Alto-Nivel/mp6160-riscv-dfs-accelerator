@@ -4,9 +4,10 @@
 # about (part, board_part, PS ports, wiring, no premature synth/bitstream)
 # without touching Vivado itself.
 #
-# build_bd.tcl refuses to run past its IP gate until #95 exports the real
-# dfs_accel IP. To validate everything past that gate anyway, this script
-# drops a placeholder component.xml at the expected path before sourcing
+# build_bd.tcl refuses to run past its IP gate until dfs_accel_prj/ (Vitis
+# HLS's export_design output, gitignored) exists locally -- which CI never
+# has. To validate everything past that gate anyway, this script drops a
+# placeholder component.xml at the expected path before sourcing
 # build_bd.tcl, and always removes it afterwards.
 #
 # Usage: tclsh src/vivado/scripts/validate_build_bd.tcl
@@ -104,7 +105,7 @@ if {![file exists $script]} {
 }
 
 set repo_root   [file normalize [file join [file dirname $script] .. .. ..]]
-set ip_repo_dir [file join $repo_root src hls scripts dfs_accel_prj solution1 impl ip]
+set ip_repo_dir [file join $repo_root dfs_accel_prj solution1 impl ip]
 set placeholder [file join $ip_repo_dir component.xml]
 set created_dir [expr {![file exists $ip_repo_dir]}]
 
