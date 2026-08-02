@@ -53,8 +53,11 @@ csynth_design
 # Runs the RTL (not the g++-compiled C++) against the same 21-case
 # testbench used by csim, to catch divergences csim can't see
 # (uninitialized BRAM, loop bounds, memory aliasing). Issue #95.
-# No export_design on purpose: exporting before this would make
-# unverified RTL look final.
+# #95 passed 21/21 (see vitis_hls.log, 2026-08-01). The gate below is
+# cleared: export the RTL as a Vivado IP so #64's block design can consume
+# a real component.xml instead of the validate script's placeholder.
 cosim_design
+
+export_design -rtl verilog -format ip_catalog
 
 exit

@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments demo hls-host clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd clean paper paper-clean
 
 all: model program
 
@@ -53,6 +53,27 @@ hls-host:
 	    -Wno-unknown-pragmas -Wno-unused-label \
 	    -Isrc/hls -Isrc/program $(HLS_TB_SOURCES) -o src/hls/build/hls_host
 	./src/hls/build/hls_host
+
+# FPGA-2/2b/2c (#63/#90/#95): csim + csynth + cosim + export_design, real Vitis
+# HLS run. Requires vitis_hls on PATH (source Vitis's settings64.sh first).
+# Cheap CI-only check without a license: `tclsh src/hls/scripts/validate_run_hls.tcl`.
+hls-synth:
+	@command -v vitis_hls >/dev/null 2>&1 || { \
+	    echo "error: vitis_hls not found on PATH -- source Vitis's settings64.sh first"; \
+	    exit 1; \
+	}
+	vitis_hls -f src/hls/scripts/run_hls.tcl
+
+# FPGA-3 (#64): builds the PS<->PL block design against the real dfs_accel IP
+# exported by `make hls-synth`. Requires vivado on PATH and a real component.xml
+# at src/hls/scripts/dfs_accel_prj/solution1/impl/ip/ (i.e. run hls-synth first).
+# Cheap CI-only check without a license: `tclsh src/vivado/scripts/validate_build_bd.tcl`.
+vivado-bd:
+	@command -v vivado >/dev/null 2>&1 || { \
+	    echo "error: vivado not found on PATH -- source Vivado's settings64.sh first"; \
+	    exit 1; \
+	}
+	vivado -mode batch -source src/vivado/scripts/build_bd.tcl
 
 clean:
 	$(MAKE) -C src/model clean

@@ -80,8 +80,8 @@ if {!$::saw_csynth} {
 if {!$::saw_cosim} {
     fail "run_hls.tcl never calls cosim_design -- required by #95"
 }
-if {$::saw_export} {
-    fail "run_hls.tcl calls export_design -- premature before cosim (#95)"
+if {!$::saw_export} {
+    fail "run_hls.tcl never calls export_design -- #95 passed, #64 needs the IP now"
 }
 
 if {[llength $::errors] > 0} {
