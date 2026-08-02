@@ -14,10 +14,12 @@ set script_dir  [file dirname [file normalize [info script]]]
 set repo_root   [file normalize [file join $script_dir .. .. ..]]
 set hls_dir     [file join $repo_root src hls]
 
-# dfs_accel becomes a Vivado IP via Vitis HLS's export_design. That step is
-# gated on #95 (cosim) on purpose -- see run_hls.tcl -- so this script stops
-# here instead of wiring a system around an unverified RTL.
-set ip_repo_dir [file join $hls_dir scripts dfs_accel_prj solution1 impl ip]
+# dfs_accel becomes a Vivado IP via Vitis HLS's export_design. run_hls.tcl's
+# own `open_project -reset dfs_accel_prj` is a relative path, resolved
+# against the CWD vitis_hls was launched from -- which per that script's
+# header is the repo root -- so dfs_accel_prj/ lands there, not under
+# src/hls/scripts/. Verified by actually running export_design (issue #64).
+set ip_repo_dir [file join $repo_root dfs_accel_prj solution1 impl ip]
 if {![file exists [file join $ip_repo_dir component.xml]]} {
     puts stderr "build_bd.tcl: no packaged IP at $ip_repo_dir"
     puts stderr "build_bd.tcl: run export_design in Vitis HLS first -- gated on #95 (cosim), not on this issue"
@@ -54,11 +56,24 @@ apply_bd_automation -rule xilinx.com:bd_rule:zynq_ultra_ps_e \
 # PL0 clock: raised to 250 MHz (4 ns) to match the clock #63 synthesized
 # dfs_accel against. Leaving it at the board preset's 100 MHz default would
 # make #66's timing closure test a frequency nobody verified in HLS.
+#
+# GP0/GP1 (M_AXI_HPM0_FPD/M_AXI_HPM1_FPD) are on by default from the board
+# preset but nothing in this design uses them -- turned off explicitly
+# instead of leaving two unconnected masters for validate_bd_design to
+# warn about.
 set_property -dict [list \
+    CONFIG.PSU__USE__M_AXI_GP0                    {0}   \
+    CONFIG.PSU__USE__M_AXI_GP1                    {0}   \
     CONFIG.PSU__USE__M_AXI_GP2                    {1}   \
     CONFIG.PSU__USE__S_AXI_GP2                     {1}   \
     CONFIG.PSU__CRL_APB__PL0_REF_CTRL__FREQMHZ     {250} \
 ] $ps
+
+# Each PS AXI interface has its own clock pin, separate from pl_clk0 --
+# found by actually running this script against the real IP (issue #64):
+# validate_bd_design fails outright without these, it's not optional.
+connect_bd_net [get_bd_pins $ps/pl_clk0] [get_bd_pins $ps/maxihpm0_lpd_aclk]
+connect_bd_net [get_bd_pins $ps/pl_clk0] [get_bd_pins $ps/saxihp0_fpd_aclk]
 
 # --- Reset, synchronized to the PL0 clock ---
 set rst [create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_0]
