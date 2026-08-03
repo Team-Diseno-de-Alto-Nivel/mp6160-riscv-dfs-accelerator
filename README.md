@@ -374,7 +374,8 @@ The program↔model co-simulation over TLM reports the same metrics.
 ### Hardware (Vitis HLS → Vivado, Kria KV260)
 
 First HLS synthesis numbers available ([#90](../../issues/90)); Vivado
-implementation, timing closure, and on-board measurement are still pending.
+timing closure is done ([#66](../../issues/66)). Resource utilization and
+on-board measurement are still pending.
 
 | Metric | Source | Value | Issue |
 |---|---|---:|---|
@@ -384,7 +385,7 @@ implementation, timing closure, and on-board measurement are still pending.
 | FF | Vivado utilization | _pending_ | [#65](../../issues/65) |
 | BRAM | Vivado utilization | _pending_ | [#65](../../issues/65) |
 | DSP | Vivado utilization | _pending_ | [#65](../../issues/65) |
-| Fmax (MHz) | Vivado timing closure | _pending_ | [#66](../../issues/66) |
+| Fmax (MHz) | Vivado timing closure | 204 | [#66](../../issues/66) |
 | Sustained throughput (OP/s) | on-board (PYNQ) | _pending_ | [#91](../../issues/91) |
 
 > HLS-estimated resources (pre-Vivado): BRAM 66 (22%), DSP 50 (4%), FF 8,601
@@ -394,6 +395,18 @@ implementation, timing closure, and on-board measurement are still pending.
 > on the burst-read loop). Full detail in
 > [`src/hls/reports/csynth.rpt`](src/hls/reports/csynth.rpt) and
 > [`src/hls/reports/dfs_accel_cosim.rpt`](src/hls/reports/dfs_accel_cosim.rpt).
+>
+> Vivado timing closure: the 250 MHz target inherited from HLS does NOT
+> close post-implementation (WNS -0.909 ns) -- the HLS-estimated Fmax above
+> was optimistic, as expected pre-place-and-route. 204 MHz is the Fmax
+> confirmed by a full re-implementation at that frequency (WNS +0.084 ns),
+> not just an extrapolation from the 250 MHz slack. That margin is thin
+> (~2%), so it's reported here as the demonstrated maximum, not as the
+> operating frequency: on-board bring-up ([#67](../../issues/67)) targets
+> 200 MHz instead, for real timing margin. Full detail in
+> [`src/vivado/reports/fmax_summary.txt`](src/vivado/reports/fmax_summary.txt),
+> [`src/vivado/reports/timing_summary.rpt`](src/vivado/reports/timing_summary.rpt) (250 MHz),
+> and [`src/vivado/reports/timing_summary_204mhz.rpt`](src/vivado/reports/timing_summary_204mhz.rpt) (204 MHz).
 
 ### Model vs hardware
 
