@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream pynq-export-cases clean paper paper-clean
 
 all: model program
 
@@ -33,9 +33,11 @@ demo:
 # FPGA-1 (#62): functional check of the HLS kernel on the host, WITHOUT Vitis.
 # Compiles the same source csynth will consume against the software reference and
 # the 21 golden cases. Does NOT replace csynth/cosim (timing, AXI, RTL).
-HLS_TB_SOURCES := \
+#
+# Shared by hls-host and pynq-export-cases (#67) -- both need the kernel plus
+# every algorithm/case source, just with a different entry point on top.
+HLS_COMMON_SOURCES := \
 	src/hls/dfs_accel.cpp \
-	src/hls/tb/dfs_accel_tb.cpp \
 	src/program/cases/datasets.cpp \
 	src/program/harness/accelerator.cpp \
 	src/program/algorithms/dfs_algorithm.cpp \
@@ -45,6 +47,9 @@ HLS_TB_SOURCES := \
 	src/program/algorithms/longest_increasing_path/longest_increasing_path.cpp \
 	src/program/algorithms/pacific_atlantic/pacific_atlantic.cpp
 
+HLS_TB_SOURCES := src/hls/tb/dfs_accel_tb.cpp $(HLS_COMMON_SOURCES)
+HLS_EXPORT_SOURCES := src/hls/tools/export_cases.cpp $(HLS_COMMON_SOURCES)
+
 HLS_CXXFLAGS ?= -O2
 
 hls-host:
@@ -53,6 +58,17 @@ hls-host:
 	    -Wno-unknown-pragmas -Wno-unused-label \
 	    -Isrc/hls -Isrc/program $(HLS_TB_SOURCES) -o src/hls/build/hls_host
 	./src/hls/build/hls_host
+
+# FPGA-6 (#67): exports the 21 golden cases to src/pynq/cases.json, packed
+# exactly as dfs_accel() expects (see kernel_io.h) -- the fixture the PYNQ
+# notebook validates on-board results against. Plain host build, no
+# Vitis/Vivado needed.
+pynq-export-cases:
+	mkdir -p src/hls/build src/pynq
+	$(CXX) -std=c++17 $(HLS_CXXFLAGS) -Wall -Wextra -Werror \
+	    -Wno-unknown-pragmas -Wno-unused-label \
+	    -Isrc/hls -Isrc/program $(HLS_EXPORT_SOURCES) -o src/hls/build/export_cases
+	./src/hls/build/export_cases src/pynq/cases.json
 
 # FPGA-2/2b/2c (#63/#90/#95): csim + csynth + cosim + export_design, real Vitis
 # HLS run. Requires vitis_hls on PATH (source Vitis's settings64.sh first).
@@ -87,6 +103,18 @@ vivado-impl:
 	    exit 1; \
 	}
 	vivado -mode batch -source src/vivado/scripts/run_impl.tcl
+
+# FPGA-6 (#67): generates the on-board bitstream (.bit + .hwh) for PYNQ
+# bring-up, fixed at 200 MHz -- see build_bitstream.tcl's header for why
+# that's not the 204 MHz reported as Fmax by #66. Requires vivado on PATH
+# and the project from `make vivado-bd` to already exist.
+# Cheap CI-only check without a license: `tclsh src/vivado/scripts/validate_build_bitstream.tcl`.
+vivado-bitstream:
+	@command -v vivado >/dev/null 2>&1 || { \
+	    echo "error: vivado not found on PATH -- source Vivado's settings64.sh first"; \
+	    exit 1; \
+	}
+	vivado -mode batch -source src/vivado/scripts/build_bitstream.tcl
 
 clean:
 	$(MAKE) -C src/model clean

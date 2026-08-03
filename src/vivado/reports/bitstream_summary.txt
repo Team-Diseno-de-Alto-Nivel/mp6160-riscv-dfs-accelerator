@@ -1,0 +1,9 @@
+dfs_system on-board bitstream (issue #67)
+Target: 200 MHz (fixed, per #66's fmax_summary.txt margin note)
+Worst setup slack (WNS) at 200 MHz: 0.084 ns
+Result: timing CLOSES at 200 MHz -- bitstream written.
+
+Outputs (local only, not versioned -- see .gitignore):
+  /home/fabio/AltoNivel/DFS/src/vivado/dfs_system/exports/dfs_system.bit
+  /home/fabio/AltoNivel/DFS/src/vivado/dfs_system/exports/dfs_system.hwh
+Full timing report: timing_summary_bitstream.rpt

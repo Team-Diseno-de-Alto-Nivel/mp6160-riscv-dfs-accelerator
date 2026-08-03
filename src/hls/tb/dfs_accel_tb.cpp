@@ -9,55 +9,9 @@
 #include "harness/instrumentation.h"
 
 #include "dfs_accel.h"
+#include "kernel_io.h"
 
 namespace {
-
-struct KernelConfig {
-    std::uint32_t mode;
-    std::uint32_t flags;
-};
-
-bool config_for(const std::string &algorithm, KernelConfig &out) {
-    if (algorithm == "number_of_islands") {
-        out = {dfs_hls::kNumberOfIslands, 0};
-    } else if (algorithm == "unique_paths_iii") {
-        out = {dfs_hls::kUniquePathsIii, 0};
-    } else if (algorithm == "word_search_ii") {
-        out = {dfs_hls::kWordSearchIi, dfs_hls::kFlagPrune};
-    } else if (algorithm == "word_search_ii_nopruning") {
-        out = {dfs_hls::kWordSearchIi, 0};
-    } else if (algorithm == "longest_increasing_path") {
-        out = {dfs_hls::kLongestIncreasingPath, dfs_hls::kFlagMemo};
-    } else if (algorithm == "longest_increasing_path_nomemo") {
-        out = {dfs_hls::kLongestIncreasingPath, 0};
-    } else if (algorithm == "pacific_atlantic") {
-        out = {dfs_hls::kPacificAtlantic, 0};
-    } else {
-        return false;
-    }
-    return true;
-}
-
-bool pack_grid(const dfs::Grid &grid, std::vector<dfs_hls::cell_t> &out) {
-    out.assign(grid.cells.size(), 0);
-    for (std::size_t i = 0; i < grid.cells.size(); ++i) {
-        const int v = grid.cells[i];
-        if (v < -128 || v > 127) return false;
-        out[i] = static_cast<dfs_hls::cell_t>(v);
-    }
-    return true;
-}
-
-bool pack_words(const std::vector<std::string> &words, std::vector<std::uint8_t> &out) {
-    out.assign(dfs_hls::kMaxWords * dfs_hls::kMaxWordLen, 0);
-    if (words.size() > dfs_hls::kMaxWords) return false;
-    for (std::size_t w = 0; w < words.size(); ++w) {
-        if (words[w].size() > dfs_hls::kMaxWordLen) return false;
-        for (std::size_t k = 0; k < words[w].size(); ++k)
-            out[w * dfs_hls::kMaxWordLen + k] = static_cast<std::uint8_t>(words[w][k]);
-    }
-    return true;
-}
 
 long run_software(const dfs::AlgoEntry &algo, const dfs::TestCase &tc, dfs::Counters &counters) {
     auto accel = dfs::make_accelerator(dfs::Mode::Off, counters);
@@ -79,8 +33,8 @@ int main() {
                 "status");
 
     for (const dfs::AlgoEntry &algo : dfs::make_algorithms()) {
-        KernelConfig cfg;
-        if (!config_for(algo.name, cfg)) {
+        dfs_hls_io::KernelConfig cfg;
+        if (!dfs_hls_io::config_for(algo.name, cfg)) {
             std::printf("unmapped algorithm: %s\n", algo.name.c_str());
             ++failures;
             continue;
@@ -91,16 +45,15 @@ int main() {
 
             std::vector<dfs_hls::cell_t> grid;
             std::vector<std::uint8_t> words;
-            if (!pack_grid(tc.input.grid, grid) || !pack_words(tc.input.words, words)) {
+            if (!dfs_hls_io::pack_grid(tc.input.grid, grid) ||
+                !dfs_hls_io::pack_words(tc.input.words, words)) {
                 std::printf("%-32s %-18s  packing failed\n", algo.name.c_str(),
                             tc.name.c_str());
                 ++failures;
                 continue;
             }
 
-            std::uint32_t flags = cfg.flags;
-            if (tc.input.connectivity == dfs::Connectivity::Eight)
-                flags |= dfs_hls::kFlagEightConnected;
+            const std::uint32_t flags = dfs_hls_io::flags_for(cfg, tc.input.connectivity);
 
             std::uint32_t result[dfs_hls::kResultWords] = {0, 0, 0, 0};
             dfs_accel(grid.data(), words.data(), result,

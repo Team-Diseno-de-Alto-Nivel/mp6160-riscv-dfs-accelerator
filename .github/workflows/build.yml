@@ -74,6 +74,27 @@ jobs:
       - name: Validate build_bd.tcl (no Vivado license needed)
         run: tclsh src/vivado/scripts/validate_build_bd.tcl
 
+      # FPGA-6 (#67): guards build_bitstream.tcl the same way -- a broken
+      # PL0 override, step order, or write_bitstream/copy logic is caught
+      # here instead of the next time someone with Vivado + the KV260 runs it.
+      - name: Validate build_bitstream.tcl (no Vivado license needed)
+        run: tclsh src/vivado/scripts/validate_build_bitstream.tcl
+
+      # FPGA-6 (#67): unlike the Vivado/Vitis scripts above, this one needs
+      # no proprietary license, so it's a real functional check, not a
+      # stub: regenerate src/pynq/cases.json and diff it against the
+      # committed copy. Catches someone changing datasets.cpp (or the
+      # mode/flags mapping in kernel_io.h) without regenerating the fixture
+      # the PYNQ notebook validates on-board results against.
+      - name: Verify src/pynq/cases.json is up to date
+        run: |
+          make pynq-export-cases
+          if [ -n "$(git status --porcelain -- src/pynq/cases.json)" ]; then
+            echo "src/pynq/cases.json is stale (or was never committed) -- run 'make pynq-export-cases' and commit the result"
+            git diff -- src/pynq/cases.json
+            exit 1
+          fi
+
   build:
     needs: changes
     if: needs.changes.outputs.src == 'true'
