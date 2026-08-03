@@ -21,8 +21,8 @@ cmake_install.cmake
 Makefile.cmake
 _deps/
 
-# Vitis HLS generated project (issues #63, #95) — only vitis_hls.log is
-# versioned, so the team can see results without installing Vitis.
+# Vitis HLS generated project (issues #63, #95) — only logs/vitis_hls.log
+# is versioned, so the team can see results without installing Vitis.
 dfs_accel_prj/
 .Xil/
 *.jou
@@ -31,6 +31,12 @@ dfs_accel_prj/
 # src/vivado/scripts/ are versioned, so the team can see the design without
 # installing Vivado.
 src/vivado/dfs_system/
+
+# Vivado batch-mode backup logs (issue #66) — Vivado renames the previous
+# vivado.log to vivado_<PID>.backup.log every time a new batch session
+# starts in the same directory. logs/vivado.log itself IS versioned (see
+# logs/), only these throwaway backups are ignored.
+vivado_*.backup.log
 
 # macOS
 .DS_Store

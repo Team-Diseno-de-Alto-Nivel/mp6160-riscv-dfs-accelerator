@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl clean paper paper-clean
 
 all: model program
 
@@ -74,6 +74,19 @@ vivado-bd:
 	    exit 1; \
 	}
 	vivado -mode batch -source src/vivado/scripts/build_bd.tcl
+
+# FPGA-5 (#66): synthesis + implementation (through route_design) of the
+# dfs_system project from `make vivado-bd`, then timing closure report and
+# achievable Fmax. Does not write a bitstream (#67) or capture utilization
+# (#65) -- see run_impl.tcl's header for why. Requires vivado on PATH and
+# the project from `make vivado-bd` to already exist.
+# Cheap CI-only check without a license: `tclsh src/vivado/scripts/validate_run_impl.tcl`.
+vivado-impl:
+	@command -v vivado >/dev/null 2>&1 || { \
+	    echo "error: vivado not found on PATH -- source Vivado's settings64.sh first"; \
+	    exit 1; \
+	}
+	vivado -mode batch -source src/vivado/scripts/run_impl.tcl
 
 clean:
 	$(MAKE) -C src/model clean

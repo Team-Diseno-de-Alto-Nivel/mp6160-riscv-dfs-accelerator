@@ -1,0 +1,33 @@
+dfs_system timing closure (issue #66)
+Target: 250.0 MHz (4.0 ns)
+Worst setup slack (WNS) at target: -0.909 ns
+Result: timing DOES NOT close at 250.0 MHz.
+First-order estimate: 203.71 MHz (4.909 ns)
+
+--- Confirmed by re-implementation at the estimated frequency ---
+PL0 reconfigured to 204 MHz, full synth_1 + impl_1
+(route_design) re-run, not just re-timed.
+Worst setup slack (WNS) at 204 MHz: 0.084 ns
+Result: timing CLOSES at 204 MHz.
+
+Fmax reported for issue #66: 204 MHz.
+Full report: timing_summary_204mhz.rpt
+
+Note: WNS margin at 204 MHz is thin (0.084 ns of 4.9 ns period, ~2%).
+Multi-corner STA (slow/fast) already covers PVT variation, but
+place_design/route_design have run-to-run variance -- a re-run at exactly
+204 MHz is not guaranteed to reproduce this exact margin. 200 MHz would
+give more headroom if a re-run ever comes back short.
+
+--- Note for issue #67 (on-board bring-up) ---
+204 MHz is the Fmax reported for #66 (the maximum this build demonstrably
+closes at), but it is NOT the recommended operating frequency for the
+actual bitstream used on the KV260. Reasons:
+  - the margin at 204 MHz is razor-thin (see above) and #67's bitstream
+    comes from its own synth/impl run, which can place/route slightly
+    differently and eat that margin;
+  - on real hardware a timing violation doesn't show up as a report line,
+    it shows up as silent wrong answers or intermittent behavior, which is
+    much harder to debug than rereading a timing report.
+Set PSU__CRL_APB__PL0_REF_CTRL__FREQMHZ to 200 (not 204) for #67's build,
+for real margin at a negligible (~2%) speed cost.
