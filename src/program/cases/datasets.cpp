@@ -1,6 +1,7 @@
 #include "cases/test_case.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace dfs {
@@ -131,6 +132,25 @@ std::vector<TestCase> CaseLoader::load(const std::string& algorithm) const {
     if (algorithm.empty() || algorithm == "pacific_atlantic")
         append(all, pacific_atlantic_cases());
     return all;
+}
+
+std::vector<CaseSpec> CaseLoader::specs(const std::string& algorithm, Tier max_tier) const {
+    std::vector<CaseSpec> out;
+    for (TestCase& tc : load(algorithm)) {
+        CaseSpec s;
+        s.name = tc.name;
+        s.algorithm = tc.algorithm;
+        s.tier = Tier::Legacy;
+        s.connectivity = tc.input.connectivity;
+        s.start = tc.input.start;
+        s.words = std::move(tc.input.words);
+        s.expected = tc.expected;
+        s.generated = false;
+        s.grid = std::move(tc.input.grid);
+        out.push_back(std::move(s));
+    }
+    for (CaseSpec& s : synthetic_specs(algorithm, max_tier)) out.push_back(std::move(s));
+    return out;
 }
 
 }  // namespace dfs

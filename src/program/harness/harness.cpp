@@ -6,7 +6,26 @@
 
 namespace dfs {
 
-RunMetrics Harness::run_one(const AlgoEntry& algo, const TestCase& tc, bool accelerator_on) {
+const char* tier_name(Tier tier) {
+    switch (tier) {
+        case Tier::Legacy: return "legacy";
+        case Tier::Small: return "small";
+        case Tier::Medium: return "medium";
+        case Tier::Large: return "large";
+    }
+    return "legacy";
+}
+
+bool parse_tier(const std::string& text, Tier& out) {
+    if (text == "legacy") { out = Tier::Legacy; return true; }
+    if (text == "small") { out = Tier::Small; return true; }
+    if (text == "medium") { out = Tier::Medium; return true; }
+    if (text == "large") { out = Tier::Large; return true; }
+    return false;
+}
+
+RunMetrics Harness::run_one(const AlgoEntry& algo, const TestCase& tc, Tier tier,
+                            bool accelerator_on) {
     Counters counters;
     const Mode mode = accelerator_on ? Mode::On : Mode::Off;
     auto accel = make_accelerator(mode, counters);
@@ -19,6 +38,8 @@ RunMetrics Harness::run_one(const AlgoEntry& algo, const TestCase& tc, bool acce
     RunMetrics m;
     m.algorithm = algo.name;
     m.case_name = tc.name;
+    m.tier = tier_name(tier);
+    m.grid_cells = static_cast<std::uint64_t>(tc.input.grid.cells.size());
     m.accelerator_on = accelerator_on;
     m.sim_latency_ns = cost.latency_ns(counters);
     m.instruction_count = counters.ops;
@@ -38,10 +59,12 @@ std::vector<RunMetrics> Harness::run_all() {
     std::vector<RunMetrics> out;
     CaseLoader loader;
     for (const AlgoEntry& algo : make_algorithms()) {
-        const auto cases = loader.load(algo.dataset_key);
-        for (const auto& tc : cases) {
-            out.push_back(run_one(algo, tc, false));
-            out.push_back(run_one(algo, tc, true));
+        const Tier limit = algo.max_tier < max_tier_ ? algo.max_tier : max_tier_;
+        for (const CaseSpec& spec : loader.specs(algo.dataset_key, limit)) {
+            if (spec.tier > limit) continue;
+            const TestCase tc = materialize(spec);
+            out.push_back(run_one(algo, tc, spec.tier, false));
+            out.push_back(run_one(algo, tc, spec.tier, true));
         }
     }
     return out;
