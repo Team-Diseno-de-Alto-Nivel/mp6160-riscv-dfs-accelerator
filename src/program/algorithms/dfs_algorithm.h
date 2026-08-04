@@ -12,6 +12,7 @@ namespace dfs {
 struct AlgoEntry {
     std::string name;
     std::string dataset_key;
+    Tier max_tier;
     std::function<long(const Problem&, Accelerator&)> run;
 };
 
