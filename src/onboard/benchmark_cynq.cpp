@@ -18,9 +18,12 @@
 //   iterations default: 50  (timed runs per case, after warm-up)
 //   warmup     default: 5   (untimed runs per case, discarded)
 //
-// CSV schema: the same 11 base columns as results/metrics.csv (see
+// CSV schema: the first 11 base columns of results/metrics.csv (see
 // docs/guides/metrics-schema.md), so scripts/plot_results.py reads this
-// file unmodified, plus trailing hardware-specific columns. accelerator_on
+// file unmodified, plus trailing hardware-specific columns. The base
+// schema's trailing grid_cells/tier (#109) are not emitted: this tool
+// runs the fixed on-board case fixture, not the tiered sweep.
+// accelerator_on
 // is always 1 (this tool only exercises the accelerated path -- the ON/OFF
 // contrast is a simulation-level experiment, not an on-board one, see
 // docs/paper/main.tex's experiment plan) and instruction_count is always 0
