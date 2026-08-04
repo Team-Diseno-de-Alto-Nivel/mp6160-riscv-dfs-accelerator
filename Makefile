@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream onboard-export-cases onboard-deploy onboard-fetch-metrics correlate-cost-model clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments experiments-small experiments-medium experiments-large demo hls-host hls-synth vivado-bd vivado-impl vivado-util vivado-bitstream onboard-export-cases onboard-deploy onboard-fetch-metrics correlate-cost-model metrics clean paper paper-clean
 
 all: model program
 
@@ -25,6 +25,18 @@ integration:
 experiments:
 	bash scripts/run_experiments.sh
 	python3 scripts/plot_results.py
+
+# Scalability sweep over the generated datasets (up to 2048x2048 = 4.2M cells).
+# Software-only: these grids exceed the SystemC (256x256) and HLS (64x64)
+# capacity, so there is no hardware cross-check at this scale.
+experiments-small:
+	bash scripts/run_experiments.sh small
+
+experiments-medium:
+	bash scripts/run_experiments.sh medium
+
+experiments-large:
+	bash scripts/run_experiments.sh large
 
 # Reproducible one-shot demo (Avance II video): RISC-V emulation + SystemC co-simulation.
 demo:
@@ -105,6 +117,16 @@ vivado-impl:
 	}
 	vivado -mode batch -source src/vivado/scripts/run_impl.tcl
 
+# FPGA-4 (#65): resource utilization off the impl_1 run already routed by
+# `make vivado-impl` (or `make vivado-bitstream`, which also leaves impl_1
+# routed) -- no re-synth, just a report. Requires vivado on PATH.
+vivado-util:
+	@command -v vivado >/dev/null 2>&1 || { \
+	    echo "error: vivado not found on PATH -- source Vivado's settings64.sh first"; \
+	    exit 1; \
+	}
+	vivado -mode batch -source src/vivado/scripts/report_utilization.tcl
+
 # FPGA-6 (#67): generates the on-board bitstream (.bit + .hwh) for on-board
 # bring-up (loaded via CYNQ in practice -- see src/onboard/README.md; PYNQ
 # was the original plan but is blocked on this board), fixed at 200 MHz -- see
@@ -177,6 +199,12 @@ onboard-fetch-metrics:
 # because it needs the board-dependent CSV that not everyone can regenerate.
 correlate-cost-model:
 	python3 scripts/correlate_cost_model.py
+
+# FPGA-7 (#68): capture whatever HLS/Vivado reports exist right now into
+# results/hw_metrics.csv. No tool dependency beyond awk/bash -- safe to run
+# any time, degrades to NA for stages not run yet.
+metrics:
+	./scripts/extract_hw_metrics.sh
 
 clean:
 	$(MAKE) -C src/model clean

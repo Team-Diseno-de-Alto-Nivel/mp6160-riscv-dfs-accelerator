@@ -25,6 +25,8 @@ by `dfs::report` ([src/program/harness/report.cpp](../../src/program/harness/rep
 | `visited_cells` | uint64 | cells | Distinct grid cells marked visited. |
 | `peak_stack_depth` | uint64 | entries | Maximum DFS stack depth reached. |
 | `throughput_cells_per_s` | double | cells/s | `expanded_nodes / (latency_ns × 1e-9)`. |
+| `grid_cells` | uint64 | cells | `rows × cols` of the case's grid. The x-axis of the scalability sweep. |
+| `tier` | string | — | Dataset tier: `legacy` (hand-written) or `small`/`medium`/`large` (generated). See [synthetic-datasets.md](synthetic-datasets.md). |
 
 ## Conventions
 
@@ -38,9 +40,12 @@ by `dfs::report` ([src/program/harness/report.cpp](../../src/program/harness/rep
   `results/integration_metrics.csv`; its ON rows travel through the modelled
   accelerator interface rather than the in-process reference model.
 - The on-board throughput benchmark (`src/onboard/benchmark_cynq.cpp`, #91)
-  emits the same base 11 columns at `results/onboard_metrics.csv`
+  emits the first 11 base columns at `results/onboard_metrics.csv`
   (via `make onboard-fetch-metrics`), reinterpreting some of them for
   real hardware and appending hardware-specific columns:
+  - `grid_cells` and `tier` are **not** emitted: this producer runs the
+    fixed on-board case fixture (`src/onboard/cases.json`), not the
+    tiered scalability sweep those two columns exist for.
   - `accelerator_on` is always `1` -- this producer only exercises the
     accelerated path on the KV260; the ON/OFF contrast is a
     simulation-level experiment (see the paper's experiment plan), not an
