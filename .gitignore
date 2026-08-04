@@ -14,6 +14,10 @@ demo.mp4
 *.so
 *.out
 
+# Python bytecode cache (e.g. from local syntax checks on src/pynq/*.py)
+__pycache__/
+*.pyc
+
 # CMake
 CMakeCache.txt
 CMakeFiles/
