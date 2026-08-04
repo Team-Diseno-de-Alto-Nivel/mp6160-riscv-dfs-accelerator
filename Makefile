@@ -60,9 +60,10 @@ hls-host:
 	./src/hls/build/hls_host
 
 # FPGA-6 (#67): exports the 21 golden cases to src/pynq/cases.json, packed
-# exactly as dfs_accel() expects (see kernel_io.h) -- the fixture the PYNQ
-# notebook validates on-board results against. Plain host build, no
-# Vitis/Vivado needed.
+# exactly as dfs_accel() expects (see kernel_io.h) -- the fixture the
+# on-board validator checks results against (validate_cynq.cpp; PYNQ's
+# driver.py/validate.ipynb use the same fixture but are currently blocked,
+# see src/pynq/README.md). Plain host build, no Vitis/Vivado needed.
 pynq-export-cases:
 	mkdir -p src/hls/build src/pynq
 	$(CXX) -std=c++17 $(HLS_CXXFLAGS) -Wall -Wextra -Werror \
@@ -104,10 +105,12 @@ vivado-impl:
 	}
 	vivado -mode batch -source src/vivado/scripts/run_impl.tcl
 
-# FPGA-6 (#67): generates the on-board bitstream (.bit + .hwh) for PYNQ
-# bring-up, fixed at 200 MHz -- see build_bitstream.tcl's header for why
-# that's not the 204 MHz reported as Fmax by #66. Requires vivado on PATH
-# and the project from `make vivado-bd` to already exist.
+# FPGA-6 (#67): generates the on-board bitstream (.bit + .hwh) for on-board
+# bring-up (loaded via CYNQ in practice -- see src/pynq/README.md; PYNQ was
+# the original plan but is blocked on this board), fixed at 200 MHz -- see
+# build_bitstream.tcl's header for why that's not the 204 MHz reported as
+# Fmax by #66. Requires vivado on PATH and the project from `make vivado-bd`
+# to already exist.
 # Cheap CI-only check without a license: `tclsh src/vivado/scripts/validate_build_bitstream.tcl`.
 vivado-bitstream:
 	@command -v vivado >/dev/null 2>&1 || { \
@@ -118,7 +121,9 @@ vivado-bitstream:
 
 # FPGA-6 (#67): copies the on-board deliverables to the KV260 over SSH --
 # the bitstream (from `make vivado-bitstream`, gitignored/local-only), the
-# case fixture (from `make pynq-export-cases`), and the driver/notebook.
+# case fixture (from `make pynq-export-cases`), the working CYNQ validator
+# (validate_cynq.cpp), and the PYNQ driver/notebook (currently blocked,
+# kept for when/if it becomes usable -- see src/pynq/README.md).
 #
 # KV260_HOST has NO default on purpose: this targets a shared lab board
 # where host/user/auth can change across sessions (see src/pynq/README.md)

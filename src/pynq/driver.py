@@ -1,5 +1,13 @@
 """PYNQ driver for the DFS accelerator on the KV260 (issue #67).
 
+STATUS: currently blocked on this lab's KV260 board -- PYNQ 3.x needs
+`pyxrt` (XRT's Python bindings), which isn't available here (missing from
+apt, not just unconfigured). The path that actually works today is
+validate_cynq.cpp (C++, via CYNQ: https://github.com/ECASLab/cynq) -- see
+README.md. This file is kept ready to use as-is if `pyxrt` ever becomes
+available; the register-level logic below is identical to
+validate_cynq.cpp's.
+
 Talks to the REAL AXI register map that Vitis HLS generated for dfs_accel
 (see src/hls/dfs_accel.cpp's #pragma HLS INTERFACE, and the auto-generated
 xdfs_accel_hw.h under src/vivado/dfs_system/.../drivers/ once exported) --

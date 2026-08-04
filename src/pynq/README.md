@@ -91,7 +91,11 @@ design actually needs since PS and PL share the same DDR.
 this bitstream was built for 200 MHz (`build_bitstream.tcl`, #67) -- call
 `platform->SetClocks({200.f, -1.f, -1.f, -1.f})` explicitly after
 `IHardware::Create()`, or the accelerator runs at whatever clock the PL
-happened to be left at. `validate_cynq.cpp` already does this too.
+happened to be left at. `validate_cynq.cpp` already does this, and then
+reads the clock back with `GetClocks()` and prints it -- don't just trust
+`SetClocks()` silently succeeded, confirm it. Confirmed on real hardware:
+`Clock 0 after SetClocks: 199.998 MHz` (the ~0.002 MHz gap is the same
+PLL-divisor rounding seen from Vivado itself, not an error).
 
 ## About `KV260_HOST`
 
