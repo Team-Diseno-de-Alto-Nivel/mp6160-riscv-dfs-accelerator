@@ -6,8 +6,8 @@
 // against -- a hand-written Python packer could silently diverge and give
 // a false correctness signal on real hardware.
 //
-// Plain host build, no Vitis/Vivado needed: `make pynq-export-cases`.
-// Output: src/pynq/cases.json (versioned -- unlike the bitstream, this file
+// Plain host build, no Vitis/Vivado needed: `make onboard-export-cases`.
+// Output: src/onboard/cases.json (versioned -- unlike the bitstream, this file
 // has to travel to the KV260, and it's small/text, so it's committed).
 
 #include <cstdint>

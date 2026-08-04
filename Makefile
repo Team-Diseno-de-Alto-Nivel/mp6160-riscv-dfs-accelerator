@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream pynq-export-cases pynq-deploy clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream onboard-export-cases onboard-deploy clean paper paper-clean
 
 all: model program
 
@@ -34,7 +34,7 @@ demo:
 # Compiles the same source csynth will consume against the software reference and
 # the 21 golden cases. Does NOT replace csynth/cosim (timing, AXI, RTL).
 #
-# Shared by hls-host and pynq-export-cases (#67) -- both need the kernel plus
+# Shared by hls-host and onboard-export-cases (#67) -- both need the kernel plus
 # every algorithm/case source, just with a different entry point on top.
 HLS_COMMON_SOURCES := \
 	src/hls/dfs_accel.cpp \
@@ -59,17 +59,17 @@ hls-host:
 	    -Isrc/hls -Isrc/program $(HLS_TB_SOURCES) -o src/hls/build/hls_host
 	./src/hls/build/hls_host
 
-# FPGA-6 (#67): exports the 21 golden cases to src/pynq/cases.json, packed
+# FPGA-6 (#67): exports the 21 golden cases to src/onboard/cases.json, packed
 # exactly as dfs_accel() expects (see kernel_io.h) -- the fixture the
 # on-board validator checks results against (validate_cynq.cpp; PYNQ's
 # driver.py/validate.ipynb use the same fixture but are currently blocked,
-# see src/pynq/README.md). Plain host build, no Vitis/Vivado needed.
-pynq-export-cases:
-	mkdir -p src/hls/build src/pynq
+# see src/onboard/README.md). Plain host build, no Vitis/Vivado needed.
+onboard-export-cases:
+	mkdir -p src/hls/build src/onboard
 	$(CXX) -std=c++17 $(HLS_CXXFLAGS) -Wall -Wextra -Werror \
 	    -Wno-unknown-pragmas -Wno-unused-label \
 	    -Isrc/hls -Isrc/program $(HLS_EXPORT_SOURCES) -o src/hls/build/export_cases
-	./src/hls/build/export_cases src/pynq/cases.json
+	./src/hls/build/export_cases src/onboard/cases.json
 
 # FPGA-2/2b/2c (#63/#90/#95): csim + csynth + cosim + export_design, real Vitis
 # HLS run. Requires vitis_hls on PATH (source Vitis's settings64.sh first).
@@ -106,8 +106,8 @@ vivado-impl:
 	vivado -mode batch -source src/vivado/scripts/run_impl.tcl
 
 # FPGA-6 (#67): generates the on-board bitstream (.bit + .hwh) for on-board
-# bring-up (loaded via CYNQ in practice -- see src/pynq/README.md; PYNQ was
-# the original plan but is blocked on this board), fixed at 200 MHz -- see
+# bring-up (loaded via CYNQ in practice -- see src/onboard/README.md; PYNQ
+# was the original plan but is blocked on this board), fixed at 200 MHz -- see
 # build_bitstream.tcl's header for why that's not the 204 MHz reported as
 # Fmax by #66. Requires vivado on PATH and the project from `make vivado-bd`
 # to already exist.
@@ -121,40 +121,40 @@ vivado-bitstream:
 
 # FPGA-6 (#67): copies the on-board deliverables to the KV260 over SSH --
 # the bitstream (from `make vivado-bitstream`, gitignored/local-only), the
-# case fixture (from `make pynq-export-cases`), the working CYNQ validator
+# case fixture (from `make onboard-export-cases`), the working CYNQ validator
 # (validate_cynq.cpp), and the PYNQ driver/notebook (currently blocked,
-# kept for when/if it becomes usable -- see src/pynq/README.md).
+# kept for when/if it becomes usable -- see src/onboard/README.md).
 #
 # KV260_HOST has NO default on purpose: this targets a shared lab board
-# where host/user/auth can change across sessions (see src/pynq/README.md)
+# where host/user/auth can change across sessions (see src/onboard/README.md)
 # -- a wrong silent default risks scp-ing to the wrong machine. Set up an
 # SSH config alias (e.g. `Host kria` with ProxyJump, if the board sits
 # behind a jump host) and pass that alias here, e.g.:
-#   make pynq-deploy KV260_HOST=kria
+#   make onboard-deploy KV260_HOST=kria
 KV260_HOST ?=
 KV260_DIR  ?= dfs_accel
 
-PYNQ_DEPLOY_FILES := \
+ONBOARD_DEPLOY_FILES := \
 	src/vivado/dfs_system/exports/dfs_system.bit \
 	src/vivado/dfs_system/exports/dfs_system.hwh \
-	src/pynq/cases.json \
-	src/pynq/driver.py \
-	src/pynq/validate.ipynb \
-	src/pynq/validate_cynq.cpp
+	src/onboard/cases.json \
+	src/onboard/driver.py \
+	src/onboard/validate.ipynb \
+	src/onboard/validate_cynq.cpp
 
-pynq-deploy:
+onboard-deploy:
 	@if [ -z "$(KV260_HOST)" ]; then \
-	    echo "error: set KV260_HOST=<ssh-alias-or-user@host> (e.g. make pynq-deploy KV260_HOST=kria)"; \
+	    echo "error: set KV260_HOST=<ssh-alias-or-user@host> (e.g. make onboard-deploy KV260_HOST=kria)"; \
 	    exit 1; \
 	fi
-	@for f in $(PYNQ_DEPLOY_FILES); do \
+	@for f in $(ONBOARD_DEPLOY_FILES); do \
 	    if [ ! -f "$$f" ]; then \
-	        echo "error: missing $$f -- run 'make vivado-bitstream' and/or 'make pynq-export-cases' first"; \
+	        echo "error: missing $$f -- run 'make vivado-bitstream' and/or 'make onboard-export-cases' first"; \
 	        exit 1; \
 	    fi; \
 	done
 	ssh $(KV260_HOST) 'mkdir -p $(KV260_DIR)'
-	scp $(PYNQ_DEPLOY_FILES) $(KV260_HOST):$(KV260_DIR)/
+	scp $(ONBOARD_DEPLOY_FILES) $(KV260_HOST):$(KV260_DIR)/
 
 clean:
 	$(MAKE) -C src/model clean

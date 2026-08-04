@@ -15,23 +15,16 @@ here.
 | File | From | Purpose |
 |---|---|---|
 | `validate_cynq.cpp` | hand-written | **The working on-board validator.** Loads `dfs_system.bit` via CYNQ, runs all 21 cases from `cases.json`, compares against the golden results. No JSON library dependency -- see its own header comment. |
-| `cases.json` | `make pynq-export-cases` | The 21 cases, packed exactly as `dfs_accel()` expects -- versioned in git (see its own generation comment for why) |
+| `cases.json` | `make onboard-export-cases` | The 21 cases, packed exactly as `dfs_accel()` expects -- versioned in git (see its own generation comment for why) |
 | `dfs_system.bit` / `dfs_system.hwh` | `make vivado-bitstream` | The bitstream + hardware handoff. **Not** in git -- gitignored like the rest of `src/vivado/dfs_system/`, only exists on a machine with Vivado |
 | `driver.py` / `validate.ipynb` | hand-written | The original PYNQ-based attempt. **Currently blocked** (see below) -- kept as-is, ready to use if the blocker ever clears, not deleted since none of it is wrong, just unusable on this board today. |
 
 ## End to end
 
 ```bash
-make vivado-bitstream                          # needs Vivado on PATH -- generates dfs_system.bit/.hwh (200 MHz)
-make pynq-export-cases                         # no Vivado/Vitis needed -- (re)generates cases.json
-make pynq-deploy KV260_HOST=<your-ssh-alias>   # copies bit/hwh/cases.json/driver.py/validate.ipynb to the board
-```
-
-`pynq-deploy` doesn't copy `validate_cynq.cpp` (that make target predates
-the CYNQ pivot) -- copy it separately:
-
-```bash
-scp src/pynq/validate_cynq.cpp <your-ssh-alias>:dfs_accel/
+make vivado-bitstream                             # needs Vivado on PATH -- generates dfs_system.bit/.hwh (200 MHz)
+make onboard-export-cases                         # no Vivado/Vitis needed -- (re)generates cases.json
+make onboard-deploy KV260_HOST=<your-ssh-alias>   # copies bit/hwh/cases.json/driver.py/validate.ipynb/validate_cynq.cpp to the board
 ```
 
 ### One-time setup on the board: installing CYNQ
@@ -119,7 +112,7 @@ Host kria
     ProxyJump kria-proxy
 ```
 
-Then `make pynq-deploy KV260_HOST=kria` just works, regardless of how many
+Then `make onboard-deploy KV260_HOST=kria` just works, regardless of how many
 times the underlying IP/credentials change -- only the alias's target needs
 updating.
 

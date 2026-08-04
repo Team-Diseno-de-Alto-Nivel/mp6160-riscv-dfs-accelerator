@@ -50,7 +50,7 @@ class DfsAccelDriver:
         self.ip = getattr(overlay, ip_name)
 
     def run_case(self, case: dict) -> dict:
-        """Runs one case (a dict as loaded from src/pynq/cases.json) on the
+        """Runs one case (a dict as loaded from src/onboard/cases.json) on the
         accelerator and returns the same fields the HLS cosim testbench
         (src/hls/tb/dfs_accel_tb.cpp) compares against software:
         value, expanded_nodes, visited_cells, peak_stack_depth.
