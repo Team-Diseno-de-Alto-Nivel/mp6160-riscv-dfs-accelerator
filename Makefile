@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream onboard-export-cases onboard-deploy clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream onboard-export-cases onboard-deploy onboard-fetch-metrics clean paper paper-clean
 
 all: model program
 
@@ -140,7 +140,9 @@ ONBOARD_DEPLOY_FILES := \
 	src/onboard/cases.json \
 	src/onboard/driver.py \
 	src/onboard/validate.ipynb \
-	src/onboard/validate_cynq.cpp
+	src/onboard/validate_cynq.cpp \
+	src/onboard/benchmark_cynq.cpp \
+	src/onboard/dfs_accel_case_io.h
 
 onboard-deploy:
 	@if [ -z "$(KV260_HOST)" ]; then \
@@ -155,6 +157,18 @@ onboard-deploy:
 	done
 	ssh $(KV260_HOST) 'mkdir -p $(KV260_DIR)'
 	scp $(ONBOARD_DEPLOY_FILES) $(KV260_HOST):$(KV260_DIR)/
+
+# FPGA-9 (#91): pulls the throughput benchmark's CSV back from the board --
+# onboard-deploy above is one-way (host->board); this is the missing return
+# trip. No KV260_HOST default for the same reason as onboard-deploy (shared
+# lab board, wrong silent default risks scp-ing from the wrong machine).
+onboard-fetch-metrics:
+	@if [ -z "$(KV260_HOST)" ]; then \
+	    echo "error: set KV260_HOST=<ssh-alias-or-user@host> (e.g. make onboard-fetch-metrics KV260_HOST=kria)"; \
+	    exit 1; \
+	fi
+	mkdir -p results
+	scp $(KV260_HOST):$(KV260_DIR)/benchmark_metrics.csv results/onboard_metrics.csv
 
 clean:
 	$(MAKE) -C src/model clean
