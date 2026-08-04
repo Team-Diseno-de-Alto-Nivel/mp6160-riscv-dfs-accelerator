@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream pynq-export-cases clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream pynq-export-cases pynq-deploy clean paper paper-clean
 
 all: model program
 
@@ -115,6 +115,41 @@ vivado-bitstream:
 	    exit 1; \
 	}
 	vivado -mode batch -source src/vivado/scripts/build_bitstream.tcl
+
+# FPGA-6 (#67): copies the on-board deliverables to the KV260 over SSH --
+# the bitstream (from `make vivado-bitstream`, gitignored/local-only), the
+# case fixture (from `make pynq-export-cases`), and the driver/notebook.
+#
+# KV260_HOST has NO default on purpose: this targets a shared lab board
+# where host/user/auth can change across sessions (see src/pynq/README.md)
+# -- a wrong silent default risks scp-ing to the wrong machine. Set up an
+# SSH config alias (e.g. `Host kria` with ProxyJump, if the board sits
+# behind a jump host) and pass that alias here, e.g.:
+#   make pynq-deploy KV260_HOST=kria
+KV260_HOST ?=
+KV260_DIR  ?= dfs_accel
+
+PYNQ_DEPLOY_FILES := \
+	src/vivado/dfs_system/exports/dfs_system.bit \
+	src/vivado/dfs_system/exports/dfs_system.hwh \
+	src/pynq/cases.json \
+	src/pynq/driver.py \
+	src/pynq/validate.ipynb \
+	src/pynq/validate_cynq.cpp
+
+pynq-deploy:
+	@if [ -z "$(KV260_HOST)" ]; then \
+	    echo "error: set KV260_HOST=<ssh-alias-or-user@host> (e.g. make pynq-deploy KV260_HOST=kria)"; \
+	    exit 1; \
+	fi
+	@for f in $(PYNQ_DEPLOY_FILES); do \
+	    if [ ! -f "$$f" ]; then \
+	        echo "error: missing $$f -- run 'make vivado-bitstream' and/or 'make pynq-export-cases' first"; \
+	        exit 1; \
+	    fi; \
+	done
+	ssh $(KV260_HOST) 'mkdir -p $(KV260_DIR)'
+	scp $(PYNQ_DEPLOY_FILES) $(KV260_HOST):$(KV260_DIR)/
 
 clean:
 	$(MAKE) -C src/model clean
