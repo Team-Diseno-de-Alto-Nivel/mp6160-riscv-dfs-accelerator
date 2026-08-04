@@ -11,6 +11,9 @@ set(LIB_SOURCES
     harness/accelerator.cpp
     harness/report.cpp
     cases/datasets.cpp
+    cases/generators.cpp
+    cases/oracle.cpp
+    cases/synthetic.cpp
     algorithms/dfs_algorithm.cpp
     algorithms/number_of_islands/number_of_islands.cpp
     algorithms/unique_paths_iii/unique_paths_iii.cpp
@@ -26,6 +29,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Generic")
 endif()
 
 add_executable(program ${PROGRAM_SOURCES})
+
+# crt0.S calls main without setting a0/a1, so argc/argv are garbage on bare metal.
+if(CMAKE_SYSTEM_NAME STREQUAL "Generic")
+    target_compile_definitions(program PRIVATE DFS_BARE_METAL)
+endif()
 
 # Headers are included by directory prefix, e.g. "harness/harness.h".
 target_include_directories(program PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

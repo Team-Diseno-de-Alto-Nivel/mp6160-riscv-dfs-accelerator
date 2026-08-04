@@ -8,6 +8,8 @@ namespace dfs {
 struct RunMetrics {
     std::string algorithm;
     std::string case_name;
+    std::string tier;
+    std::uint64_t grid_cells = 0;
     bool accelerator_on = false;
 
     double sim_latency_ns = 0.0;

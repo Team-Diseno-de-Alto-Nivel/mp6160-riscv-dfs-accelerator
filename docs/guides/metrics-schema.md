@@ -25,6 +25,8 @@ by `dfs::report` ([src/program/harness/report.cpp](../../src/program/harness/rep
 | `visited_cells` | uint64 | cells | Distinct grid cells marked visited. |
 | `peak_stack_depth` | uint64 | entries | Maximum DFS stack depth reached. |
 | `throughput_cells_per_s` | double | cells/s | `expanded_nodes / (latency_ns × 1e-9)`. |
+| `grid_cells` | uint64 | cells | `rows × cols` of the case's grid. The x-axis of the scalability sweep. |
+| `tier` | string | — | Dataset tier: `legacy` (hand-written) or `small`/`medium`/`large` (generated). See [synthetic-datasets.md](synthetic-datasets.md). |
 
 ## Conventions
 

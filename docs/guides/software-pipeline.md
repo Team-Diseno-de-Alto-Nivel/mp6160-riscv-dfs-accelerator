@@ -78,8 +78,12 @@ flowchart TB
 | `harness/instrumentation.h` | `Counters`, `CostModel`, `CountedStack` |
 | `harness/metrics.h` | `RunMetrics` collected per run |
 | `harness/report.{h,cpp}` | Human table + ON/OFF speedup + CSV |
-| `cases/test_case.h` | `Problem` (algorithm input) and `TestCase` (`Problem` + `expected`) |
-| `cases/datasets.cpp` | Embedded datasets + `CaseLoader` |
+| `cases/test_case.h` | `Problem` (algorithm input), `TestCase` (`Problem` + `expected`), `CaseSpec` (lazy descriptor) |
+| `cases/datasets.cpp` | Embedded hand-written datasets + `CaseLoader` |
+| `cases/grid_spec.h` | `Tier`, `Topology` and `GridSpec` (the generated-grid descriptor) |
+| `cases/generators.{h,cpp}` | Seeded PRNG + `generate_grid` for every topology |
+| `cases/synthetic.cpp` | Tiered catalog of generated cases + `materialize` |
+| `cases/oracle.{h,cpp}` | Independent reference implementations validating generated cases |
 | `dfs_types.h` | `Coord`, `Grid`, `Connectivity`, `AlgoResult` |
 
 ## Accelerator seam and modes
@@ -115,6 +119,14 @@ make program                    # build the bare-metal RISC-V ELF (src/program/b
 make run-emu                    # bare-metal ELF, run on qemu-system-riscv64 -machine virt
 make run-native                 # native host build (build-native/program), run
 make test                       # native build + ctest (driver unit test)
+```
+
+By default the program runs only the hand-written cases. `--tier=small|medium|large`
+adds the generated datasets up to that size (native build only — `crt0.S` calls
+`main` without setting `a0`/`a1`, so argc/argv are not read on bare metal):
+
+```bash
+./build-native/program --tier=large   # 272 runs, grids up to 2048x2048
 ```
 
 CI ([.github/workflows/build.yml](../../.github/workflows/build.yml)) verifies both
