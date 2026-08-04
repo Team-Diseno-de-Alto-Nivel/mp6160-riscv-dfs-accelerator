@@ -603,8 +603,46 @@ through the fine-grained primitive interface (\textit{is\_visited},
 per-primitive cost difference between the software and accelerator paths in
 the simulation's cost model, not an algorithm-dependent effect.
 
-\pend{Resource usage, Fmax, and OP/s from the Vitis HLS/Vivado synthesis on
-the Kria KV260 are in progress and will be added once available.}
+The theoretical model failed to accelerate processing on the Xilinx Kria
+KV260 board, resulting in a tenfold speed reduction due to a 90--100\%
+underestimation of latency by the cost model (Table~\ref{tab:cost_model_correlation}).
+This overhead comes from invoking the accelerator itself, not from the
+DFS computation.
+
+The cost model only considers the cost of the operations involved in the
+DFS traversal itself, not the fixed cost of calling the accelerator over
+AXI, which is register writes, the interrupt round trip and the transfer
+of the result via DMA, all of which adds up to a minimum of
+$\sim$12{,}000 ns per invocation, independent of the problem size. This
+is not a measurement error: the cost model itself was optimistic. The
+independent Vitis HLS cycle-accurate co-simulation estimate is
+128--10{,}811 cycles (640--54{,}055 ns at 200 MHz), in the same order of
+magnitude as the hardware measurement. We leave closing this gap as
+future work, which requires an additive fixed-overhead term in the cost
+model, not just retuning \texttt{cycles\_per\_op}/\texttt{clock\_period\_ns}.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\caption{Simulated (modelled) vs.\ on-board (measured) speedup.}
+\label{tab:cost_model_correlation}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{3.1cm}ccc@{}}
+\toprule
+\textbf{Problem (variant)} & \textbf{Model.} & \textbf{Meas.} & \textbf{Error} \\
+\midrule
+Number of Islands & 1.65$\times$ & 0.07$\times$ & +96.0\% \\
+Unique Paths III & 1.48$\times$ & 0.09$\times$ & +90.3\% \\
+Word Search II & 1.54$\times$ & 0.04$\times$ & +97.4\% \\
+Word Search II (no pruning) & 1.61$\times$ & 0.04$\times$ & +97.7\% \\
+Pacific Atlantic & 1.41$\times$ & 0.06$\times$ & +90.9\% \\
+Longest Increasing Path & 4.00$\times$ & 0.01$\times$ & +99.6\% \\
+Longest Increasing Path (no memo) & 4.00$\times$ & 0.02$\times$ & +99.2\% \\
+\midrule
+\textbf{Aggregate} & \textbf{1.56$\times$} & \textbf{0.10$\times$} & \textbf{+96.0\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section*{Artificial Intelligence Use Declaration}
 This paper was made with the help of generative AI tools, specifically in technical claims against the cited sources, improve the writing style, and classify information from prior state-of-the-art work. An example of the kind of prompt used is: \textit{``classify the information we provided on the 10 articles and cite them correctly according to the technique by which they improve DFS, whether traversal parallelization, memory access optimization, or hardware specialization''}. All the content, design decisions, and the final selection of references were reviewed and validated by the authors.

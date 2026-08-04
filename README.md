@@ -458,19 +458,55 @@ on-board measurement are still pending.
 
 ### Model vs hardware
 
-Not yet measured. Validates the cost model above against real cycles
-([#92](../../issues/92)).
+Validates the cost model above against real cycles ([#92](../../issues/92)).
+**The cost model is a poor predictor of absolute latency on real hardware.**
+"Speedup (modelled)" is `OFF.latency_ns / ON.latency_ns`, both from the cost
+model (`results/metrics.csv`); "Speedup (measured)" keeps that same modelled
+`OFF` (the software baseline was only ever run in simulation, see the
+Experiment Plan in [docs/paper/main.tex](docs/paper/main.tex)) and swaps `ON`
+for the real median latency measured on the KV260
+(`results/onboard_metrics.csv`, [#91](../../issues/91)). Per-problem figures
+are the geometric mean of their per-case ratios; the aggregate is
+total-OFF-time / total-ON-time. Full per-case detail in
+[`results/tables/cost_model_correlation.md`](results/tables/cost_model_correlation.md),
+reproducible with `make correlate-cost-model`
+([scripts/correlate_cost_model.py](scripts/correlate_cost_model.py)).
 
-| Problem (variant) | Speedup (modelled) | Speedup (measured) | Relative error |
+| Problem (variant) | Speedup (modelled) | Speedup (measured) | Relative error (latency) |
 |---|---:|---:|---:|
-| Number of Islands | 1.65× | _pending_ | _pending_ |
-| Unique Paths III | 1.48× | _pending_ | _pending_ |
-| Word Search II | 1.54× | _pending_ | _pending_ |
-| Word Search II (no pruning) | 1.61× | _pending_ | _pending_ |
-| Pacific Atlantic | 1.41× | _pending_ | _pending_ |
-| Longest Increasing Path | 4.00× | _pending_ | _pending_ |
-| Longest Increasing Path (no memo) | 4.00× | _pending_ | _pending_ |
-| **Aggregate** | **1.56×** | _pending_ | _pending_ |
+| Number of Islands | 1.65× | 0.07× | +96.0% |
+| Unique Paths III | 1.48× | 0.09× | +90.3% |
+| Word Search II | 1.54× | 0.04× | +97.4% |
+| Word Search II (no pruning) | 1.61× | 0.04× | +97.7% |
+| Pacific Atlantic | 1.41× | 0.06× | +90.9% |
+| Longest Increasing Path | 4.00× | 0.01× | +99.6% |
+| Longest Increasing Path (no memo) | 4.00× | 0.02× | +99.2% |
+| **Aggregate** | **1.56×** | **0.10×** | **+96.0%** |
+
+The accelerator is not slow -- the model was optimistic. On real hardware
+the measured speedup collapses to ~0.10× aggregate (i.e. slower than the
+modelled software baseline, not faster), and the cost model underestimates
+real latency by ~90-100% in every one of the 21 cases, not just the
+already-flagged `noi_all_water` gap above. The cost model
+(`latency_ns = ops * cycles_per_op * clock_period_ns`, in
+[instrumentation.h](src/program/harness/instrumentation.h)) only charges the
+DFS traversal's own operations; it never accounted for the fixed cost of
+actually invoking the accelerator -- AXI-lite register writes, the
+interrupt round trip, and the result DMA transfer, all going through a
+non-RT Linux driver. That fixed cost is a ~12,000-12,300 ns floor present
+in every one of the 21 cases regardless of problem size (even
+`lip_single`, a single operation, pays it in full), and it dwarfs the
+handful of nanoseconds to microseconds the cost model predicts for these
+problem sizes. It's not a one-off measurement artifact: the on-board
+benchmark was run twice independently with consistent results (<1%
+case-by-case difference), and a second, independent estimate -- the Vitis
+HLS cosim report (128-10,811 cycles, i.e. 640-54,055 ns at 200 MHz,
+[#90](../../issues/90)) -- lands in the same order of magnitude as the
+real measurement, not the cost model's. 21/21 cases still pass on
+hardware; the gap is in the latency *prediction*, not the accelerator's
+logic. Whether/how to recalibrate the cost model (it would need an
+additive fixed-overhead term, not just retuning `cycles_per_op`/
+`clock_period_ns`) is tracked as follow-up work, not done in #92.
 
 ---
 
