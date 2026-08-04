@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\caption{Simulated (modelled) vs.\ on-board (measured) speedup, DFS accelerator on Kria KV260.}
+\label{tab:cost_model_correlation}
+\begin{tabular}{lrrr}
+\toprule
+Problem (variant) & Speedup (modelled) & Speedup (measured) & Rel.\ error (latency) \\
+\midrule
+Number of Islands & 1.65x & 0.07x & +96.0% \\
+Unique Paths III & 1.48x & 0.09x & +90.3% \\
+Word Search II & 1.54x & 0.04x & +97.4% \\
+Word Search II (no pruning) & 1.61x & 0.04x & +97.7% \\
+Pacific Atlantic & 1.41x & 0.06x & +90.9% \\
+Longest Increasing Path & 4.00x & 0.01x & +99.6% \\
+Longest Increasing Path (no memo) & 4.00x & 0.02x & +99.2% \\
+\midrule
+\textbf{Aggregate} & \textbf{1.56x} & \textbf{0.10x} & \textbf{+96.0%} \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream onboard-export-cases onboard-deploy onboard-fetch-metrics clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream onboard-export-cases onboard-deploy onboard-fetch-metrics correlate-cost-model clean paper paper-clean
 
 all: model program
 
@@ -169,6 +169,14 @@ onboard-fetch-metrics:
 	fi
 	mkdir -p results
 	scp $(KV260_HOST):$(KV260_DIR)/benchmark_metrics.csv results/onboard_metrics.csv
+
+# FPGA-10 (#92): correlates the cost model (results/metrics.csv, `make
+# experiments`) against the real on-board latency (results/onboard_metrics.csv,
+# `make onboard-fetch-metrics`) -- per-case relative error and modelled vs.
+# measured speedup per problem. Own target, not folded into `experiments`,
+# because it needs the board-dependent CSV that not everyone can regenerate.
+correlate-cost-model:
+	python3 scripts/correlate_cost_model.py
 
 clean:
 	$(MAKE) -C src/model clean
