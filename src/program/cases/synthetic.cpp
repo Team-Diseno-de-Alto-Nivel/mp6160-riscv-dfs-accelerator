@@ -1,4 +1,5 @@
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "cases/generators.h"
@@ -184,6 +185,25 @@ std::vector<CaseSpec> synthetic_specs(const std::string& algorithm, Tier max_tie
         longest_increasing_path_specs(max_tier, out);
     if (algorithm.empty() || algorithm == "word_search_ii")
         word_search_ii_specs(max_tier, out);
+    return out;
+}
+
+std::vector<CaseSpec> CaseLoader::specs(const std::string& algorithm, Tier max_tier) const {
+    std::vector<CaseSpec> out;
+    for (TestCase& tc : load(algorithm)) {
+        CaseSpec s;
+        s.name = tc.name;
+        s.algorithm = tc.algorithm;
+        s.tier = Tier::Legacy;
+        s.connectivity = tc.input.connectivity;
+        s.start = tc.input.start;
+        s.words = std::move(tc.input.words);
+        s.expected = tc.expected;
+        s.generated = false;
+        s.grid = std::move(tc.input.grid);
+        out.push_back(std::move(s));
+    }
+    for (CaseSpec& s : synthetic_specs(algorithm, max_tier)) out.push_back(std::move(s));
     return out;
 }
 

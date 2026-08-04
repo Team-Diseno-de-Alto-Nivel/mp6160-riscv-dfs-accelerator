@@ -76,6 +76,18 @@ host stack; do not add one.
 | `RandomHeights` | random in `[0, levels)` | height maps for LIP and Pacific/Atlantic |
 | `Letters` | random over an alphabet | boards for Word Search II |
 
+## Keep `datasets.cpp` free of the generator
+
+`CaseLoader::specs()` is defined in [synthetic.cpp](../../src/program/cases/synthetic.cpp),
+not next to `CaseLoader::load()` in `datasets.cpp`, and it must stay that way.
+
+The HLS host check (`hls-host`), the PYNQ case exporter (`onboard-export-cases`)
+and the Vitis csim script ([run_hls.tcl](../../src/hls/scripts/run_hls.tcl)) all
+compile `datasets.cpp` for the 21 golden cases and nothing else. If `datasets.cpp`
+referenced `synthetic_specs`, those builds would fail to link, and the fix of
+adding the generator to their source lists would drag the PRNG, the topologies
+and the oracles into a synthesis-adjacent build that has no use for them.
+
 ## Reproducibility
 
 The PRNG is a hand-rolled xorshift64* with splitmix64 seeding
