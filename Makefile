@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-bitstream onboard-export-cases onboard-deploy clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments demo hls-host hls-synth vivado-bd vivado-impl vivado-util vivado-bitstream onboard-export-cases onboard-deploy metrics clean paper paper-clean
 
 all: model program
 
@@ -105,6 +105,16 @@ vivado-impl:
 	}
 	vivado -mode batch -source src/vivado/scripts/run_impl.tcl
 
+# FPGA-4 (#65): resource utilization off the impl_1 run already routed by
+# `make vivado-impl` (or `make vivado-bitstream`, which also leaves impl_1
+# routed) -- no re-synth, just a report. Requires vivado on PATH.
+vivado-util:
+	@command -v vivado >/dev/null 2>&1 || { \
+	    echo "error: vivado not found on PATH -- source Vivado's settings64.sh first"; \
+	    exit 1; \
+	}
+	vivado -mode batch -source src/vivado/scripts/report_utilization.tcl
+
 # FPGA-6 (#67): generates the on-board bitstream (.bit + .hwh) for on-board
 # bring-up (loaded via CYNQ in practice -- see src/onboard/README.md; PYNQ
 # was the original plan but is blocked on this board), fixed at 200 MHz -- see
@@ -155,6 +165,12 @@ onboard-deploy:
 	done
 	ssh $(KV260_HOST) 'mkdir -p $(KV260_DIR)'
 	scp $(ONBOARD_DEPLOY_FILES) $(KV260_HOST):$(KV260_DIR)/
+
+# FPGA-7 (#68): capture whatever HLS/Vivado reports exist right now into
+# results/hw_metrics.csv. No tool dependency beyond awk/bash -- safe to run
+# any time, degrades to NA for stages not run yet.
+metrics:
+	./scripts/extract_hw_metrics.sh
 
 clean:
 	$(MAKE) -C src/model clean
