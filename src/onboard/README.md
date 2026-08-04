@@ -8,13 +8,17 @@ that's issue #51 (DOC-1). This just covers the artifacts in this directory.
 [CYNQ](https://github.com/ECASLab/cynq), gets **21/21 cases matching the
 golden result on real hardware**. PYNQ (this directory's original plan --
 see below) is blocked on this board; CYNQ is the path that actually works
-here.
+here. `benchmark_cynq.cpp` (issue #91, sustained throughput) reuses the same
+setup -- see "Throughput benchmark" below. **Also confirmed working: 21/21
+cases pass, ~64,362 OP/s average (15,248-81,400 range across cases).**
 
 ## What's here
 
 | File | From | Purpose |
 |---|---|---|
 | `validate_cynq.cpp` | hand-written | **The working on-board validator.** Loads `dfs_system.bit` via CYNQ, runs all 21 cases from `cases.json`, compares against the golden results. No JSON library dependency -- see its own header comment. |
+| `benchmark_cynq.cpp` | hand-written | **Sustained-throughput benchmark (issue #91).** Same setup as `validate_cynq.cpp`, but times warm-up + repeated `Start()`/`Sync()` per case with a PS-side clock and writes a `results/metrics.csv`-compatible CSV with real latency/OP/s. See "Throughput benchmark" below. |
+| `dfs_accel_case_io.h` | hand-written (extracted from `validate_cynq.cpp`) | The `cases.json` parser, register map, and result layout shared by both `validate_cynq.cpp` and `benchmark_cynq.cpp`. |
 | `cases.json` | `make onboard-export-cases` | The 21 cases, packed exactly as `dfs_accel()` expects -- versioned in git (see its own generation comment for why) |
 | `dfs_system.bit` / `dfs_system.hwh` | `make vivado-bitstream` | The bitstream + hardware handoff. **Not** in git -- gitignored like the rest of `src/vivado/dfs_system/`, only exists on a machine with Vivado |
 | `driver.py` / `validate.ipynb` | hand-written | The original PYNQ-based attempt. **Currently blocked** (see below) -- kept as-is, ready to use if the blocker ever clears, not deleted since none of it is wrong, just unusable on this board today. |
@@ -24,7 +28,7 @@ here.
 ```bash
 make vivado-bitstream                             # needs Vivado on PATH -- generates dfs_system.bit/.hwh (200 MHz)
 make onboard-export-cases                         # no Vivado/Vitis needed -- (re)generates cases.json
-make onboard-deploy KV260_HOST=<your-ssh-alias>   # copies bit/hwh/cases.json/driver.py/validate.ipynb/validate_cynq.cpp to the board
+make onboard-deploy KV260_HOST=<your-ssh-alias>   # copies bit/hwh/cases.json/driver.py/validate.ipynb/validate_cynq.cpp/benchmark_cynq.cpp/dfs_accel_case_io.h to the board
 ```
 
 ### One-time setup on the board: installing CYNQ
@@ -88,7 +92,56 @@ happened to be left at. `validate_cynq.cpp` already does this, and then
 reads the clock back with `GetClocks()` and prints it -- don't just trust
 `SetClocks()` silently succeeded, confirm it. Confirmed on real hardware:
 `Clock 0 after SetClocks: 199.998 MHz` (the ~0.002 MHz gap is the same
-PLL-divisor rounding seen from Vivado itself, not an error).
+PLL-divisor rounding seen from Vivado itself, not an error). Both
+`validate_cynq.cpp` and `benchmark_cynq.cpp` do this.
+
+## Throughput benchmark (issue #91)
+
+`benchmark_cynq.cpp` measures sustained on-board latency/throughput for the
+21 cases, with a PS-side `std::chrono::steady_clock` timer (not a new
+hardware counter IP -- see its own header comment for why) bracketing only
+`Start()`/`Sync()`/the result read-back, after hoisting buffer setup out of
+the timed loop (per-case buffer reallocation is fine for the correctness
+check `validate_cynq.cpp` exists for, but would pollute a throughput
+number). Each case runs a few untimed warm-up iterations, then a batch of
+timed iterations; the CSV reports min/median/max/stddev latency, with the
+median used as the "sustained" figure.
+
+Build it the same way as `validate_cynq.cpp` (gotcha #1 above), just with
+the extra source file:
+
+```bash
+ssh <alias> 'cd dfs_accel && g++ -std=c++17 benchmark_cynq.cpp \
+    -I ~/cynq/include $(pkg-config --cflags --libs cynq) -I/usr/include/xrt \
+    -o benchmark_cynq'
+```
+
+Run it (also needs `sudo`, same reason as `validate_cynq.cpp`):
+
+```bash
+ssh -t <alias> 'cd dfs_accel && sudo ./benchmark_cynq dfs_system.bit cases.json'
+```
+
+Defaults: `benchmark_metrics.csv` output, 50 timed iterations, 5 warm-up
+iterations -- override with
+`./benchmark_cynq dfs_system.bit cases.json <csv_out> <iterations> <warmup>`.
+Expected output: a table of all 21 cases with median latency and sustained
+OP/s, `21/21 cases passed (on-board benchmark)`, and
+`Wrote benchmark_metrics.csv (21 rows)`.
+
+Bring the CSV back to the repo with:
+
+```bash
+make onboard-fetch-metrics KV260_HOST=<your-ssh-alias>   # -> results/onboard_metrics.csv
+```
+
+`results/onboard_metrics.csv` matches the base 11-column schema of
+`results/metrics.csv` (`docs/guides/metrics-schema.md`) plus hardware
+columns, so `scripts/plot_results.py results/onboard_metrics.csv` reads it
+unmodified. The case to look at first is `noi_all_water`: its cost-model
+latency is 0 ns (no DFS work), but on-board it costs the full grid sweep --
+that gap is the expected finding from #92 (cost model vs. measured
+hardware), not a bug.
 
 ## About `KV260_HOST`
 
