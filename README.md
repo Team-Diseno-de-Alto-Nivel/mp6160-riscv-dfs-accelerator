@@ -419,7 +419,7 @@ on-board measurement are still pending.
 | BRAM | Vivado utilization | _pending_ | [#65](../../issues/65) |
 | DSP | Vivado utilization | _pending_ | [#65](../../issues/65) |
 | Fmax (MHz) | Vivado timing closure | 204 | [#66](../../issues/66) |
-| Sustained throughput (OP/s) | on-board (PYNQ) | _pending_ | [#91](../../issues/91) |
+| Sustained throughput (OP/s) | on-board (CYNQ) | ~64,362 avg (15,248–81,400 range, 21 cases) | [#91](../../issues/91) |
 
 > HLS-estimated resources (pre-Vivado): BRAM 66 (22%), DSP 50 (4%), FF 8,601
 > (3%), LUT 23,473 (20%); estimated Fmax 285.71 MHz. Not all loop-level II
@@ -440,6 +440,21 @@ on-board measurement are still pending.
 > [`src/vivado/reports/fmax_summary.txt`](src/vivado/reports/fmax_summary.txt),
 > [`src/vivado/reports/timing_summary.rpt`](src/vivado/reports/timing_summary.rpt) (250 MHz),
 > and [`src/vivado/reports/timing_summary_204mhz.rpt`](src/vivado/reports/timing_summary_204mhz.rpt) (204 MHz).
+>
+> Sustained throughput: measured on-board at 200 MHz (`Clock 0 after
+> SetClocks: 199.998 MHz`) with `src/onboard/benchmark_cynq.cpp`, 5 warm-up
+> + 50 timed `Start()`/`Sync()` iterations per case, PS-side
+> `std::chrono` timer. Per-case latency uses the median of the 50 timed
+> samples (robust to occasional scheduling-jitter outliers on this
+> non-RT Ubuntu image); the reported 64,362 OP/s is the mean of the 21
+> per-case sustained-OP/s figures across all cases, 21/21 passing. Note
+> `noi_all_water`: 12,291 ns / 81,360 OP/s measured on real hardware vs.
+> 0 ns in the cost model (no DFS work to charge in simulation, but the
+> hardware still sweeps the full grid) -- the expected model-vs-hardware
+> gap for [#92](../../issues/92). Full per-case CSV (latency
+> min/median/max/stddev, throughput) in `results/onboard_metrics.csv`
+> (gitignored, regenerate with `make onboard-deploy && make
+> onboard-fetch-metrics KV260_HOST=<alias>`).
 
 ### Model vs hardware
 

@@ -39,3 +39,33 @@ by `dfs::report` ([src/program/harness/report.cpp](../../src/program/harness/rep
 - The co-simulation over TLM (`integration_sim`) emits the same schema at
   `results/integration_metrics.csv`; its ON rows travel through the modelled
   accelerator interface rather than the in-process reference model.
+- The on-board throughput benchmark (`src/onboard/benchmark_cynq.cpp`, #91)
+  emits the first 11 base columns at `results/onboard_metrics.csv`
+  (via `make onboard-fetch-metrics`), reinterpreting some of them for
+  real hardware and appending hardware-specific columns:
+  - `grid_cells` and `tier` are **not** emitted: this producer runs the
+    fixed on-board case fixture (`src/onboard/cases.json`), not the
+    tiered scalability sweep those two columns exist for.
+  - `accelerator_on` is always `1` -- this producer only exercises the
+    accelerated path on the KV260; the ON/OFF contrast is a
+    simulation-level experiment (see the paper's experiment plan), not an
+    on-board one.
+  - `latency_ns` is the **median of repeated real measurements** on the
+    KV260 (PS-side `std::chrono` timer around `Start()`/`Sync()`), not the
+    cost model -- same pattern as `integration_metrics.csv` substituting
+    TLM latency for the cost model, just with real hardware latency
+    instead.
+  - `instruction_count` is always `0` -- there is no cost-model
+    instrumentation inside the HLS kernel to report it from.
+  - `throughput_cells_per_s` uses the same formula as the base schema,
+    computed from the real `expanded_nodes` and measured median latency.
+  - Extra columns: `hw_clock_mhz` (PL clock confirmed via `GetClocks()`
+    after `SetClocks()`), `iterations`/`warmup_iterations` (timed vs.
+    discarded runs per case), `latency_ns_min`/`latency_ns_median`/
+    `latency_ns_max`/`latency_ns_stddev` (full latency distribution across
+    the timed iterations), and `throughput_ops_sustained`
+    (`1e9 / latency_ns_median` -- full accelerator invocations per second).
+  - `noi_all_water` is the case to check first: its cost-model `latency_ns`
+    is `0` (no DFS work), but its on-board `latency_ns` is expected to be
+    `> 0` (the full grid sweep still costs real cycles) -- that gap is the
+    expected finding for #92 (cost model vs. measured hardware), not a bug.
