@@ -508,6 +508,65 @@ logic. Whether/how to recalibrate the cost model (it would need an
 additive fixed-overhead term, not just retuning `cycles_per_op`/
 `clock_period_ns`) is tracked as follow-up work, not done in #92.
 
+### Scale sensitivity
+
+The 21 cases above top out at 25 cells, so `noi_all_water`'s ~12,000 ns gap
+raises an obvious question: does that gap shrink once there's real work to
+amortize it over? Re-ran the same comparison on 64×64 grids (4,096
+cells, the largest the kernel supports -- `kMaxRows`/`kMaxCols` in
+[`dfs_accel.h`](src/hls/dfs_accel.h)) using the generated datasets from
+[#109](../../issues/109) (`make onboard-export-cases-small` ->
+[`src/onboard/cases_small.json`](src/onboard/cases_small.json), the 21
+legacy cases plus 21 new ones; 5 `lip_rand_64_*` cases fail packing and are
+skipped, see [src/onboard/README.md](src/onboard/README.md)). Aggregate
+figures use the same total-OFF-time/total-ON-time convention as the table
+above, so they're directly comparable to it:
+
+| | Speedup (modelled) | Speedup (measured) | Latency error |
+|---|---:|---:|---:|
+| Legacy (≤25 cells) | 1.56× | 0.10× | ~97% |
+| 64×64 (4,096 cells) | 1.44× | 0.27× | 21%–83% |
+
+Measured speedup roughly triples (0.10× -> 0.27×) and the latency error
+drops sharply, confirming the fixed overhead does dilute as the problem
+grows -- best case `noi_land_64` at 21% error, worst case `word_search_ii`
+still at ~83% because its cost tracks the dictionary size, not just the
+grid. But even at the largest size the current kernel supports, measured
+speedup does not cross 1× -- the accelerator still loses to the modelled
+software baseline.
+
+### Invocation overhead breakdown
+
+Splitting an on-board invocation into its three steps (`Start()`, `Sync()`,
+result read-back -- [`src/onboard/benchmark_batch_cynq.cpp`](src/onboard/benchmark_batch_cynq.cpp),
+see [src/onboard/README.md](src/onboard/README.md) for how to run it) on
+`noi_rand_64_s1` (4,096 cells) attributes 1.7% of the time to `Start()`,
+1.1% to the DMA read-back, and 97.1% to `Sync()`. Batching the read-back
+across repeated calls (skip it on every call but the last) changes latency
+by only ~1%, ruling that out as a lever.
+
+`Sync()` dominating isn't itself surprising -- that's where the actual
+computation happens, not just interrupt overhead. To separate the two:
+using the near-zero-work case (`noi_all_water`, ~12,240 ns) as the pure
+communication floor and subtracting it from `noi_rand_64_s1`'s measured
+latency leaves ~273,000 ns attributable to computation -- roughly double
+the ~127,000 ns the cost model predicts for that same case. So there are
+two separate, additive gaps, not one: the ~12,000 ns fixed per-invocation
+cost already covered above, *and* the per-operation compute cost itself
+running slower than modelled.
+
+Both point to specific, already-evidenced hardware causes rather than open
+questions -- neither addressed in this iteration:
+
+- The kernel's top-level control interface is not pipelined (`Pipelined`
+  column, [`src/hls/reports/csynth.rpt`](src/hls/reports/csynth.rpt)), so a
+  new invocation cannot start before the previous one signals completion --
+  ruling out a software-only fix for the fixed per-call cost.
+- The same report already flags `VITIS_LOOP_465_4`/`VITIS_LOOP_338_4`
+  settling at initiation interval 16 instead of the targeted 1, due to a
+  memory dependency in the burst-read loop -- a concrete target for a
+  future HLS restructuring pass to close the per-operation gap.
+
 ---
 
 ## AI-Assisted Development

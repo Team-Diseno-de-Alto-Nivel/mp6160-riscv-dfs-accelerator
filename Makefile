@@ -1,4 +1,4 @@
-.PHONY: all model program run run-emu run-native integration experiments experiments-small experiments-medium experiments-large demo hls-host hls-synth vivado-bd vivado-impl vivado-util vivado-bitstream onboard-export-cases onboard-deploy onboard-fetch-metrics correlate-cost-model metrics clean paper paper-clean
+.PHONY: all model program run run-emu run-native integration experiments experiments-small experiments-medium experiments-large demo hls-host hls-synth vivado-bd vivado-impl vivado-util vivado-bitstream onboard-export-cases onboard-export-cases-small onboard-deploy onboard-fetch-metrics correlate-cost-model metrics clean paper paper-clean
 
 all: model program
 
@@ -60,7 +60,17 @@ HLS_COMMON_SOURCES := \
 	src/program/algorithms/pacific_atlantic/pacific_atlantic.cpp
 
 HLS_TB_SOURCES := src/hls/tb/dfs_accel_tb.cpp $(HLS_COMMON_SOURCES)
-HLS_EXPORT_SOURCES := src/hls/tools/export_cases.cpp $(HLS_COMMON_SOURCES)
+
+# export_cases.cpp (only) also needs the generated-dataset sources for its
+# optional [tier] argument (CaseLoader::specs()/materialize(), #109's
+# synthetic.cpp). Kept out of HLS_COMMON_SOURCES on purpose -- hls-host and
+# hls-synth never call into the generator/oracle code, so dragging it into
+# those builds would be scope creep for no benefit (same reasoning as the
+# fix for #109's original hls-host break: see synthetic.cpp's history).
+HLS_EXPORT_SOURCES := src/hls/tools/export_cases.cpp $(HLS_COMMON_SOURCES) \
+	src/program/cases/synthetic.cpp \
+	src/program/cases/generators.cpp \
+	src/program/cases/oracle.cpp
 
 HLS_CXXFLAGS ?= -O2
 
@@ -82,6 +92,22 @@ onboard-export-cases:
 	    -Wno-unknown-pragmas -Wno-unused-label \
 	    -Isrc/hls -Isrc/program $(HLS_EXPORT_SOURCES) -o src/hls/build/export_cases
 	./src/hls/build/export_cases src/onboard/cases.json
+
+# #92 scale-sensitivity follow-up: same fixture, plus the generated 64x64
+# cases (tier small, #109) -- see export_cases.cpp's header for why medium/
+# large aren't supported here. Exits non-zero (5 lip_rand_64_* cases fail
+# packing -- their generated heights don't fit pack_grid's expected range,
+# #109 follow-up, not fixed here) but still writes the other 42/47 cases;
+# expected, not a build failure to chase. Output kept separate from
+# cases.json (the 21-case fixture validate_cynq.cpp/benchmark_cynq.cpp check
+# against by default) so this doesn't change what those already-established
+# tools do.
+onboard-export-cases-small:
+	mkdir -p src/hls/build src/onboard
+	$(CXX) -std=c++17 $(HLS_CXXFLAGS) -Wall -Wextra -Werror \
+	    -Wno-unknown-pragmas -Wno-unused-label \
+	    -Isrc/hls -Isrc/program $(HLS_EXPORT_SOURCES) -o src/hls/build/export_cases
+	./src/hls/build/export_cases src/onboard/cases_small.json small
 
 # FPGA-2/2b/2c (#63/#90/#95): csim + csynth + cosim + export_design, real Vitis
 # HLS run. Requires vitis_hls on PATH (source Vitis's settings64.sh first).
@@ -160,10 +186,12 @@ ONBOARD_DEPLOY_FILES := \
 	src/vivado/dfs_system/exports/dfs_system.bit \
 	src/vivado/dfs_system/exports/dfs_system.hwh \
 	src/onboard/cases.json \
+	src/onboard/cases_small.json \
 	src/onboard/driver.py \
 	src/onboard/validate.ipynb \
 	src/onboard/validate_cynq.cpp \
 	src/onboard/benchmark_cynq.cpp \
+	src/onboard/benchmark_batch_cynq.cpp \
 	src/onboard/dfs_accel_case_io.h
 
 onboard-deploy:
@@ -173,7 +201,8 @@ onboard-deploy:
 	fi
 	@for f in $(ONBOARD_DEPLOY_FILES); do \
 	    if [ ! -f "$$f" ]; then \
-	        echo "error: missing $$f -- run 'make vivado-bitstream' and/or 'make onboard-export-cases' first"; \
+	        echo "error: missing $$f -- run 'make vivado-bitstream', 'make onboard-export-cases' " \
+	             "and/or 'make onboard-export-cases-small' first"; \
 	        exit 1; \
 	    fi; \
 	done

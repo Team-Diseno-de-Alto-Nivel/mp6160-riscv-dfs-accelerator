@@ -606,8 +606,8 @@ the simulation's cost model, not an algorithm-dependent effect.
 The theoretical model failed to accelerate processing on the Xilinx Kria
 KV260 board, resulting in a tenfold speed reduction due to a 90--100\%
 underestimation of latency by the cost model (Table~\ref{tab:cost_model_correlation}).
-This overhead comes from invoking the accelerator itself, not from the
-DFS computation.
+At this scale, the overhead comes from invoking the accelerator itself,
+rather than the DFS computation.
 
 The cost model only considers the cost of the operations involved in the
 DFS traversal itself, not the fixed cost of calling the accelerator over
@@ -617,9 +617,8 @@ $\sim$12{,}000 ns per invocation, independent of the problem size. This
 is not a measurement error: the cost model itself was optimistic. The
 independent Vitis HLS cycle-accurate co-simulation estimate is
 128--10{,}811 cycles (640--54{,}055 ns at 200 MHz), in the same order of
-magnitude as the hardware measurement. We leave closing this gap as
-future work, which requires an additive fixed-overhead term in the cost
-model, not just retuning \texttt{cycles\_per\_op}/\texttt{clock\_period\_ns}.
+magnitude as the hardware measurement. Closing this gap would require an additive fixed-overhead term in the
+cost model, not just retuning \texttt{cycles\_per\_op}/\texttt{clock\_period\_ns}.
 
 \begin{table}[h]
 \centering
@@ -643,6 +642,31 @@ Longest Increasing Path (no memo) & 4.00$\times$ & 0.02$\times$ & +99.2\% \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+To determine if this gap shrinks with problem size, the same test ran on
+64$\times$64 grids (4,096 cells), the largest size the kernel supports,
+instead of the small legacy cases. Measured speedup improves from
+0.10$\times$ to 0.27$\times$, and the latency error drops from
+$\sim$97\% to 21--83\%, depending on the problem. The fixed overhead
+does shrink as the problem grows, but even at the largest size the
+hardware supports, it still does not beat the software baseline.
+
+Splitting an invocation into its three steps -- start, wait, and read
+the result back -- shows the wait step takes 97.1\% of the time; start
+and read-back are 1.7\% and 1.1\%. Batching the read-back step barely
+changes latency (1.4\%), so that is not the cause. The wait step is not
+wasted time, though: part of it is real computation. Using the case
+with almost no work as a baseline ($\sim$12,240 ns), the leftover
+computation time for the 4,096-cell case is $\sim$273,000 ns -- about
+double what the cost model predicts. So there are two separate gaps: a
+fixed cost per call and a slower-than-expected computation itself.
+
+Both are specific hardware causes, not open-ended questions. The kernel
+can't start a new run until the current one is finished, so the issue
+can't be fixed in software alone. The synthesis report alone already
+shows two loops running 16 times slower than intended due to a memory
+access pattern, a clear target for future work. Neither is fixed in
+this iteration.
 
 \section*{Artificial Intelligence Use Declaration}
 This paper was made with the help of generative AI tools, specifically in technical claims against the cited sources, improve the writing style, and classify information from prior state-of-the-art work. An example of the kind of prompt used is: \textit{``classify the information we provided on the 10 articles and cite them correctly according to the technique by which they improve DFS, whether traversal parallelization, memory access optimization, or hardware specialization''}. All the content, design decisions, and the final selection of references were reviewed and validated by the authors.

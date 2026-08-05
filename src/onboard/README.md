@@ -143,6 +143,47 @@ latency is 0 ns (no DFS work), but on-board it costs the full grid sweep --
 that gap is the expected finding from #92 (cost model vs. measured
 hardware), not a bug.
 
+## Scale sensitivity and overhead breakdown (issue #92 follow-up)
+
+Two follow-up questions once #92 found the cost model badly underestimates
+real latency: does the gap shrink on bigger problems, and which part of an
+invocation is actually expensive? See the README's "Model vs hardware"
+section for the numbers; this section is only the on-board tooling.
+
+**Bigger cases.** `make onboard-export-cases-small` (Makefile) exports
+`cases_small.json`: the 21 legacy cases plus 21 generated 64x64 ones (#109's
+tier `small`, the largest the kernel supports -- `kMaxRows`/`kMaxCols` in
+`dfs_accel.h`). 5 `lip_rand_64_*` cases fail packing (their generated
+heights don't fit `pack_grid`'s expected range) and are skipped; the target
+still writes the other 42/47. Deploy and run it exactly like `cases.json`
+above, just pointing at the new file:
+
+```bash
+ssh -t <alias> 'cd dfs_accel && sudo ./benchmark_cynq dfs_system.bit cases_small.json benchmark_metrics_small.csv'
+```
+
+**Overhead breakdown.** `benchmark_batch_cynq.cpp` repeats a single named
+case (positional argument, e.g. `noi_rand_64_s1`) 50 times and reports three
+numbers: the per-call latency measured the normal way; the same, but
+skipping the result DMA read-back on every call except the last (isolates
+whether batching read-backs helps -- it doesn't, ~1% difference); and a
+per-step breakdown of `Start()` vs.\ `Sync()` vs.\ the DMA read-back, since
+`Sync()` alone accounts for ~97% of the time (expected -- that's where the
+actual computation happens, not just interrupt overhead). Build and run it
+the same way as `benchmark_cynq.cpp`:
+
+```bash
+ssh -t <alias> 'cd dfs_accel && g++ -std=c++17 benchmark_batch_cynq.cpp \
+    -I ~/cynq/include $(pkg-config --cflags --libs cynq) -I/usr/include/xrt \
+    -o benchmark_batch_cynq'
+ssh -t <alias> 'cd dfs_accel && sudo ./benchmark_batch_cynq dfs_system.bit cases_small.json noi_rand_64_s1'
+```
+
+No `make` target pulls either CSV back automatically (unlike
+`onboard-fetch-metrics`) -- both are exploratory, one-off diagnostics, not
+part of the regular metrics pipeline; copy them back with a plain `scp` if
+you want to keep the raw numbers.
+
 ## About `KV260_HOST`
 
 This board sits behind a jump host and its own SSH login on a shared lab

@@ -1,5 +1,5 @@
-// Exports the 21 golden cases to JSON for on-board validation from PYNQ
-// (issue #67). Reuses the exact packing/config logic already proven by the
+// Exports golden cases to JSON for on-board validation from PYNQ (issue
+// #67). Reuses the exact packing/config logic already proven by the
 // cosim testbench (kernel_io.h, shared with tb/dfs_accel_tb.cpp) instead of
 // re-deriving it in Python, so the grid/words bytes and the mode/flags for
 // each case are guaranteed to match what dfs_accel() was actually cosim'd
@@ -9,6 +9,16 @@
 // Plain host build, no Vitis/Vivado needed: `make onboard-export-cases`.
 // Output: src/onboard/cases.json (versioned -- unlike the bitstream, this file
 // has to travel to the KV260, and it's small/text, so it's committed).
+//
+// Optional [tier] argument (default legacy): also export the generated
+// datasets up to that tier (#109's synthetic.cpp), intersected with each
+// algorithm's own max_tier the same way Harness::run_all() does (harness.cpp)
+// -- skipping that intersection let a 64x64 no-memo longest-increasing-path
+// case slip through once and hang (unbounded exponential search on a long
+// gradient path). small (64x64) is the largest tier the HLS kernel can hold
+// (kMaxRows/kMaxCols = 64, dfs_accel.h); medium/large exceed it and aren't
+// supported here. `make onboard-export-cases-small` -> cases_small.json,
+// used by #92's scale-sensitivity follow-up (see README.md).
 
 #include <cstdint>
 #include <cstdio>
@@ -54,9 +64,26 @@ void write_int_array(std::FILE *f, const std::vector<T> &values) {
 }  // namespace
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        std::fprintf(stderr, "usage: %s <output.json>\n", argv[0]);
+    if (argc < 2 || argc > 3) {
+        std::fprintf(stderr, "usage: %s <output.json> [tier=legacy|small]\n", argv[0]);
         return 1;
+    }
+
+    // small (64x64) is the largest tier the HLS kernel can hold (kMaxRows/
+    // kMaxCols = 64, see dfs_accel.h); medium/large exceed it, so exporting
+    // them here would silently hand the board a fixture it can't run.
+    dfs::Tier tier = dfs::Tier::Legacy;
+    if (argc == 3) {
+        const std::string t = argv[2];
+        if (t == "legacy") {
+            tier = dfs::Tier::Legacy;
+        } else if (t == "small") {
+            tier = dfs::Tier::Small;
+        } else {
+            std::fprintf(stderr, "export_cases: unsupported tier '%s' (use legacy|small)\n",
+                         t.c_str());
+            return 1;
+        }
     }
 
     std::FILE *f = std::fopen(argv[1], "w");
@@ -80,7 +107,15 @@ int main(int argc, char **argv) {
             continue;
         }
 
-        for (const dfs::TestCase &tc : loader.load(algo.dataset_key)) {
+        // Intersect with the algorithm's own cap (exponential variants like
+        // longest_increasing_path_nomemo are pinned to Legacy) -- same rule
+        // Harness::run_all() applies (harness.cpp). Skipping this let a
+        // 64x64 no-memo LIP case slip through and hang (unbounded exponential
+        // search on a long gradient path).
+        const dfs::Tier limit = algo.max_tier < tier ? algo.max_tier : tier;
+        for (const dfs::CaseSpec &spec : loader.specs(algo.dataset_key, limit)) {
+            if (spec.tier > limit) continue;
+            const dfs::TestCase tc = dfs::materialize(spec);
             ++total;
 
             std::vector<dfs_hls::cell_t> grid;
