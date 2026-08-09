@@ -668,6 +668,35 @@ shows two loops running 16 times slower than intended due to a memory
 access pattern, a clear target for future work. Neither is fixed in
 this iteration.
 
+Table~\ref{tab:resource_utilization} reports the post-implementation
+resource usage on the KV260 (Vivado, 200~MHz operating frequency). The
+accelerator uses a modest share of the fabric -- under 13\% of any
+resource class -- leaving headroom for the memory-access fix identified
+above. Timing closes with positive slack at 204~MHz (WNS +0.084~ns),
+which is the demonstrated maximum rather than the 200~MHz operating
+point used on-board, where the sustained throughput averages
+64{,}362~OP/s across the 21 cases (15{,}248--81{,}400 range).
+
+\begin{table}[h]
+\centering
+\footnotesize
+\caption{Post-implementation resource utilization and throughput on the KV260 (Vivado).}
+\label{tab:resource_utilization}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+LUT & 11{,}774 / 117{,}120 (10.05\%) \\
+FF & 12{,}276 / 234{,}240 (5.24\%) \\
+BRAM (36Kb tiles) & 18 / 144 (12.50\%) \\
+DSP & 50 / 1{,}248 (4.01\%) \\
+Fmax & 204~MHz (WNS +0.084~ns) \\
+Sustained throughput & 64{,}362~OP/s avg (15{,}248--81{,}400 range, 21 cases) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Conclusions and Future Work}
 
 This work presented a hardware accelerator for Depth-First Search over 2D
