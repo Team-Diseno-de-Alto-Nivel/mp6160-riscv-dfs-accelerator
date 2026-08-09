@@ -406,21 +406,25 @@ only the adversarial topologies exercise this dimension at all.
 
 ### Hardware (Vitis HLS → Vivado, Kria KV260)
 
-First HLS synthesis numbers available ([#90](../../issues/90)); Vivado
-timing closure is done ([#66](../../issues/66)). Resource utilization and
-on-board measurement are still pending.
+HLS synthesis, Vivado resource utilization, timing closure, and on-board
+throughput measurement are all done ([#90](../../issues/90),
+[#65](../../issues/65), [#66](../../issues/66), [#91](../../issues/91)).
 
 | Metric | Source | Value | Issue |
 |---|---|---:|---|
 | Latency (cycles, min/avg/max) | Vitis HLS cosim (`dfs_accel_cosim.rpt`) | 128 / 1,381 / 10,811 | [#90](../../issues/90) |
 | Initiation interval (II, worst case) | Vitis HLS `csynth.rpt` | 16 (`VITIS_LOOP_465_4`) | [#90](../../issues/90) |
-| LUT | Vivado utilization | _pending_ | [#65](../../issues/65) |
-| FF | Vivado utilization | _pending_ | [#65](../../issues/65) |
-| BRAM | Vivado utilization | _pending_ | [#65](../../issues/65) |
-| DSP | Vivado utilization | _pending_ | [#65](../../issues/65) |
+| LUT | Vivado utilization | 11,774 / 117,120 (10.05%) | [#65](../../issues/65) |
+| FF | Vivado utilization | 12,276 / 234,240 (5.24%) | [#65](../../issues/65) |
+| BRAM (36Kb tiles) | Vivado utilization | 18 / 144 (12.50%) | [#65](../../issues/65) |
+| DSP | Vivado utilization | 50 / 1,248 (4.01%) | [#65](../../issues/65) |
 | Fmax (MHz) | Vivado timing closure | 204 | [#66](../../issues/66) |
 | Sustained throughput (OP/s) | on-board (CYNQ) | ~64,362 avg (15,248–81,400 range, 21 cases) | [#91](../../issues/91) |
 
+> Post-implementation resource usage from
+> [`system_wrapper_utilization_placed.rpt`](src/vivado/dfs_system/dfs_system.runs/impl_1/system_wrapper_utilization_placed.rpt)
+> (Vivado v2024.1, device xck26-sfvc784-2LV-c).
+>
 > HLS-estimated resources (pre-Vivado): BRAM 66 (22%), DSP 50 (4%), FF 8,601
 > (3%), LUT 23,473 (20%); estimated Fmax 285.71 MHz. Not all loop-level II
 > targets were met during synthesis (`VITIS_LOOP_465_4` and `VITIS_LOOP_338_4`
