@@ -182,7 +182,7 @@ Their contribution proves that the forward-backtracking loop—the heart of back
 \textit{datapath} with substantial gains. However, these designs address domains whose data structures and pruning logic differ from traversal on 2D arrays.
 
 
-\subsection{Strengths and Weaknesses of SOTA Solutions}
+\subsection{Strengths and Weaknesses of State-of-the-Art (SOTA) Solutions}
 
 Table~\ref{tab:sota_fortalezas} summarizes, by line of attack, the
 strengths and weaknesses identified in Section~II, along with the
@@ -201,9 +201,10 @@ structures as our DFS traversal.
 
 \begin{table*}[t]
 \centering
+\footnotesize
 \caption{Strengths, weaknesses, and viability of SOTA solutions, by line of attack.}
 \label{tab:sota_fortalezas}
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.0}
 \begin{tabular}{@{}p{2.6cm}p{0.9cm}p{4.6cm}p{4.6cm}p{4.0cm}@{}}
 \toprule
 \textbf{Line} & \textbf{Refs.} & \textbf{Strengths} & \textbf{Weaknesses / not viable when\ldots} & \textbf{Viable when\ldots} \\
@@ -211,51 +212,39 @@ structures as our DFS traversal.
  
 Traversal parallelization (CPU+GPU)
 & \cite{futuhi2025}, \cite{naumov2017}, \cite{yuan2024}
-& Extracts task parallelism from sequential algorithms, achieving order-of-magnitude gains in bounded DFS and up to 6$\times$ in CUDA. It also mitigates load imbalance between asymmetric branches.
-& Demands a hybrid CPU+GPU platform, ruling out isolated embedded cores. It is also inefficient if the state space is a regular 2D matrix, as it requires the complexity of general graphs or puzzles.
-& A GPU is available and the domain requires a general graph or a complex space with a costly metric. \\
- 
+& Order-of-magnitude gains in bounded DFS; up to 6$\times$ in CUDA. Mitigates load imbalance between branches.
+& Needs a CPU+GPU platform, ruling out embedded cores; inefficient on regular 2D matrices.
+& A GPU is available and the domain needs a general graph or a costly-metric space. \\
+
 Memory optimization and locality
 & \cite{giorgi2023}, \cite{dann2021}
-& Pinpoints the memory bottlenecks that bloat traversal costs, such as locality or repeated transfers. Plus, Giorgi's multi-FPGA setup beats equivalent CPU/GPUs when the graph saturates a single chip.
-& Dann's work is a theoretical analysis lacking a real hardware proposal. Meanwhile, Giorgi's solution drops in efficiency due to inter-FPGA traffic if the graph overflows. Both target iterative methods like PageRank on sparse graphs, discarding DFS on dense matrices.
-& The graph is massive, exceeds a single FPGA's capacity, and the algorithm follows an iterative PageRank-like pattern. \\ 
- 
+& Identifies key memory bottlenecks; Giorgi's multi-FPGA setup beats CPU/GPUs past one chip's capacity.
+& Dann has no hardware proposal; Giorgi loses efficiency past capacity. Both target sparse, PageRank-like methods, not dense DFS.
+& The graph exceeds one FPGA's capacity and the algorithm is iterative, PageRank-like. \\
+
 Specialization in reconfigurable hardware (Huffman/SAT)
 & \cite{mukherji2025}, \cite{article}, \cite{microsoftsat}
-& Proves that moving the backtracking loop to dedicated hardware speeds up the process significantly, hitting 5 to 16$\times$ over software while consuming very few LUTs in SAT and Huffman.
-& The DFS engine is completely fused with the internal domain logic. Due to this rigidity, you cannot separate it to use it as a generic search engine in other applications.
-& The problem is restricted to compression or SAT solvers where the structures and discard rules are already fixed out of the box. \\ 
- 
+& 5--16$\times$ over software with minimal LUTs, in SAT and Huffman.
+& DFS engine fused with domain logic; cannot reuse it as a generic search engine.
+& The problem is fixed to compression or SAT, with rules known upfront. \\
+
 RISC-V ISA extension for graphs
 & \cite{yenimol2022}, \cite{tang2022gpgcn}
-& Allows programming via custom instructions without losing speed. GPGCN delivers unbeatable speedups of 1001$\times$ over standard CPUs and 267$\times$ against vector extensions using the Cora dataset.
-& Yenimol's work is a paper without a real chip or empirical. GPGCN is restricted to sparse matrices in CSR format, straying completely from the push/pop stack behavior of a DFS.
-& It works strictly as a proof of concept that modifying the RISC-V ISA speeds up complex operations, but it fails as a direct alternative to compete against a matrix DFS. \\
- 
+& Custom instructions without losing speed; GPGCN hits 1001$\times$ over CPUs, 267$\times$ over vector extensions (Cora).
+& Yenimol has no chip or empirical data; GPGCN is CSR-only, unlike a DFS stack.
+& Proof of concept that ISA changes help, but not a direct DFS alternative. \\
+
 Connected component labeling (CCL/CCA) on FPGA
 & \cite{bailey2022unionretire}, \cite{kowalczyk2021ccl4k}, \cite{appiah2008runlength}
-& Optimizes the classic flood fill in binary matrices using minimal hardware. Thus, Union-Retire cuts memory by 36\,\%, Kowalczyk's design handles 4K video at a real 60~fps, and Run-Length speeds up labeling over software.
-& They only do a single raster pass. With no real stack or backtracking to undo steps, they fall short for the DFS we need here. On top of that, Union-Retire needs more logic and Kowalczyk struggles when several merges happen at once.
-& The matrix is strictly binary and can be solved with a single linear sweep, eliminating the need for stacks or return paths. \\ 
- 
+& Minimal-hardware flood fill: Union-Retire cuts memory 36\,\%, Kowalczyk hits 4K/60~fps, Run-Length beats software.
+& Single raster pass, no stack or backtracking; Union-Retire needs more logic, Kowalczyk struggles with concurrent merges.
+& The matrix is strictly binary and solvable in one linear sweep. \\
+
 Sparse graph accelerators on FPGA with HBM
 & \cite{li2024scalabfs2}
-& Pushes BFS as far as it can go by using HBM channels through a multi-layer crossbar. ScalaBFS2 reaches 56.92~GTEPS on an XCU280 chip, three times its predecessor and on par with high-end GPUs while using half the bandwidth.
-& Requires expensive, prohibitive HBM boards, far from the course's KV260. Also, its logic is tailored for sparse BFS, not the matrix DFS of this project. Its crossbar scales quadratically, so a dense matrix would drain the LUTs fast.
-& The budget allows HBM hardware and the real bottleneck lies in random access over massive sparse graphs processed vertex by vertex. \\
- 
-High-performance, energy-efficient accelerator for graph analytics
-& \cite{ham2016graphicionado}
-& Puts memory closer to the processing to waste less energy. With fewer trips out to external memory, it beats regular CPUs and GPUs on efficiency by a wide margin.
-& Targets massive sparse graphs. Because of this, if you try to apply it to moderate 2D matrices, the hardware complexity and memory demands turn into an unnecessary burden.
-& Ideal when external memory traffic chokes the system and the absolute priority is squeezing every watt of power to the max. \\
- 
-Large-scale graph processing on multi-FPGA architectures
-& \cite{dai2017foregraph}
-& Splits the graph so the work is shared across several FPGAs and performance does not stall on a single chip, this entails load balancing and managing inter-chip communication.
-& Synchronizing multiple FPGAs can be complex, often leading to the decision to forgo it when working with embedded systems or low-cost boards.
-& It is specific to a setup where there is a multi-FPGA hardware and the graph overflows any single chip on the market. \\
+& HBM crossbar pushes BFS to 56.92~GTEPS, 3$\times$ its predecessor, matching high-end GPUs at half the bandwidth.
+& Needs costly HBM boards, unlike the KV260; tailored for sparse BFS; crossbar scales quadratically on dense matrices.
+& HBM budget available and the bottleneck is random access over massive sparse graphs. \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -463,7 +452,7 @@ accelerator on the FPGA were collected, including:
 \end{itemize}
 
 A metric-by-metric comparison of the two runs quantifies the gain provided by
-the accelerator. The model is implemented in SystemC 2.3.4 with TLM 2.0, and the
+the accelerator. The model is implemented in SystemC 2.3.4 with TLM~2.0, and the
 software is compiled with \texttt{riscv64-unknown-elf-gcc/g++}. The hardware generation strategy and target platform are detailed in
 Section~III.
 
@@ -504,7 +493,7 @@ Two patterns stand out. First, \textit{Number of Islands} gains more from the
 accelerator on denser, more fragmented grids (checkerboard, 1.60--1.97$\times$)
 than on a single connected region (1.39--1.47$\times$): the more islands the
 multi-source scan has to restart from, the more of the traversal's
-visited/neighbour bookkeeping the controller takes over from the software.
+visited/neighbor bookkeeping the controller takes over from the software.
 Second, \textit{Longest Increasing Path} shows an exact, constant
 4$\times$ speedup regardless of memoization. That problem is driven entirely
 through the fine-grained primitive interface (\textit{is\_visited},
@@ -512,7 +501,7 @@ through the fine-grained primitive interface (\textit{is\_visited},
 per-primitive cost difference between the software and accelerator paths in
 the simulation's cost model, not an algorithm-dependent effect.
 
-The theoretical model failed to accelerate processing on the Xilinx Kria
+The theoretical model failed to accelerate processing on the AMD Kria
 KV260 board, resulting in a tenfold speed reduction due to a 90--100\%
 underestimation of latency by the cost model (Table~\ref{tab:cost_model_correlation}).
 At this scale, the overhead comes from invoking the accelerator itself,
@@ -571,8 +560,8 @@ double what the cost model predicts. So there are two separate gaps: a
 fixed cost per call and a slower-than-expected computation itself.
 
 Both are specific hardware causes, not open-ended questions. The kernel
-can't start a new run until the current one is finished, so the issue
-can't be fixed in software alone. The synthesis report alone already
+cannot start a new run until the current one is finished, so the issue
+cannot be fixed in software alone. The synthesis report alone already
 shows two loops running 16 times slower than intended due to a memory
 access pattern, a clear target for future work. Neither is fixed in
 this iteration.
