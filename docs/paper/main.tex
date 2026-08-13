@@ -43,9 +43,21 @@ work proposes to optimize DFS algorithms over 2D matrices using a RISC-V
 processor with hardware acceleration, modeled at a high level in SystemC to
 enable early architectural exploration. Based on the analysis of several DFS
 problems, the dominant computation pattern is identified as a candidate for
-specialization, and an experimental methodology is outlined to contrast the
-solution against a baseline RISC-V execution in terms of throughput, latency,
-and resource usage.
+specialization. The resulting accelerator is modeled in SystemC/TLM~2.0 and
+synthesized to RTL for an AMD Kria KV260 through Vitis HLS. Across five
+representative DFS problems and their variants (21 cases), the accelerator
+matches the RISC-V software baseline exactly, confirming its functional
+correctness, while the SystemC-level cost model predicts a
+1.33$\times$--4.00$\times$ speedup. On the real board, however, the
+accelerator does not yet beat the software baseline: measured speedup ranges
+from 0.01$\times$ to 0.27$\times$, improving with problem size but never
+crossing 1$\times$ at the largest supported grid. An independent,
+cycle-accurate co-simulation confirms this gap is real and traces it to two
+causes external to the DFS logic: a $\sim$12{,}000~ns fixed overhead per
+invocation over AXI/DMA, and a memory access pattern that runs two
+synthesized loops 16$\times$ slower than intended. The accelerator itself
+uses under 13\% of the FPGA fabric and closes timing at 204~MHz, leaving room
+to close this gap in future work.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -106,7 +118,7 @@ A common approach is to find independent tasks that can be executed in multiple 
 propose a CPU-GPU framework for cost-bounded DFS that separates the search and 
 heuristic evaluation phases, groups evaluations into batches, and distributes subtree 
 among asynchronous workers. Running the heuristic checks in GPU batches makes cost-bounded DFS tens of times
-faster than doing them one at a time, on problems like the Rubiks Cube and the
+faster than doing them one at a time, on problems like the Rubik's Cube and the
 sliding-tile puzzle \cite{futuhi2025}. 
 
 Their approach suggests that the phases of a DFS can be separated and distributed, 
@@ -114,14 +126,14 @@ an idea we reuse when offloading the computation to hardware.
 Naumov \textit{et al.} approach the problem from the perspective of 
 graph structure. They present an efficient parallel algorithm that traverses a directed 
 acyclic graph in a manner similar to BFS—up to three times—to obtain the preorder, postorder, 
-and parent relationships for each node. Their CUDA implementation achieves up to a 6x 
+and parent relationships for each node. Their CUDA implementation achieves up to a $6\times$ 
 speedup compared to sequential DFS on a CPU\cite{naumov2017}. 
 
 This work provides us with a concrete technique for extracting parallelism from a 
 traversal that is theoretically considered sequential. Yuan \textit{et al.} extend 
 this idea to subgraph matching. They organize the search into a non-blocking task 
 queue distributed across GPU warps, introduce a timeout mechanism that reassigns tasks 
-to maintain load balance, and employ dynamic memory allocation for stack spaces.\cite{yuan2024}. 
+to maintain load balance, and employ dynamic memory allocation for stack spaces~\cite{yuan2024}. 
 From this, we adopt the approach to managing load imbalance among branches of unequal 
 depth—a central problem in DFS. Taken together, these works confirm that DFS exposes 
 task-level parallelism. However, they all rely on CPU+GPU platforms and state spaces 
@@ -147,13 +159,13 @@ This work follows a philosophy similar to ours: instead of reordering vertices
 in a general graph, it specializes the datapath of a RISC-V core to execute the 
 dominant traversal pattern on 2D matrices. SeqDFS pursues the same goal through 
 software, reordering the visit sequence of vertices to improve cache efficiency 
-and reduce the cost of traversing sparse graphs. \cite{Lyu2021SeqDFS}; Both agree 
+and reduce the cost of traversing sparse graphs~\cite{Lyu2021SeqDFS}. Both agree 
 that the order of visitation is key to optimizing the traversal.
 
-Giorgi \textit{et al.} have addressed the limitation of devices internal memory: since this 
+Giorgi \textit{et al.} have addressed the limitation of devices' internal memory: since this 
 forces repeated data transfers, causing transfer time to exceed computation time, 
-he proposes dividing the graph and using a distributed multi-FPGA architecture that 
-outperforms equivalent implementations on CPUs and GPUs.\cite{giorgi2023}.
+they propose dividing the graph and using a distributed multi-FPGA architecture that 
+outperforms equivalent implementations on CPUs and GPUs~\cite{giorgi2023}.
 
 \subsection{Specialization in reconfigurable hardware}
 
@@ -167,7 +179,7 @@ loop from a SAT solver to an FPGA inference engine that stores the instance in B
 partitions the problem among several engines in parallel. The accelerator infers implications
 in 6 to 17 clock cycles and is 5 to 16 times faster than the equivalent solution in Microsoft SAT software \cite{microsoftsat}. 
 Their contribution proves that the forward-backtracking loop—the heart of backtracking—can be executed on a dedicated
-\textit{datapath} with substantial gains. However, these designs address domains whose data structures and pruning logic differ from traversal on 2D arrays
+\textit{datapath} with substantial gains. However, these designs address domains whose data structures and pruning logic differ from traversal on 2D arrays.
 
 
 \subsection{Strengths and Weaknesses of SOTA Solutions}
@@ -243,7 +255,7 @@ Large-scale graph processing on multi-FPGA architectures
 & \cite{dai2017foregraph}
 & Splits the graph so the work is shared across several FPGAs and performance does not stall on a single chip, this entails load balancing and managing inter-chip communication.
 & Synchronizing multiple FPGAs can be complex, often leading to the decision to forgo it when working with embedded systems or low-cost boards.
-& It is specific to a setup were there is a multi-FPGA hardware and the graph overflows any single chip on the market. \\
+& It is specific to a setup where there is a multi-FPGA hardware and the graph overflows any single chip on the market. \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -251,7 +263,7 @@ Large-scale graph processing on multi-FPGA architectures
 \subsection{Observed Challenges}
 From the analysis in Section II and the summary in Table I, we can pull out the main problems that pushed us to do this work. 
 The first challenge focuses on the fact that DFS parallelism is limited by contention on the shared traversal state.
-Second, traversal of 2D matrices exhibits an irregular memory access patterns, which reduces cache utilization and increases latency in the architectures. 
+Second, traversal of 2D matrices exhibits an irregular memory access pattern, which reduces cache utilization and increases latency in the architectures. 
 Third, state-of-the-art solutions focus primarily on sparse graphs, GPU acceleration, or specialized domains such as SAT or subgraph matching. 
 This limits their direct applicability to the problem of DFS on dense 2D matrices in a RISC-V-based embedded environment. 
 Taken together, these limitations highlight the absence of a specialized architecture that decouples DFS control from neighbor exploration computation, which defines the architectural gap that this work addresses in the following section.
@@ -290,11 +302,7 @@ repeated traversals.
 
 \subsubsection{DFS Controller}
 
-The DFS Controller  manages the sequence of operations of the accelerator 
-using a state machine (FSM). This controller coordinates the stages of 
-reading nodes, exploring neighbors, updating memory state, and completing the 
-traversal. In this way, the execution flow of the DFS algorithm is maintained
-without requiring intervention from the processor.
+The DFS Controller controls the operation sequence of the accelerator by a finite state machine (FSM). This controller handles the phases of reading nodes, exploring neighbors, updating the memory state and ending the traversal. This maintains the flow of execution of the DFS algorithm without intervention from the processor.
 
 \subsubsection{Neighbor Generation}
 
@@ -303,8 +311,8 @@ adjacent to the current node within the 2D matrix. For a cell at position $(x,y)
 
 \subsubsection{Stack Manager}
 
-Due to the iterative nature of the DFS algorithm, it's necessary maintain a
-record of the nodes no explored. The Stack Manager module implements this function using
+Due to the iterative nature of the DFS algorithm, it is necessary to maintain a
+record of the unexplored nodes. The Stack Manager module implements this function using
 push/pop operations, allowing the traversal order to be preserved and the internal state of the
 search to be efficiently managed.
 
@@ -318,9 +326,84 @@ and the dynamic state of the algorithm to remain independent, preventing redunda
 \subsubsection{Result Interface}
 
 Finally, when there are no more pending nodes in the stack, the controller
-terminates execution and the \textit{Result Interface} module delivers the generated 
+terminates execution and the \textit{Result Interface} module delivers the generated
 information to the host system. Depending on the application, the result
 can represent a path found, connected region, or the number of nodes explored.
+
+\subsection{Development Flow}
+
+The proposed DFS accelerator was developed following a hardware design methodology in which functional validation was prioritized. The project starts from the description of the high-level software instead of implementing the architecture directly in RTL, and is then refined into a hardware-oriented model. This development strategy reduces debugging effort and allows architectural exploration at the early stage.
+
+This development follows a refinement methodology, in which the accelerator moves forward from a software reference into a FPGA-based hardware system. Figure~\ref{fig:development_flow} illustrates the stages.
+
+
+\begin{figure}[h]
+\centering
+
+\begin{tikzpicture}[
+node distance=0.6cm,
+block/.style={
+rectangle,
+draw,
+rounded corners,
+minimum width=3.6cm,
+minimum height=0.7cm,
+align=center,
+font=\footnotesize
+},
+arrow/.style={
+-{Latex[length=2.5mm]},
+thick
+}
+]
+
+\node[block] (dfs) {DFS Algorithms (C++ Reference)};
+\node[block, below=of dfs] (systemc) {SystemC/TLM Model \\ {\scriptsize\itshape via MMIO/TLM}};
+\node[block, below=of systemc] (hls) {AMD Vitis HLS};
+\node[block, below=of hls] (vivado) {Vivado};
+\node[block, below=of vivado] (kv260) {AMD Kria KV260 \\ {\scriptsize\itshape via AXI-Lite}};
+
+\draw[arrow] (dfs) -- (systemc);
+\draw[arrow] (systemc) -- (hls);
+\draw[arrow] (hls) -- (vivado);
+\draw[arrow] (vivado) -- (kv260);
+
+\end{tikzpicture}
+
+\caption{Development flow: from a C++ reference through SystemC/TLM, HLS, and Vivado onto the KV260. The host drives the design via MMIO/TLM in simulation and via AXI-Lite once on hardware.}
+\label{fig:development_flow}
+
+\end{figure}
+
+The modeling language used during the early stages was SystemC, the main objective was to verify the behavior of the DFS architecture before moving into an RTL implementation. The use of SystemC/TLM enabled the communication model between the hardware modules and the verification of the accelerator while preserving a higher level of abstraction.
+
+SystemC also enables early design evaluation by architectural exploration and latency analysis before synthesis. This shortens the time of development and enables comparison of different approaches and design improvements.
+
+The accelerator was designed in a modular architecture, not as a complex block, to make it future hardware optimization, maintainability and scalability friendly. Each module has a specific function and communicates with the other modules of the system via interfaces. This organization offers a structure similar to a real hardware accelerator.
+
+\subsection{Accelerator Architecture}
+
+The accelerator architecture is composed of independent hardware modules controlled by a centralized DFS controller, as shown in Figure~\ref{fig:diagrama_segundo_nivel}.
+
+The communication between software and hardware accelerator is modeled through a memory-mapped register interface using Transaction-Level Modeling (TLM). From the software perspective, the accelerator behaves as a memory-mapped peripheral, while internally the SystemC model captures the interactions among the hardware modules.
+The communication scheme follows a structure similar to an AXI-Lite peripheral; the transition from the SystemC model to the FPGA implementation requires only minor architectural changes, which reduces the hardware integration effort and lets the validated model be reused during the synthesis stages.
+
+
+\subsection{Hardware Generation Strategy}
+
+Instead of using the traditional RTL design, the AMD Vitis High-Level Synthesis (HLS) tool was selected for hardware generation. This decision helps reduce development complexity and allows the hardware implementation to start from a higher-level behavioral description. After the SystemC model has been functionally validated and its timing characteristics have been analyzed, the design can be further synthesized into RTL using Vitis HLS. This enables a smoother transition from architectural modeling to hardware implementation while preserving the validated functionality.
+Using HLS also allows the application of hardware-specific optimizations, such as loop pipelining, interface generation, and resource utilization improvements without compromising code  long-term maintainability and readability.
+
+\subsection{Target Platform Selection}
+The AMD Kria KV260 was selected as the target platform because it provides a suitable environment for hardware/software co-design and FPGA-based deployment.
+The combination of programmable logic, an embedded processing system, AXI-based communication infrastructure, and native support for the AMD Vitis toolchain makes the KV260 a suitable platform for integrating and evaluating custom hardware accelerators \cite{amd_kv260_user_guide, amd_vitis_hls_user_guide}.
+Additionally, the communication architecture adopted throughout this project is compatible with the AXI-based infrastructure available on the KV260 platform \cite{arm_axi_protocol}. This compatibility simplifies the integration process and enables a direct transition from the SystemC model to the final FPGA implementation.
+
+\subsection{Hardware/Software Integration}
+
+Altogether, these design choices define a complex development methodology that ranges from the validation of algorithms, to architectural modeling, hardware synthesis and FPGA deployment.
+
+By validating the accelerator functionality and performance before generating the RTL implementation, the proposed workflow increases confidence in the correctness of the design while reducing development complexity and enabling future improvements or extensions to the architecture.
 
 \section{Results and Analysis}
 
@@ -371,7 +454,7 @@ RISC-V core, and both runs record:
 \end{itemize}
 
 Hardware-level metrics from synthesizing and implementing the
-accelerator on the FPGA will be collected, including:
+accelerator on the FPGA were collected, including:
 
 \begin{itemize}
 \item Resource usage (LUT, FF, BRAM, and DSP)
@@ -381,182 +464,8 @@ accelerator on the FPGA will be collected, including:
 
 A metric-by-metric comparison of the two runs quantifies the gain provided by
 the accelerator. The model is implemented in SystemC 2.3.4 with TLM 2.0, and the
-software is compiled with \texttt{riscv64-unknown-elf-gcc/g++}. The hardware
-implementation is carried out through high-level synthesis (HLS) with AMD Vitis
-HLS and Vivado, targeting an AMD Kria KV260 FPGA.
-
-\section{From SystemC to RTL Design Proposed}
-
-The proposed DFS accelerator was developed following a hardware design methodology in which the functional validation was prioritized. The project starts from the description of the high-level software intead of implementing the architecture directly in RTL and then it is refined it into a hardware-oriented model. This development strategy reduces debugging effort and allows architectural exploration at the early stage.
-
-\subsection{Overall Development Flow}
-
-This development follows a refinement methodology, in which the accelerator moves forward from a software reference into a FPGA-based hardware system. Figure~\ref{fig:development_flow} illustrates the stages.
-
-
-\begin{figure}[h]
-\centering
-
-\begin{tikzpicture}[
-node distance=1.2cm,
-block/.style={
-rectangle,
-draw,
-rounded corners,
-minimum width=5cm,
-minimum height=0.8cm,
-align=center
-},
-arrow/.style={
--{Latex[length=3mm]},
-thick
-}
-]
-
-\node[block] (dfs) {DFS Algorithms\\(C++ Reference)};
-
-\node[block, below=of dfs] (systemc) 
-{SystemC/TLM Model\\
-Functional + Timing Validation};
-
-\node[block, below=of systemc] (hls)
-{AMD Vitis HLS\\
-RTL Generation};
-
-\node[block, below=of hls] (vivado)
-{Vivado\\
-FPGA Integration};
-
-\node[block, below=of vivado] (kv260)
-{AMD Kria KV260};
-
-\draw[arrow] (dfs) -- (systemc);
-\draw[arrow] (systemc) -- (hls);
-\draw[arrow] (hls) -- (vivado);
-\draw[arrow] (vivado) -- (kv260);
-
-\end{tikzpicture}
-
-\caption{Progressive development flow adopted for the DFS accelerator.}
-\label{fig:development_flow}
-
-\end{figure}
-
-The modeling language used during the early stages was SystemC, the main objetive was to verify the behavior of the DFS architecture before moving into an RTL implementation. The use of SystemC/TLM enabled the communication model between the hardware modules and the verification of the accelerator while preserving a higher level of abstraction.
-
-Additionally, SystemC enables early evaluation of design by allowing latency analysis and architectural exploration before moving to the synthesis stage. This makes it possible to compare different approaches and refine the design while development time is reduced.
-
-To improve scalability, maintainability, and support future hardware optimizations, the accelerator was implemented using a modular architecture instead of a single complex block. Each module is responsible for a specific task and communicates with the rest of the system through the interfaces. This organization provides a structure similar to a real hardware accelerator.
-
-\subsection{Accelerator Architecture}
-
-The accelerator architecture is composed of independent hardware modules which are controlled by a DFS controller centralized. Figure~\ref{fig:accelerator_architecture} presents the organization of the components.
-
-\begin{figure}[h]
-\centering
-
-\begin{tikzpicture}[
-block/.style={
-rectangle,
-draw,
-rounded corners,
-minimum width=2.5cm,
-minimum height=0.9cm,
-align=center,
-font=\footnotesize
-},
-arrow/.style={
--{Latex[length=2mm]},
-thick
-}
-]
-
-\node[block] (neighbor) {Neighbor\\Generator};
-\node[block, below=0.3cm of neighbor] (stack) {Stack\\Manager};
-\node[block, below=0.3cm of stack] (visited) {Visited\\Memory};
-\node[block, below=0.3cm of visited] (grid) {Grid\\Memory};
-\node[block, below=0.3cm of grid] (result) {Result\\Interface};
-
-\node[block, left=1.5cm of visited] (controller) {DFS\\Controller};
-
-\foreach \x in {neighbor,stack,visited,grid,result}
-{
-\draw[arrow] (controller.east) -- (\x.west);
-}
-
-\end{tikzpicture}
-
-\caption{Modular architecture of the DFS hardware accelerator}
-\label{fig:accelerator_architecture}
-
-\end{figure}
-
-
-The communication between software and hardware accelerator is modeled through a memory-mapped register interface using Transaction-Level Modeling (TLM). From the software perspective, the accelerator behaves as a memory-mapped peripheral, while internally the SystemC model captures the interactions among the hardware modules.
-The communication scheme follows a structure similar to an AXI-Lite peripheral, the transition from the SystemC model to the FPGA implementation requires minor architectural changes which reduces the hardware integration and, during the synthesis stages, the validated model can be reused.
-
-
-\subsection{Hardware Generation Strategy}
-
-Instead of using the traditional RTL design, th AMD Vitis High-Level Synthesis (HLS) was selected as the hardware generation, this decision helps to reduce the development complexity and allows the hardware implementation from the higher-level behavioral. After the SystemC model has been functionally validated and its timing characteristics have been analyzed, the design can be further synthesized into RTL using Vitis HLS. This enables a smoother transition from architectural modeling to hardware implementation while preserving the validated functionality.
-Using HLS also allows the application of hardware-specific optimizations, such as loop pipelining, interface generation, and resource utilization improvements without compromising code  long-term maintainability and readability.
-
-\subsection{Target Platform Selection}
-The AMD Kria KV260 was selected as the target platform because it provides a suitable environment for hardware/software co-design and FPGA-based deployment.
-The combination of programmable logic, an embedded processing system, AXI-based communication infrastructure, and native support for the AMD Vitis toolchain makes the KV260 a suitable platform for integrating and evaluating custom hardware accelerators \cite{amd_kv260_user_guide, amd_vitis_hls_user_guide}. 
-Additionally, the communication architecture adopted throughout this project is compatible with the AXI-based infrastructure available on the KV260 platform \cite{arm_axi_protocol}. This compatibility simplifies the integration process and enables a direct transition from the SystemC model to the final FPGA implementation.
-
-\subsection{Hardware/Software Integration}
-\begin{figure}[h]
-\centering
-
-\begin{tikzpicture}[
-node distance=1.2cm,
-block/.style={
-rectangle,
-draw,
-rounded corners,
-minimum width=5cm,
-minimum height=0.8cm,
-align=center
-},
-arrow/.style={
--{Latex[length=3mm]},
-thick
-}
-]
-
-\node[block] (app)
-{Bare-metal Application\\
-(RISC-V / Host)};
-
-\node[block, below=of app] (acc)
-{DFS Accelerator\\
-(SystemC Model)};
-
-\node[block, below=of acc] (rtl)
-{RTL Accelerator};
-
-\node[block, below=of rtl] (fpga)
-{AMD Kria KV260 FPGA};
-
-
-\draw[arrow] (app) -- node[right]{MMIO / TLM} (acc);
-\draw[arrow] (acc) -- node[right]{HLS} (rtl);
-\draw[arrow] (rtl) -- node[right]{AXI-Lite} (fpga);
-
-
-\end{tikzpicture}
-
-\caption{Hardware/software integration flow.}
-\label{fig:hw_sw_integration}
-
-\end{figure}
-
-Overall, these design decisions establish a structured development methodology that progresses from algorithm validation to architectural modeling, hardware synthesis and FPGA deployment.
-
-By validating the accelerator functionality and performance before generating the RTL implementation, the proposed workflow increases confidence in the correctness of the design while reducing development complexity and enabling future improvements or extensions to the architecture.
-
+software is compiled with \texttt{riscv64-unknown-elf-gcc/g++}. The hardware generation strategy and target platform are detailed in
+Section~III.
 
 \subsection{Preliminary Results}
 
@@ -725,7 +634,7 @@ e.g. by batching multiple DFS calls per invocation to amortize the fixed
 AXI/DMA cost.
 
 \section*{Artificial Intelligence Use Declaration}
-This paper was made with the help of generative AI tools, specifically in technical claims against the cited sources, improve the writing style, and classify information from prior state-of-the-art work. An example of the kind of prompt used is: \textit{``classify the information we provided on the 10 articles and cite them correctly according to the technique by which they improve DFS, whether traversal parallelization, memory access optimization, or hardware specialization''}. All the content, design decisions, and the final selection of references were reviewed and validated by the authors.
+This paper was made with the help of generative AI tools, specifically to check technical claims against the cited sources, improve the writing style, and classify information from prior state-of-the-art work. An example of the kind of prompt used is: \textit{``classify the information we provided on the 10 articles and cite them correctly according to the technique by which they improve DFS, whether traversal parallelization, memory access optimization, or hardware specialization''}. All the content, design decisions, and the final selection of references were reviewed and validated by the authors.
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
