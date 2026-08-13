@@ -302,11 +302,7 @@ repeated traversals.
 
 \subsubsection{DFS Controller}
 
-The DFS Controller  manages the sequence of operations of the accelerator 
-using a state machine (FSM). This controller coordinates the stages of 
-reading nodes, exploring neighbors, updating memory state, and completing the 
-traversal. In this way, the execution flow of the DFS algorithm is maintained
-without requiring intervention from the processor.
+The DFS Controller controls the operation sequence of the accelerator by a finite state machine (FSM). This controller handles the phases of reading nodes, exploring neighbors, updating the memory state and ending the traversal. This maintains the flow of execution of the DFS algorithm without intervention from the processor.
 
 \subsubsection{Neighbor Generation}
 
@@ -381,9 +377,9 @@ thick
 
 The modeling language used during the early stages was SystemC, the main objective was to verify the behavior of the DFS architecture before moving into an RTL implementation. The use of SystemC/TLM enabled the communication model between the hardware modules and the verification of the accelerator while preserving a higher level of abstraction.
 
-Additionally, SystemC enables early evaluation of design by allowing latency analysis and architectural exploration before moving to the synthesis stage. This makes it possible to compare different approaches and refine the design while development time is reduced.
+SystemC also enables early design evaluation by architectural exploration and latency analysis before synthesis. This shortens the time of development and enables comparison of different approaches and design improvements.
 
-To improve scalability, maintainability, and support future hardware optimizations, the accelerator was implemented using a modular architecture instead of a single complex block. Each module is responsible for a specific task and communicates with the rest of the system through the interfaces. This organization provides a structure similar to a real hardware accelerator.
+The accelerator was designed in a modular architecture, not as a complex block, to make it future hardware optimization, maintainability and scalability friendly. Each module has a specific function and communicates with the other modules of the system via interfaces. This organization offers a structure similar to a real hardware accelerator.
 
 \subsection{Accelerator Architecture}
 
@@ -405,7 +401,7 @@ Additionally, the communication architecture adopted throughout this project is 
 
 \subsection{Hardware/Software Integration}
 
-Overall, these design decisions establish a structured development methodology that progresses from algorithm validation to architectural modeling, hardware synthesis and FPGA deployment.
+Altogether, these design choices define a complex development methodology that ranges from the validation of algorithms, to architectural modeling, hardware synthesis and FPGA deployment.
 
 By validating the accelerator functionality and performance before generating the RTL implementation, the proposed workflow increases confidence in the correctness of the design while reducing development complexity and enabling future improvements or extensions to the architecture.
 
